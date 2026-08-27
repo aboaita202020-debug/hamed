@@ -1,0 +1,6 @@
+# المتطلبات الأساسية
+pyTelegramBotAPI
+python-dotenv
+requests
+# اختياري: الحزمة الرسمية لـ Anthropic (لو مستخدم)
+anthropic
