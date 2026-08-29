@@ -1,0 +1,30 @@
+name: Northflank Docker readiness
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  docker-readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t hamed-ai:ci .
+
+      - name: Run container
+        run: |
+          docker run -d --rm --name hamed-ci -p 8000:8000 \
+            -e HAMED_HOST=0.0.0.0 \
+            -e HAMED_PORT=8000 \
+            hamed-ai:ci
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:8000/health; then exit 0; fi
+            sleep 2
+          done
+          docker logs hamed-ci
+          exit 1
