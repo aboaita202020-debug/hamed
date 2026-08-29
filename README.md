@@ -1,23 +1,28 @@
-# 🤖 بوت تليجرام ذكي مبني على Claude (MVP)
+# 🤖 Hamed AI
 
-بوت تليجرام (نسخة MVP) بيستخدم Claude من Anthropic كوكيل ذكي واحد، بيحتفظ بسياق المحادثة، وقابل للتوسع لاحقًا لمشروع أكبر (قاعدة بيانات، عدة وكلاء، Dashboard... إلخ).
+Hamed is an AI commercial operating system evolving from the original Telegram/Claude MVP into a modular sales, purchasing, research, negotiation, finance, customer-service and website-assistance platform.
 
-## الملفات
-- bot.py — نقطة التشغيل (polling)
-- agent.py — طبقة الوكيل التي تتكلم مع Anthropic وتحفظ السياق
-- requirements.txt — المكتبات المطلوبة
-- .env.example — نموذج متغيرات بيئة
+## Current implementation
+- AI provider abstraction with OpenAI as the primary provider.
+- Hamed orchestration layer with conversational session memory.
+- Deterministic commercial calculations for landed cost, revenue, gross profit and margin.
+- Server-side approval primitives for high-impact actions.
+- Structured audit events.
+- Telegram MVP remains in the repository during migration.
 
-## التشغيل
-1. انسخ `.env.example` إلى `.env` واملأ المفاتيح:
-   cp .env.example .env
-2. ثبت المتطلبات:
-   pip install -r requirements.txt
-3. شغّل البوت:
-   python bot.py
-4. جرّب إرسال /start أو أي رسالة لبوتك في Telegram.
+## Security rules
+- Never commit `.env` or real API keys.
+- Research and drafting can be autonomous; purchases, payments, contracts, publishing and irreversible actions require explicit approval.
+- The model must never bypass server-side authorization.
+- Unknown commercial inputs must be presented as unknown/estimated, not invented.
 
-## ملاحظات
-- الكود يستخدم polling (سهُل للتشغيل محليًا). للـ production يفضل Webhooks.
-- احفظ مفاتيحك سرية ولا ترفع `.env` إلى GitHub.
-- للحفاظ على المحادثات بشكل دائم استخدم قاعدة بيانات (Postgres أو غيرها).
+## Local setup
+1. Copy `.env.example` to `.env` and add your credentials.
+2. Install dependencies:
+   `pip install -r requirements.txt`
+3. Run tests:
+   `pytest -q`
+4. The legacy Telegram entry point is `python bot.py` while the migration continues.
+
+## Roadmap
+See `HAMED_AI_CODEX.md` for the complete architecture, agent roles, approval policy, channels, seller website workflow, dashboard, testing strategy and production delivery phases.
