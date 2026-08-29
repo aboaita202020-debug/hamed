@@ -20,7 +20,7 @@ python3 -m venv "$APP_DIR/.venv"
 "$APP_DIR/.venv/bin/pip" install --upgrade pip
 "$APP_DIR/.venv/bin/pip" install -r "$APP_DIR/requirements.txt"
 
-mkdir -p /etc/hamed
+mkdir -p /etc/hamed "$APP_DIR/data"
 chmod 700 /etc/hamed
 
 cat >/etc/systemd/system/hamed.service <<'UNIT'
@@ -32,8 +32,10 @@ Wants=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=/opt/hamed
-EnvironmentFile=/etc/hamed/hamed.env
-ExecStart=/opt/hamed/.venv/bin/python -m app.main
+EnvironmentFile=-/etc/hamed/hamed.env
+Environment=HAMED_HOST=0.0.0.0
+Environment=HAMED_PORT=8000
+ExecStart=/opt/hamed/.venv/bin/python /opt/hamed/cloud_server.py
 Restart=always
 RestartSec=5
 NoNewPrivileges=true
