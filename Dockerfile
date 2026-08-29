@@ -8,9 +8,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 ENV PYTHONUNBUFFERED=1
-ENV HAMED_HOST=0.0.0.0
-ENV HAMED_PORT=8000
+ENV PORT=8000
 
 EXPOSE 8000
 
-CMD ["python", "cloud_server.py"]
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
