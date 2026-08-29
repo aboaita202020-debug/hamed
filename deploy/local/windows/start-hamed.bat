@@ -7,12 +7,10 @@ if not exist .venv\Scripts\python.exe (
   exit /b 1
 )
 call .venv\Scripts\activate.bat
-if exist app\main.py (
-  python app\main.py
-) else if exist main.py (
-  python main.py
+if exist local_server.py (
+  python local_server.py
 ) else (
-  echo Could not find the application entrypoint.
+  echo Could not find local_server.py.
   pause
   exit /b 1
 )
