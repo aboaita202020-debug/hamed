@@ -1,27 +1,19 @@
-"""Safe web research adapter for commercial discovery.
+"""Commercial web-research tool boundary.
 
-The model requests a search; the application returns structured evidence. Search is read-only.
+Actual search is performed by the configured OpenAI web-search tool. This module
+keeps a small, testable boundary for future non-OpenAI search providers.
 """
 from dataclasses import dataclass
-from urllib.parse import quote
-from urllib.request import Request, urlopen
-import json
 
 
 @dataclass(frozen=True)
-class SearchResult:
-    title: str
-    url: str
-    snippet: str
+class SearchRequest:
+    query: str
+    purpose: str = "commercial_research"
 
 
-def build_search_url(query: str) -> str:
-    return "https://www.google.com/search?q=" + quote(query)
-
-
-def search(query: str, timeout: int = 10) -> list[SearchResult]:
-    if not query.strip():
-        return []
-    # This adapter intentionally returns a safe placeholder until a configured
-    # search provider is enabled; it never fabricates supplier/product results.
-    return []
+def validate_request(request: SearchRequest) -> SearchRequest:
+    query = request.query.strip()
+    if not query:
+        raise ValueError("Search query cannot be empty")
+    return SearchRequest(query=query, purpose=request.purpose)
