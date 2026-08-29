@@ -9,5 +9,11 @@ openai
 # Legacy compatibility during migration
 anthropic
 
+# Voice / realtime telephony
+fastapi
+uvicorn[standard]
+twilio
+websockets
+
 # Testing
 pytest
