@@ -1,0 +1,29 @@
+name: Hamed Docker Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  docker-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Hamed image
+        run: docker build -t hamed:ci .
+
+      - name: Run health check
+        run: |
+          docker run -d --name hamed-ci -p 8000:8000 hamed:ci
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8000/health; then
+              echo
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs hamed-ci
+          exit 1
