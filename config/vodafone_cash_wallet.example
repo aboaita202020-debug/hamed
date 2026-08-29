@@ -1,0 +1,3 @@
+# Merchant Vodafone Cash wallet
+# Store the real value in your deployment Secret/Environment variable:
+# HAMED_VODAFONE_CASH_WALLET=01040900623
