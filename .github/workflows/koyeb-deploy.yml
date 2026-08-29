@@ -19,8 +19,8 @@ jobs:
         env:
           KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
         run: |
-          koyeb app init hamed \
-            --git github.com/aboaita202020-debug/hamed \
+          koyeb apps init hamed \
+            --git https://github.com/aboaita202020-debug/hamed \
             --git-branch main \
             --git-builder docker \
             --instance-type nano \
