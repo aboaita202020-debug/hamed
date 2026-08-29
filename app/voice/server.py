@@ -1,7 +1,8 @@
-"""FastAPI bridge: Twilio Media Streams <-> OpenAI Realtime.
+"""FastAPI bridge: Twilio Media Streams <-> OpenAI Realtime for Hamed.
 
-The bridge keeps API keys server-side. Twilio streams G.711 μ-law audio;
-OpenAI Realtime can consume/emit G.711 μ-law for low-latency telephony.
+Credentials remain server-side. The bridge is intentionally approval-aware:
+voice calls can qualify and sell services, but it must not make high-impact
+commitments on behalf of the owner.
 """
 import asyncio
 import json
@@ -17,12 +18,15 @@ app = FastAPI(title="Hamed Voice Sales Agent")
 VOICE_SYSTEM_PROMPT = os.environ.get(
     "HAMED_VOICE_SYSTEM_PROMPT",
     """You are Hamed AI, a professional commercial sales assistant.
-Identify yourself as an AI assistant when asked or when required by policy.
+At the beginning of an outbound call, clearly identify yourself as an AI assistant and state the business purpose of the call.
 Be warm, concise, consultative and honest. Discover the customer's needs before proposing an offer.
+For website, e-commerce, marketing, affiliate and other services, diagnose the customer's real need and propose only relevant services.
 Never invent facts about the customer's business, website, prices, results or capabilities.
 Never pressure, deceive, impersonate a human, or guarantee outcomes.
+Respect a clear request to end the call and do not repeatedly contact a person who declines.
+Do not request or expose sensitive personal data unnecessarily.
 For purchases, payments, contracts, discounts below the configured floor, or other high-impact actions, require human approval.
-Your goal is a mutually beneficial agreement and long-term customer satisfaction.""",
+Your goal is a mutually beneficial agreement, customer satisfaction and long-term commercial value.""",
 )
 
 
@@ -38,9 +42,7 @@ def twiml_for_session(session_id: str, public_base_url: str) -> str:
 
 @app.post("/voice/twiml/{session_id}")
 async def voice_twiml(session_id: str, request: Request) -> Response:
-    public_base_url = os.environ.get("PUBLIC_BASE_URL")
-    if not public_base_url:
-        public_base_url = str(request.base_url).rstrip("/")
+    public_base_url = os.environ.get("PUBLIC_BASE_URL") or str(request.base_url).rstrip("/")
     return Response(twiml_for_session(session_id, public_base_url), media_type="application/xml")
 
 
@@ -60,6 +62,22 @@ async def _send_openai_session_config(openai_ws: Any) -> None:
     }))
 
 
+async def _start_greeting(openai_ws: Any) -> None:
+    greeting = (
+        "ابدأ المكالمة بتحية قصيرة باللغة العربية المصرية، واذكر بوضوح أنك مساعد ذكاء اصطناعي "
+        "تتصل من أجل مناقشة فرصة لتحسين النشاط التجاري، ثم اسأل هل الوقت مناسب لدقيقة."
+    )
+    await openai_ws.send(json.dumps({
+        "type": "conversation.item.create",
+        "item": {
+            "type": "message",
+            "role": "user",
+            "content": [{"type": "input_text", "text": greeting}],
+        },
+    }))
+    await openai_ws.send(json.dumps({"type": "response.create"}))
+
+
 @app.websocket("/voice/stream/{session_id}")
 async def voice_stream(websocket: WebSocket, session_id: str) -> None:
     await websocket.accept()
@@ -77,6 +95,7 @@ async def voice_stream(websocket: WebSocket, session_id: str) -> None:
     try:
         async with connect(realtime_url, additional_headers=headers, max_size=None) as openai_ws:
             await _send_openai_session_config(openai_ws)
+            await _start_greeting(openai_ws)
             stream_sid: str | None = None
 
             async def twilio_to_openai() -> None:
