@@ -1,17 +1,16 @@
-"""Minimal local Hamed server entrypoint for Windows development."""
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+"""Backward-compatible local entrypoint.
 
-app = FastAPI(title="Hamed AI Local Server", version="0.1.0")
-
-@app.get("/")
-def root():
-    return {"name": "Hamed AI", "status": "running", "mode": "local"}
-
-@app.get("/health")
-def health():
-    return JSONResponse({"status": "ok", "voice": "disabled", "paid_integrations": "disabled"})
+Runs the full Hamed FastAPI application instead of a health-only stub.
+"""
+from app.main import app
 
 if __name__ == "__main__":
+    import os
     import uvicorn
-    uvicorn.run("local_server:app", host="127.0.0.1", port=8000, reload=False)
+
+    uvicorn.run(
+        "local_server:app",
+        host=os.getenv("HAMED_HOST", "127.0.0.1"),
+        port=int(os.getenv("PORT", os.getenv("HAMED_PORT", "8000"))),
+        reload=False,
+    )
