@@ -9,6 +9,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
+from .agent_worker import HamedWorker
 from .agents.commercial_brain import build_plan
 from .agents.orchestrator import HamedOrchestrator
 from .agents.provider import OpenAIProvider
@@ -58,10 +59,42 @@ class DecisionRequest(BaseModel):
     approved: bool
 
 
-app = FastAPI(title="Hamed AI", version="0.3.0", docs_url="/docs")
+app = FastAPI(title="Hamed AI", version="0.4.0", docs_url="/docs")
 _provider = OpenAIProvider(settings.openai_api_key, settings.openai_model) if settings.openai_api_key else FallbackProvider()
 _orchestrator = HamedOrchestrator(_provider)
+_worker = HamedWorker(interval_seconds=int(os.getenv("HAMED_WORKER_INTERVAL", "900")))
 _pending: dict[tuple[str, str], Any] = {}
+
+
+def autonomous_scan() -> dict[str, Any]:
+    """Create the next safe commercial work agenda; no spending/publishing/calls occur here."""
+    prompt = (
+        "حدد أولويات العمل التجاري الآمن لحامد الآن. ركّز بالترتيب على: "
+        "اكتشاف فرص خدمات مواقع ومتاجر، فرص تسويق بالعمولة عالية الملاءمة، "
+        "فرص شراء وإعادة بيع، ثم تحسين مهارات البيع والتفاوض. "
+        "أخرج 3 مهام عملية قابلة للبحث أو التحليل، بدون شراء أو دفع أو نشر أو تعاقد."
+    )
+    plan = build_plan(prompt)
+    return {
+        "status": "ok",
+        "task_type": "commercial_scan",
+        "objective": plan.objective.value,
+        "next_steps": plan.next_steps,
+        "requires_research": plan.requires_research,
+        "approval_required": plan.approval_required,
+        "safe_mode": True,
+    }
+
+
+@app.on_event("startup")
+async def start_worker() -> None:
+    if os.getenv("HAMED_WORKER_ENABLED", "true").lower() == "true":
+        _worker.start(hooks=[autonomous_scan])
+
+
+@app.on_event("shutdown")
+async def stop_worker() -> None:
+    _worker.stop()
 
 
 @app.get("/")
@@ -77,7 +110,18 @@ def health() -> dict[str, Any]:
         "telegram": bool(settings.telegram_bot_token),
         "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")),
         "autonomous_mode": settings.autonomous_mode,
+        "worker": _worker.status(),
     }
+
+
+@app.get("/worker/status")
+def worker_status() -> dict[str, Any]:
+    return _worker.status()
+
+
+@app.post("/worker/run")
+def worker_run() -> dict[str, Any]:
+    return _worker.run_once(hooks=[autonomous_scan])
 
 
 @app.post("/chat")
@@ -143,7 +187,7 @@ def dashboard() -> str:
                 f"<tr><td>{html.escape(session_id)}</td><td>{html.escape(action)}</td><td>{html.escape(item.description)}</td><td>{item.value if item.value is not None else ''}</td></tr>"
             )
     rows = "".join(pending_rows) or "<tr><td colspan='4'>لا توجد موافقات معلّقة</td></tr>"
-    return f"""<!doctype html><html lang='ar' dir='rtl'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Hamed AI</title><style>body{{font-family:Arial,sans-serif;max-width:1100px;margin:40px auto;padding:0 20px}}table{{width:100%;border-collapse:collapse}}th,td{{padding:10px;border:1px solid #ddd;text-align:right}}.ok{{font-weight:700}}</style></head><body><h1>Hamed AI</h1><p>الحالة: <span class='ok'>تشغيل</span></p><p>مزود الذكاء: <span class='ok'>{'OpenAI' if settings.openai_api_key else 'Fallback مجاني'}</span></p><h2>الموافقات المعلّقة</h2><table><thead><tr><th>Session</th><th>Action</th><th>Description</th><th>Value</th></tr></thead><tbody>{rows}</tbody></table><p><a href='/docs'>API Docs</a> | <a href='/health'>Health</a></p></body></html>"""
+    return f"""<!doctype html><html lang='ar' dir='rtl'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Hamed AI</title><style>body{{font-family:Arial,sans-serif;max-width:1100px;margin:40px auto;padding:0 20px}}table{{width:100%;border-collapse:collapse}}th,td{{padding:10px;border:1px solid #ddd;text-align:right}}.ok{{font-weight:700}}</style></head><body><h1>Hamed AI</h1><p>الحالة: <span class='ok'>تشغيل</span></p><p>مزود الذكاء: <span class='ok'>{'OpenAI' if settings.openai_api_key else 'Fallback مجاني'}</span></p><h2>الموافقات المعلّقة</h2><table><thead><tr><th>Session</th><th>Action</th><th>Description</th><th>Value</th></tr></thead><tbody>{rows}</tbody></table><p><a href='/worker/status'>Worker</a> | <a href='/docs'>API Docs</a> | <a href='/health'>Health</a></p></body></html>"""
 
 
 def run_telegram_bot() -> None:
