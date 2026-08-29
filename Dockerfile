@@ -8,5 +8,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 ENV PYTHONUNBUFFERED=1
+ENV HAMED_HOST=0.0.0.0
+ENV HAMED_PORT=8000
 
-CMD ["python", "bot.py"]
+EXPOSE 8000
+
+CMD ["python", "cloud_server.py"]
