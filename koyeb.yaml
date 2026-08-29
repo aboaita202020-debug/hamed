@@ -1,0 +1,14 @@
+name: hamed
+services:
+  - name: hamed
+    type: web
+    instance_type: nano
+    ports:
+      - port: 8000
+        protocol: http
+    routes:
+      - path: /
+        port: 8000
+    build:
+      type: buildpack
+    run_command: python cloud_server.py
