@@ -1,19 +1,30 @@
-# Telegram channel
-pyTelegramBotAPI
-python-dotenv
-requests
+# Hamed AI - Windows 7 compatible dependency set
+# Python 3.8.x is the supported interpreter for Windows 7.
 
-# Primary AI provider
-openai
+fastapi==0.115.0
+uvicorn==0.30.6
+sqlmodel==0.0.22
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-dotenv==1.0.1
+requests==2.32.3
+httpx==0.27.2
 
-# Legacy compatibility during migration
-anthropic
+# Telegram
+python-telegram-bot==21.6
+pyTelegramBotAPI==4.21.2
+
+# AI providers
+openai==1.51.0
+anthropic==0.34.2
 
 # Voice / realtime telephony
-fastapi
-uvicorn[standard]
-twilio
-websockets
+twilio==9.3.6
+websockets==13.1
+
+# Optional local/dev compatibility
+Flask==3.0.3
+passlib[bcrypt]==1.7.4
 
 # Testing
-pytest
+pytest==8.3.3
