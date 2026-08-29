@@ -1,6 +1,13 @@
-# المتطلبات الأساسية
+# Telegram channel
 pyTelegramBotAPI
 python-dotenv
 requests
-# اختياري: الحزمة الرسمية لـ Anthropic (لو مستخدم)
+
+# Primary AI provider
+openai
+
+# Legacy compatibility during migration
 anthropic
+
+# Testing
+pytest
