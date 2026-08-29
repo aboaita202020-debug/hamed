@@ -1,0 +1,25 @@
+name: Deploy Hamed to Koyeb
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.KOYEB_API_TOKEN != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Koyeb CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
+          echo "$HOME/.koyeb/bin" >> "$GITHUB_PATH"
+
+      - name: Deploy Hamed
+        env:
+          KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
+        run: |
+          koyeb app init hamed --docker 'Dockerfile' --ports '8000:http' --routes '/:8000' --env 'HAMED_HOST=0.0.0.0' --env 'HAMED_PORT=8000'
