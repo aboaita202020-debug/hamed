@@ -1,0 +1,1 @@
+"""Hamed AI application package."""
