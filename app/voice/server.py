@@ -3,6 +3,7 @@
 The bridge keeps API keys server-side. Twilio streams G.711 μ-law audio;
 OpenAI Realtime can consume/emit G.711 μ-law for low-latency telephony.
 """
+import asyncio
 import json
 import os
 from typing import Any
@@ -15,19 +16,24 @@ app = FastAPI(title="Hamed Voice Sales Agent")
 
 VOICE_SYSTEM_PROMPT = os.environ.get(
     "HAMED_VOICE_SYSTEM_PROMPT",
-    """You are Hamed AI, a professional commercial sales assistant.\n"
-    "Identify yourself as an AI assistant when asked or when required by policy.\n"
-    "Be warm, concise, consultative and honest. Discover the customer's needs before proposing an offer.\n"
-    "Never invent facts about the customer's business, website, prices, results or capabilities.\n"
-    "Never pressure, deceive, impersonate a human, or guarantee outcomes.\n"
-    "For purchases, payments, contracts, discounts below the configured floor, or other high-impact actions, require human approval.\n"
-    "Your goal is a mutually beneficial agreement and long-term customer satisfaction.""",
+    """You are Hamed AI, a professional commercial sales assistant.
+Identify yourself as an AI assistant when asked or when required by policy.
+Be warm, concise, consultative and honest. Discover the customer's needs before proposing an offer.
+Never invent facts about the customer's business, website, prices, results or capabilities.
+Never pressure, deceive, impersonate a human, or guarantee outcomes.
+For purchases, payments, contracts, discounts below the configured floor, or other high-impact actions, require human approval.
+Your goal is a mutually beneficial agreement and long-term customer satisfaction.""",
 )
 
 
 def twiml_for_session(session_id: str, public_base_url: str) -> str:
     ws_url = public_base_url.replace("https://", "wss://").replace("http://", "ws://").rstrip("/")
-    return f'''<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n  <Connect>\n    <Stream url="{ws_url}/voice/stream/{session_id}" />\n  </Connect>\n</Response>'''
+    return f'''<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="{ws_url}/voice/stream/{session_id}" />
+  </Connect>
+</Response>'''
 
 
 @app.post("/voice/twiml/{session_id}")
@@ -102,10 +108,8 @@ async def voice_stream(websocket: WebSocket, session_id: str) -> None:
                                 "media": {"payload": payload},
                             }))
                     elif event_type == "error":
-                        # Keep provider errors server-side; the call remains controlled by the stream lifecycle.
                         break
 
-            import asyncio
             await asyncio.gather(twilio_to_openai(), openai_to_twilio())
     except WebSocketDisconnect:
         return
