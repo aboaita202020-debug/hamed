@@ -1,6 +1,12 @@
-"""Server-side permission and approval primitives."""
+"""Server-side commercial authority policy for Hamed AI.
+
+Autonomous mode permits Hamed to execute routine commercial actions without
+asking the owner again, but only inside server-enforced value and risk limits.
+The model cannot change these limits at runtime.
+"""
 from dataclasses import dataclass
 from enum import Enum
+import os
 import secrets
 from datetime import datetime, timezone
 
@@ -26,7 +32,40 @@ class ApprovalRequest:
             self.token = secrets.token_urlsafe(24)
 
 
-def can_execute(action: str, approved: bool = False) -> bool:
-    if action in {"purchase", "payment", "transfer", "contract", "publish", "account_change", "irreversible"}:
-        return approved
+AUTONOMOUS_ACTIONS = {
+    "sale", "negotiate", "affiliate_marketing", "marketing",
+    "website_service", "purchase", "payment",
+}
+
+BLOCKED_ACTIONS = {"transfer", "contract", "account_change", "irreversible"}
+
+
+def _autonomous_mode() -> bool:
+    return os.getenv("HAMED_AUTONOMOUS_MODE", "false").lower() == "true"
+
+
+def _limit_for(action: str) -> float:
+    if action == "purchase":
+        return float(os.getenv("HAMED_MAX_PURCHASE_VALUE", "0"))
+    if action == "payment":
+        return float(os.getenv("HAMED_MAX_PAYMENT_VALUE", "0"))
+    return float("inf")
+
+
+def can_execute(action: str, approved: bool = False, value: float | None = None,
+                risk: Risk = Risk.LOW) -> bool:
+    if approved:
+        return True
+    if action in BLOCKED_ACTIONS:
+        return False
+    if action not in AUTONOMOUS_ACTIONS:
+        return True
+    if not _autonomous_mode():
+        return False if action in {"purchase", "payment"} else True
+    if risk == Risk.HIGH:
+        return False
+    if action in {"purchase", "payment"}:
+        if value is None or value < 0:
+            return False
+        return value <= _limit_for(action)
     return True
