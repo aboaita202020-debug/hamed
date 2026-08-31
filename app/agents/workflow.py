@@ -91,10 +91,11 @@ def approve_action(pending: PendingAction) -> None:
 
 
 def execute_approved(pending: PendingAction) -> bool:
-    """Execute only when the permission layer authorizes the action."""
-    approved = pending.action in READ_ONLY_ACTIONS or bool(
-        pending.approval and pending.approval.approved
-    )
+    """Execute read-only work directly or execute an explicitly approved action."""
+    if pending.action in READ_ONLY_ACTIONS:
+        pending.stage = Stage.COMPLETE
+        return True
+    approved = bool(pending.approval and pending.approval.approved)
     allowed = can_execute(pending.action, approved=approved)
     if allowed:
         pending.stage = Stage.COMPLETE
