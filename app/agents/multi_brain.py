@@ -1,8 +1,4 @@
-"""Multi-model brain router for Hamed AI.
-
-Providers are optional and are enabled only when their environment key exists.
-The router keeps the common AIProvider interface so existing agents do not change.
-"""
+"""Multi-model brain router for Hamed AI."""
 from __future__ import annotations
 
 import logging
@@ -22,13 +18,11 @@ class AnthropicProvider:
 
     def generate_response(self, messages: list[dict[str, str]], *, system: str = "") -> str:
         response = self.client.messages.create(
-            model=self.model,
-            max_tokens=4096,
+            model=self.model, max_tokens=4096,
             system=system or "You are Hamed AI, a reliable commercial AI agent.",
             messages=[m for m in messages if m.get("role") in {"user", "assistant"}],
         )
-        parts = [getattr(block, "text", "") for block in response.content]
-        return "".join(parts).strip()
+        return "".join(getattr(block, "text", "") for block in response.content).strip()
 
     def web_research(self, query: str, *, system: str = "") -> str:
         return self.generate_response([{"role": "user", "content": query}], system=system)
@@ -37,25 +31,18 @@ class AnthropicProvider:
 class OpenAICompatibleProvider:
     """Provider for APIs exposing an OpenAI-compatible /chat/completions endpoint."""
     def __init__(self, api_key: str, base_url: str, model: str) -> None:
-        self.api_key = api_key
-        self.base_url = base_url.rstrip("/")
-        self.model = model
+        self.api_key, self.base_url, self.model = api_key, base_url.rstrip("/"), model
 
     def _call(self, messages: list[dict[str, str]], system: str = "") -> str:
         import requests
-        payload_messages = []
-        if system:
-            payload_messages.append({"role": "system", "content": system})
-        payload_messages.extend(messages)
+        payload_messages = ([{"role": "system", "content": system}] if system else []) + messages
         response = requests.post(
             self.base_url + "/chat/completions",
             headers={"Authorization": "Bearer " + self.api_key, "Content-Type": "application/json"},
-            json={"model": self.model, "messages": payload_messages, "temperature": 0.2},
-            timeout=90,
+            json={"model": self.model, "messages": payload_messages, "temperature": 0.2}, timeout=90,
         )
         response.raise_for_status()
-        data: dict[str, Any] = response.json()
-        return str(data["choices"][0]["message"]["content"]).strip()
+        return str(response.json()["choices"][0]["message"]["content"]).strip()
 
     def generate_response(self, messages: list[dict[str, str]], *, system: str = "") -> str:
         return self._call(messages, system)
@@ -65,15 +52,9 @@ class OpenAICompatibleProvider:
 
 
 class MultiBrainRouter:
-    """Routes Hamed requests across configured models with automatic fallback.
-
-    Modes:
-      - fallback: try providers in configured order until one succeeds.
-      - council: ask all configured providers, then synthesize with the first provider.
-    """
+    """Fallback or council routing across every configured Hamed brain."""
     def __init__(self, providers: list[tuple[str, AIProvider]], mode: str = "fallback") -> None:
-        self.providers = providers
-        self.mode = mode
+        self.providers, self.mode = providers, mode
         if not providers:
             raise RuntimeError("No AI provider configured. Add at least one provider API key.")
 
@@ -85,54 +66,43 @@ class MultiBrainRouter:
         if self.mode == "council" and len(self.providers) > 1:
             answers = []
             for name, provider in self.providers:
-                try:
-                    answers.append((name, provider.generate_response(messages, system=system)))
-                except Exception:
-                    logger.exception("Provider %s failed in council mode", name)
-            if answers:
-                if len(answers) == 1:
-                    return answers[0][1]
+                try: answers.append((name, provider.generate_response(messages, system=system)))
+                except Exception: logger.exception("Provider %s failed in council mode", name)
+            if len(answers) > 1:
                 evidence = "\n\n".join("[%s]\n%s" % item for item in answers)
-                synth_system = (system + "\n\n" if system else "") + (
-                    "You are the lead Hamed brain. Synthesize the candidate answers below. "
-                    "Resolve contradictions conservatively, do not invent facts, and return one decisive answer.\n"
-                    + evidence
-                )
-                try:
-                    return self.providers[0][1].generate_response(messages, system=synth_system)
-                except Exception:
-                    return answers[0][1]
-        last_error: Exception | None = None
+                synth = (system + "\n\n" if system else "") + "Synthesize these candidate answers into one decisive, factual answer. Do not invent facts.\n" + evidence
+                try: return self.providers[0][1].generate_response(messages, system=synth)
+                except Exception: return answers[0][1]
+            if answers: return answers[0][1]
+        last_error = None
         for name, provider in self.providers:
-            try:
-                return provider.generate_response(messages, system=system)
+            try: return provider.generate_response(messages, system=system)
             except Exception as exc:
-                last_error = exc
-                logger.exception("Provider %s failed; trying next provider", name)
+                last_error = exc; logger.exception("Provider %s failed; trying next", name)
         raise RuntimeError("All configured AI providers failed") from last_error
 
     def web_research(self, query: str, *, system: str = "") -> str:
         for name, provider in self.providers:
-            try:
-                return provider.web_research(query, system=system)
-            except Exception:
-                logger.exception("Research provider %s failed; trying next provider", name)
+            try: return provider.web_research(query, system=system)
+            except Exception: logger.exception("Research provider %s failed; trying next", name)
         raise RuntimeError("All configured AI research providers failed")
 
 
 def build_brain_router(settings: Any) -> MultiBrainRouter:
+    def get(name: str, default: Any = None) -> Any:
+        value = getattr(settings, name, None)
+        return value if value is not None else os.getenv(name.upper(), default)
+
     providers: list[tuple[str, AIProvider]] = []
-    if settings.openai_api_key:
-        providers.append(("openai", OpenAIProvider(settings.openai_api_key, settings.openai_model)))
-    if settings.anthropic_api_key:
-        providers.append(("claude", AnthropicProvider(settings.anthropic_api_key, settings.anthropic_model)))
-    if settings.deepseek_api_key:
-        providers.append(("deepseek", OpenAICompatibleProvider(settings.deepseek_api_key, settings.deepseek_base_url, settings.deepseek_model)))
-    if settings.kimi_api_key:
-        providers.append(("kimi", OpenAICompatibleProvider(settings.kimi_api_key, settings.kimi_base_url, settings.kimi_model)))
+    if get("openai_api_key"):
+        providers.append(("openai", OpenAIProvider(get("openai_api_key"), get("openai_model", "gpt-5"))))
+    if get("anthropic_api_key"):
+        providers.append(("claude", AnthropicProvider(get("anthropic_api_key"), get("anthropic_model", "claude-sonnet-4-5"))))
+    if get("deepseek_api_key"):
+        providers.append(("deepseek", OpenAICompatibleProvider(get("deepseek_api_key"), get("deepseek_base_url", "https://api.deepseek.com"), get("deepseek_model", "deepseek-chat"))))
+    if get("kimi_api_key"):
+        providers.append(("kimi", OpenAICompatibleProvider(get("kimi_api_key"), get("kimi_base_url", "https://api.moonshot.cn/v1"), get("kimi_model", "kimi-k2.5"))))
 
     requested = [x.strip().lower() for x in os.getenv("HAMED_AI_PROVIDERS", "openai,claude,deepseek,kimi").split(",") if x.strip()]
     ordered = [item for key in requested for item in providers if item[0] == key]
-    if not ordered:
-        ordered = providers
-    return MultiBrainRouter(ordered, mode=os.getenv("HAMED_AI_MODE", "fallback").lower())
+    return MultiBrainRouter(ordered or providers, mode=os.getenv("HAMED_AI_MODE", "fallback").lower())
