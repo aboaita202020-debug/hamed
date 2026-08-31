@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.effective_message:
         await update.effective_message.reply_text(
-            "أهلًا، أنا حامد 🤖\nاكتب لي هدفك أو طلبك وسأحلله وأساعدك في تحويله إلى خطوات عملية."
+            "أهلًا، أنا حامد 🤖\nأنا أدير المحادثة والعرض والتنفيذ بشكل مستقل ضمن الصلاحيات المتاحة."
         )
 
 
@@ -36,6 +36,21 @@ async def chat_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         logger.exception("Telegram request failed")
         reply = "حصل خطأ مؤقت أثناء معالجة طلبك. حاول مرة أخرى."
     await update.effective_message.reply_text(reply)
+
+    # Owner channel is for concise outcome notifications only; the owner is not
+    # placed in the customer decision loop.
+    owner_chat_id = settings.telegram_chat_id
+    if owner_chat_id and update.effective_user.id != int(owner_chat_id):
+        lowered = reply.lower()
+        completion_markers = ("تم التنفيذ", "تم التسليم", "تم إتمام", "اكتمل", "completed", "delivered")
+        if any(marker in lowered for marker in completion_markers):
+            try:
+                await context.bot.send_message(
+                    chat_id=owner_chat_id,
+                    text=f"✅ تم التنفيذ\nالعميل: {update.effective_user.full_name}\nالنتيجة: {reply[:1500]}",
+                )
+            except Exception:
+                logger.exception("Could not notify owner")
 
 
 def build_telegram_application(orchestrator: HamedOrchestrator) -> Application:
