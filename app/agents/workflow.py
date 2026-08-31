@@ -32,9 +32,16 @@ class PendingAction:
     demo_delivered: bool = False
 
 
+READ_ONLY_ACTIONS = {"research", "analysis", "recommendation"}
+
+
 def prepare_action(action: str, description: str, value: float | None = None) -> PendingAction:
     pending = PendingAction(action, description, value)
-    pending.stage = Stage.OFFER
+    if action in READ_ONLY_ACTIONS:
+        pending.stage = Stage.EXECUTION
+        return pending
+    pending.stage = Stage.APPROVAL
+    pending.approval = ApprovalRequest(action=action, description=description, value=value)
     return pending
 
 
@@ -84,8 +91,11 @@ def approve_action(pending: PendingAction) -> None:
 
 
 def execute_approved(pending: PendingAction) -> bool:
-    """Legacy approval path; payment gates still apply to delivery-sensitive work."""
-    allowed = can_execute(pending.action, approved=bool(pending.approval and pending.approval.approved))
+    """Execute only when the permission layer authorizes the action."""
+    approved = pending.action in READ_ONLY_ACTIONS or bool(
+        pending.approval and pending.approval.approved
+    )
+    allowed = can_execute(pending.action, approved=approved)
     if allowed:
         pending.stage = Stage.COMPLETE
     return allowed
