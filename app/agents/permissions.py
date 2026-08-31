@@ -1,10 +1,5 @@
-"""Server-side commercial authority policy for Hamed AI.
-
-Autonomous mode permits Hamed to execute routine commercial actions without
-asking the owner again, but only inside server-enforced value and risk limits.
-The model cannot change these limits at runtime.
-"""
-from dataclasses import dataclass
+"""Server-side commercial authority policy for Hamed AI."""
+from dataclasses import dataclass, field
 from enum import Enum
 import os
 import secrets
@@ -25,7 +20,7 @@ class ApprovalRequest:
     risk: Risk = Risk.HIGH
     token: str = ""
     approved: bool = False
-    created_at: datetime = datetime.now(timezone.utc)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __post_init__(self) -> None:
         if not self.token:
@@ -54,8 +49,9 @@ def _limit_for(action: str) -> float:
 
 def can_execute(action: str, approved: bool = False, value: float | None = None,
                 risk: Risk = Risk.LOW) -> bool:
+    # Explicit human approval is the final authorization for known high-impact actions.
     if approved:
-        return True
+        return action in AUTONOMOUS_ACTIONS or action in BLOCKED_ACTIONS
     if action in BLOCKED_ACTIONS:
         return False
     if action not in AUTONOMOUS_ACTIONS:

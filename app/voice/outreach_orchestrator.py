@@ -52,8 +52,6 @@ class OutreachOrchestrator:
         if prospect.do_not_contact:
             return OutreachPlan(False, country, profile.timezone, profile.currency, profile.language, "none", "none", "Prospect opted out")
 
-        # Outbound marketing calls require the configured legal/telecom path.
-        # For unsolicited prospects, prefer a non-call channel unless consent exists.
         if prospect.consented and prospect.phone:
             channel = "voice"
             reason = "Consent/eligibility allows voice outreach; provider and local telecom checks still required"
@@ -75,5 +73,4 @@ class OutreachOrchestrator:
             return False
         current = now or datetime.now(ZoneInfo("UTC"))
         local = current.astimezone(ZoneInfo(plan.timezone))
-        # Conservative default; country-specific rules can be added to policy.
-        return 09 <= local.hour < 18 and local.weekday() < 5
+        return 9 <= local.hour < 18 and local.weekday() < 5
