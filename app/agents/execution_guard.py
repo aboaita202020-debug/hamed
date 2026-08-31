@@ -23,6 +23,6 @@ def authorize(action: str, approved: bool = False, value: float | None = None) -
         return ExecutionDecision(action, True, "authorized_by_autonomy_policy")
 
     if action in {"purchase", "payment", "transfer", "contract", "publish", "account_change", "irreversible"}:
-        return ExecutionDecision(action, False, "outside_autonomy_policy_or_approval_required")
+        return ExecutionDecision(action, False, "explicit_human_approval_required")
 
     return ExecutionDecision(action, True, "authorized")
