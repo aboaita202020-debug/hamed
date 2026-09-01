@@ -49,27 +49,55 @@ def test_startup_fails_cleanly_when_openai_key_is_missing():
     assert "12345:TEST_TOKEN_PLACEHOLDER" not in result.stderr
 
 
-def test_multibrain_loads_only_configured_fake_providers(monkeypatch: pytest.MonkeyPatch):
+def _clear_brain_env(monkeypatch: pytest.MonkeyPatch):
     for key in (
-        "OPENAI_API_KEY",
-        "DEEPSEEK_API_KEY",
-        "KIMI_API_KEY",
-        "GEMINI_API_KEY",
-        "MISTRAL_API_KEY",
-        "QWEN_API_KEY",
-        "GROK_API_KEY",
-        "LLAMA_API_KEY",
-        "OPENROUTER_API_KEY",
-        "ANTHROPIC_API_KEY",
+        "OPENAI_API_KEY", "DEEPSEEK_API_KEY", "KIMI_API_KEY", "GEMINI_API_KEY",
+        "MISTRAL_API_KEY", "QWEN_API_KEY", "XAI_API_KEY", "GROK_API_KEY",
+        "LLAMA_API_KEY", "OPENROUTER_API_KEY", "ANTHROPIC_API_KEY",
     ):
         monkeypatch.delenv(key, raising=False)
 
+
+def test_multibrain_loads_only_configured_fake_providers(monkeypatch: pytest.MonkeyPatch):
+    _clear_brain_env(monkeypatch)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test-placeholder")
     monkeypatch.setenv("DEEPSEEK_API_KEY", "fake-deepseek")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "fake-anthropic")
 
     provider = MultiBrainProvider()
     assert set(provider.available_brains()) == {"openai", "deepseek", "claude"}
+
+
+def test_multibrain_loads_all_ten_brains_with_fake_credentials(monkeypatch: pytest.MonkeyPatch):
+    _clear_brain_env(monkeypatch)
+    fake_keys = {
+        "OPENAI_API_KEY": "fake-openai",
+        "ANTHROPIC_API_KEY": "fake-anthropic",
+        "DEEPSEEK_API_KEY": "fake-deepseek",
+        "KIMI_API_KEY": "fake-kimi",
+        "GEMINI_API_KEY": "fake-gemini",
+        "MISTRAL_API_KEY": "fake-mistral",
+        "QWEN_API_KEY": "fake-qwen",
+        "XAI_API_KEY": "fake-xai",
+        "LLAMA_API_KEY": "fake-llama",
+        "OPENROUTER_API_KEY": "fake-openrouter",
+    }
+    for key, value in fake_keys.items():
+        monkeypatch.setenv(key, value)
+
+    provider = MultiBrainProvider()
+    assert set(provider.available_brains()) == {
+        "openai", "claude", "deepseek", "kimi", "gemini",
+        "mistral", "qwen", "grok", "llama", "openrouter",
+    }
+
+
+def test_grok_legacy_key_remains_compatible(monkeypatch: pytest.MonkeyPatch):
+    _clear_brain_env(monkeypatch)
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-openai")
+    monkeypatch.setenv("GROK_API_KEY", "fake-grok")
+    provider = MultiBrainProvider()
+    assert "grok" in provider.available_brains()
 
 
 def test_multibrain_fallback_uses_next_provider(monkeypatch: pytest.MonkeyPatch):
