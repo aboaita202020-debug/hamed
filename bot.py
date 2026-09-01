@@ -1,38 +1,50 @@
 #!/usr/bin/env python3
-"""Hamed AI Telegram entry point.
+"""Hamed AI Telegram bot entry point.
 
-Runs the Telegram channel and routes requests through the common Hamed
-orchestrator. Secrets are read only from environment variables.
+Secrets are read only from environment variables. Telegram and OpenAI are
+required for this runtime; database, Twilio and Paymob integrations remain
+optional and must never block startup.
 """
+from __future__ import annotations
+
 import os
 import time
+
 from dotenv import load_dotenv
 import telebot
+
 from app.agents.orchestrator import HamedOrchestrator
 from app.agents.provider import OpenAIProvider
 
 load_dotenv()
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
 HAMED_NAME = os.getenv("HAMED_NAME", "Hamed AI")
 
-if not TELEGRAM_BOT_TOKEN:
-    raise RuntimeError("TELEGRAM_BOT_TOKEN is missing. Add it as a deployment secret.")
+
+def validate_required_secrets() -> None:
+    missing = []
+    if not TELEGRAM_BOT_TOKEN:
+        missing.append("TELEGRAM_BOT_TOKEN")
+    if not OPENAI_API_KEY:
+        missing.append("OPENAI_API_KEY")
+    if missing:
+        raise RuntimeError("Missing required environment variable(s): " + ", ".join(missing))
+
+
+validate_required_secrets()
 
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN, parse_mode=None)
-hamed = None
-if OPENAI_API_KEY:
-    hamed = HamedOrchestrator(OpenAIProvider(OPENAI_API_KEY, OPENAI_MODEL))
+hamed = HamedOrchestrator(OpenAIProvider(OPENAI_API_KEY, OPENAI_MODEL))
 
 
 def status_text() -> str:
-    ai = "READY" if hamed else "WAITING_FOR_AI_KEY"
     return (
         f"🟢 {HAMED_NAME} ONLINE\n\n"
         "📡 Telegram: CONNECTED\n"
-        f"🧠 AI Core: {ai}\n"
+        "🧠 AI Core: READY\n"
         "🛡️ Safety: ACTIVE\n"
         "🤖 Orchestrator: READY\n\n"
         "اكتب /help لمعرفة الأوامر."
@@ -58,8 +70,7 @@ def handle_help(message):
 
 @bot.message_handler(commands=["reset"])
 def handle_reset(message):
-    if hamed:
-        hamed.reset(str(message.chat.id))
+    hamed.reset(str(message.chat.id))
     bot.send_message(message.chat.id, "تم تصفير سياق المحادثة ونبدأ من جديد ✅")
 
 
@@ -71,15 +82,6 @@ def handle_text(message):
         return
 
     bot.send_chat_action(message.chat.id, "typing")
-
-    if not hamed:
-        bot.send_message(
-            message.chat.id,
-            "🟡 Telegram متصل وحامد شغال، لكن AI Core محتاج OPENAI_API_KEY في Secrets.\n"
-            "لن أقول إن الذكاء الاصطناعي شغال قبل ما يكون متصل فعليًا.",
-        )
-        return
-
     try:
         reply = hamed.respond(chat_id, user_text)
         if not reply:
@@ -91,11 +93,14 @@ def handle_text(message):
     bot.send_message(message.chat.id, reply)
 
 
-if __name__ == "__main__":
+def run() -> None:
     print("=" * 52, flush=True)
     print(f"{HAMED_NAME} Telegram Bot is STARTING...", flush=True)
     print("Telegram polling: READY", flush=True)
-    print(f"AI Core: {'READY' if hamed else 'WAITING_FOR_OPENAI_API_KEY'}", flush=True)
+    print("AI Core: READY", flush=True)
+    print("Database: OPTIONAL", flush=True)
+    print("Twilio: OPTIONAL", flush=True)
+    print("Paymob: OPTIONAL", flush=True)
     print("=" * 52, flush=True)
     while True:
         try:
@@ -103,3 +108,7 @@ if __name__ == "__main__":
         except Exception as exc:
             print(f"Telegram polling error: {type(exc).__name__}: {exc}", flush=True)
             time.sleep(5)
+
+
+if __name__ == "__main__":
+    run()
