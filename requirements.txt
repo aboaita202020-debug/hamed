@@ -1,5 +1,5 @@
 # Hamed AI - dependency set
-# Telegram bot uses python-telegram-bot only.
+# Telegram runtime uses pyTelegramBotAPI (telebot).
 
 fastapi==0.115.0
 uvicorn==0.30.6
@@ -12,6 +12,7 @@ httpx==0.27.2
 
 # Telegram
 python-telegram-bot==21.6
+pyTelegramBotAPI==4.28.1
 
 # AI providers
 openai==1.51.0
