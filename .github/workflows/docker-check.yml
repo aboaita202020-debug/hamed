@@ -18,15 +18,20 @@ jobs:
       - name: Build Hamed image
         run: docker build -t hamed:ci .
 
-      - name: Run health check with non-secret CI placeholders
+      - name: Run health check with offline non-secret CI placeholders
         run: |
+          set -euo pipefail
           docker run -d --name hamed-ci -p 8000:8000 \
-            -e TELEGRAM_BOT_TOKEN=ci-placeholder-token \
-            -e OPENAI_API_KEY=ci-placeholder-key \
+            -e TELEGRAM_BOT_TOKEN=12345:TEST_TOKEN_PLACEHOLDER \
+            -e OPENAI_API_KEY=sk-test-placeholder \
+            -e HAMED_TELEGRAM_POLLING=false \
+            -e HAMED_WORKER_ENABLED=false \
             hamed:ci
+          trap 'docker logs hamed-ci || true; docker rm -f hamed-ci || true' EXIT
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:8000/health; then
               echo
+              echo "Docker health smoke test: PASS"
               exit 0
             fi
             sleep 2
