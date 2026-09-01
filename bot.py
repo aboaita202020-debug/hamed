@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Hamed AI Telegram bot entry point.
-
-Telegram and OpenAI are required. Database, Twilio, Paymob and additional AI
-providers are optional. The FastAPI health endpoint runs beside Telegram.
-"""
+"""Hamed AI Telegram runtime: multi-brain, 80+ agents, learning and research."""
 from __future__ import annotations
 
 import os
@@ -15,41 +11,35 @@ import telebot
 import uvicorn
 
 from app.agents.orchestrator import HamedOrchestrator
-from app.agents.provider import OpenAIProvider
+from app.agents.provider import MultiBrainProvider
 
 load_dotenv()
-
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
 HAMED_NAME = os.getenv("HAMED_NAME", "Hamed AI")
 PORT = int(os.getenv("PORT", "8000"))
 
 
 def validate_required_secrets() -> None:
-    missing = []
-    if not TELEGRAM_BOT_TOKEN:
-        missing.append("TELEGRAM_BOT_TOKEN")
-    if not OPENAI_API_KEY:
-        missing.append("OPENAI_API_KEY")
+    missing = [name for name, value in (("TELEGRAM_BOT_TOKEN", TELEGRAM_BOT_TOKEN), ("OPENAI_API_KEY", OPENAI_API_KEY)) if not value]
     if missing:
         raise RuntimeError("Missing required environment variable(s): " + ", ".join(missing))
 
 
 validate_required_secrets()
-
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN, parse_mode=None)
-hamed = HamedOrchestrator(OpenAIProvider(OPENAI_API_KEY, OPENAI_MODEL))
+hamed = HamedOrchestrator(MultiBrainProvider())
 
 
 def status_text() -> str:
+    brains = ", ".join(getattr(hamed.provider, "available_brains", lambda: ("openai",))())
     return (
         f"🟢 {HAMED_NAME} ONLINE\n\n"
         "📡 Telegram: CONNECTED\n"
-        "🧠 AI Core: READY\n"
+        f"🧠 AI Brains: {brains}\n"
         "🤖 80+ specialist agents: READY\n"
         "📚 Learning Council: READY\n"
-        "🔎 Client Research Team: READY\n"
+        "🎯 Client Research Team: READY\n"
         "🛡️ Safety & approvals: ACTIVE\n\n"
         "اكتب /help لمعرفة الأوامر."
     )
@@ -62,16 +52,7 @@ def handle_start(message):
 
 @bot.message_handler(commands=["help"])
 def handle_help(message):
-    bot.send_message(
-        message.chat.id,
-        "أوامر حامد:\n\n"
-        "/start — تشغيل واختبار الاتصال\n"
-        "/status — حالة النظام\n"
-        "/brains — عرض فريق الوكلاء\n"
-        "/learn — بحث تعلمي في علم النفس/المبيعات/الخدمات\n"
-        "/reset — بدء محادثة جديدة\n\n"
-        "ثم اكتب طلبك مباشرة.",
-    )
+    bot.send_message(message.chat.id, "أوامر حامد:\n\n/start — تشغيل واختبار الاتصال\n/status — حالة النظام\n/brains — عرض فريق الوكلاء والعقول\n/learn — بحث تعلمي في علم النفس/المبيعات/الخدمات\n/reset — بدء محادثة جديدة\n\nثم اكتب طلبك مباشرة.")
 
 
 @bot.message_handler(commands=["brains"])
@@ -79,19 +60,13 @@ def handle_brains(message):
     names = hamed.available_agents()
     learning = ", ".join(hamed.learning_agents())
     clients = ", ".join(hamed.client_research_agents())
-    bot.send_message(
-        message.chat.id,
-        f"🤖 الوكلاء المتاحون: {len(names)}+\n\n"
-        f"📚 Learning Council: {learning}\n\n"
-        f"🎯 Client Research Team: {clients}",
-    )
+    brains = ", ".join(hamed.provider.available_brains())
+    bot.send_message(message.chat.id, f"🤖 الوكلاء: {len(names)}+\n🧠 العقول المتصلة: {brains}\n\n📚 Learning Council: {learning}\n\n🎯 Client Research Team: {clients}")
 
 
 @bot.message_handler(commands=["learn"])
 def handle_learn(message):
-    topic = (message.text or "").partition(" ")[2].strip()
-    if not topic:
-        topic = "علم النفس في التواصل مع العملاء واستراتيجيات البيع وخدمة العملاء"
+    topic = (message.text or "").partition(" ")[2].strip() or "علم النفس في التواصل مع العملاء واستراتيجيات البيع وخدمة العملاء"
     bot.send_chat_action(message.chat.id, "typing")
     try:
         evidence = hamed.research_for_learning(topic)
@@ -109,20 +84,15 @@ def handle_reset(message):
 
 @bot.message_handler(func=lambda m: True, content_types=["text"])
 def handle_text(message):
-    chat_id = str(message.chat.id)
-    user_text = (message.text or "").strip()
+    chat_id, user_text = str(message.chat.id), (message.text or "").strip()
     if not user_text:
         return
-
     bot.send_chat_action(message.chat.id, "typing")
     try:
-        reply = hamed.respond(chat_id, user_text)
-        if not reply:
-            reply = "لم يصلني رد من AI Core. حاول مرة أخرى."
+        reply = hamed.respond(chat_id, user_text) or "لم يصلني رد من AI Core. حاول مرة أخرى."
     except Exception as exc:
         print(f"Hamed request error: {type(exc).__name__}: {exc}", flush=True)
         reply = "حصل خطأ مؤقت داخل Hamed. استخدم /status ثم حاول مرة أخرى."
-
     bot.send_message(message.chat.id, reply)
 
 
@@ -135,19 +105,9 @@ def start_health_server() -> threading.Thread:
 
 
 def run() -> None:
-    print("=" * 52, flush=True)
-    print(f"{HAMED_NAME} Telegram Bot is STARTING...", flush=True)
-    print("Telegram polling: READY", flush=True)
-    print("AI Core: READY", flush=True)
-    print("80+ specialist agents: READY", flush=True)
-    print("Learning Council: READY", flush=True)
-    print("Client Research Team: READY", flush=True)
-    print("Health endpoint: http://0.0.0.0:%d/health" % PORT, flush=True)
-    print("Database: OPTIONAL", flush=True)
-    print("Twilio: OPTIONAL", flush=True)
-    print("Paymob: OPTIONAL", flush=True)
-    print("=" * 52, flush=True)
-
+    print(f"{HAMED_NAME} Telegram Bot STARTING...", flush=True)
+    print("80+ agents / Learning Council / Client Research / Multi-Brain: READY", flush=True)
+    print("Database / Twilio / Paymob: OPTIONAL", flush=True)
     start_health_server()
     while True:
         try:
