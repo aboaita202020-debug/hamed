@@ -61,6 +61,7 @@ class MultiBrainProvider:
         for name,env,url,model_env,default in compatible:
             value=os.getenv(env,"").strip()
             if name=="grok" and not value: value=os.getenv("GROK_API_KEY","").strip(); model_env="GROK_MODEL" if value else model_env
+            if name=="llama" and not value: value=os.getenv("GROQ_API_KEY","").strip()
             if value: self.providers[name]=OpenAICompatibleProvider(name,value,os.getenv(env+"_BASE_URL",url),os.getenv(model_env,default))
         key=os.getenv("ANTHROPIC_API_KEY","").strip()
         if key: self.providers["claude"]=AnthropicProvider(key,os.getenv("ANTHROPIC_MODEL","claude-3-5-sonnet-latest"))
