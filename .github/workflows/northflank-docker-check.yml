@@ -17,15 +17,26 @@ jobs:
       - name: Build image
         run: docker build -t hamed-ai:ci .
 
-      - name: Run container
+      - name: Run container and verify health
         run: |
-          docker run -d --rm --name hamed-ci -p 8000:8000 \
+          set -euo pipefail
+          docker run -d --name hamed-ci -p 8000:8000 \
+            -e TELEGRAM_BOT_TOKEN=test-token-placeholder \
+            -e OPENAI_API_KEY=test-key-placeholder \
+            -e HAMED_WORKER_ENABLED=false \
             -e HAMED_HOST=0.0.0.0 \
             -e HAMED_PORT=8000 \
             hamed-ai:ci
-          for i in $(seq 1 20); do
-            if curl -fsS http://127.0.0.1:8000/health; then exit 0; fi
+          trap 'docker logs hamed-ci || true; docker rm -f hamed-ci || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/health; then
+              echo
+              echo "Northflank Docker readiness: PASS"
+              exit 0
+            fi
             sleep 2
           done
+          echo "Northflank Docker readiness: FAIL"
+          docker ps -a --filter name=hamed-ci
           docker logs hamed-ci
           exit 1
