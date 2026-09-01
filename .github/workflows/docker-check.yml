@@ -12,12 +12,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Python syntax check
+        run: python -m compileall -q bot.py app
+
       - name: Build Hamed image
         run: docker build -t hamed:ci .
 
-      - name: Run health check
+      - name: Run health check with non-secret CI placeholders
         run: |
-          docker run -d --name hamed-ci -p 8000:8000 hamed:ci
+          docker run -d --name hamed-ci -p 8000:8000 \
+            -e TELEGRAM_BOT_TOKEN=ci-placeholder-token \
+            -e OPENAI_API_KEY=ci-placeholder-key \
+            hamed:ci
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:8000/health; then
               echo
