@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Hamed AI Telegram bot entry point.
 
-Telegram and OpenAI are required. Database, Twilio and Paymob are optional.
-The FastAPI application is served in a background thread so /health remains
-available while Telegram polling is the primary runtime.
+Telegram and OpenAI are required. Database, Twilio, Paymob and additional AI
+providers are optional. The FastAPI health endpoint runs beside Telegram.
 """
 from __future__ import annotations
 
@@ -48,8 +47,10 @@ def status_text() -> str:
         f"🟢 {HAMED_NAME} ONLINE\n\n"
         "📡 Telegram: CONNECTED\n"
         "🧠 AI Core: READY\n"
-        "🛡️ Safety: ACTIVE\n"
-        "🤖 Orchestrator: READY\n\n"
+        "🤖 80+ specialist agents: READY\n"
+        "📚 Learning Council: READY\n"
+        "🔎 Client Research Team: READY\n"
+        "🛡️ Safety & approvals: ACTIVE\n\n"
         "اكتب /help لمعرفة الأوامر."
     )
 
@@ -66,9 +67,38 @@ def handle_help(message):
         "أوامر حامد:\n\n"
         "/start — تشغيل واختبار الاتصال\n"
         "/status — حالة النظام\n"
+        "/brains — عرض فريق الوكلاء\n"
+        "/learn — بحث تعلمي في علم النفس/المبيعات/الخدمات\n"
         "/reset — بدء محادثة جديدة\n\n"
         "ثم اكتب طلبك مباشرة.",
     )
+
+
+@bot.message_handler(commands=["brains"])
+def handle_brains(message):
+    names = hamed.available_agents()
+    learning = ", ".join(hamed.learning_agents())
+    clients = ", ".join(hamed.client_research_agents())
+    bot.send_message(
+        message.chat.id,
+        f"🤖 الوكلاء المتاحون: {len(names)}+\n\n"
+        f"📚 Learning Council: {learning}\n\n"
+        f"🎯 Client Research Team: {clients}",
+    )
+
+
+@bot.message_handler(commands=["learn"])
+def handle_learn(message):
+    topic = (message.text or "").partition(" ")[2].strip()
+    if not topic:
+        topic = "علم النفس في التواصل مع العملاء واستراتيجيات البيع وخدمة العملاء"
+    bot.send_chat_action(message.chat.id, "typing")
+    try:
+        evidence = hamed.research_for_learning(topic)
+        bot.send_message(message.chat.id, "📚 نتيجة البحث التعلمي (للمراجعة):\n\n" + evidence[:3900])
+    except Exception as exc:
+        print(f"Learning error: {type(exc).__name__}: {exc}", flush=True)
+        bot.send_message(message.chat.id, "تعذر تشغيل البحث التعلمي الآن. حاول مرة أخرى.")
 
 
 @bot.message_handler(commands=["reset"])
@@ -97,7 +127,6 @@ def handle_text(message):
 
 
 def start_health_server() -> threading.Thread:
-    """Keep the existing FastAPI /health endpoint available beside Telegram."""
     config = uvicorn.Config("app.main:app", host="0.0.0.0", port=PORT, log_level="info")
     server = uvicorn.Server(config)
     thread = threading.Thread(target=server.run, name="hamed-health-server", daemon=True)
@@ -110,6 +139,9 @@ def run() -> None:
     print(f"{HAMED_NAME} Telegram Bot is STARTING...", flush=True)
     print("Telegram polling: READY", flush=True)
     print("AI Core: READY", flush=True)
+    print("80+ specialist agents: READY", flush=True)
+    print("Learning Council: READY", flush=True)
+    print("Client Research Team: READY", flush=True)
     print("Health endpoint: http://0.0.0.0:%d/health" % PORT, flush=True)
     print("Database: OPTIONAL", flush=True)
     print("Twilio: OPTIONAL", flush=True)
