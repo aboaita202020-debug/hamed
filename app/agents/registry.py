@@ -1,9 +1,4 @@
-"""Extensible registry of Hamed's specialist agents.
-
-Agents are capability profiles, not separate model instances. The router selects
-profiles and an available AI provider at runtime. This keeps the system easy to
-extend from 80 agents to hundreds without duplicating orchestration code.
-"""
+"""Extensible registry of Hamed specialist agents."""
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -43,7 +38,7 @@ AGENTS = [
     ("seo", "SEO Agent", "marketing", "improve organic search visibility"),
     ("conversion", "Conversion Optimization Agent", "marketing", "improve conversion funnels"),
     ("ecommerce", "E-commerce Agent", "commerce", "design and optimize online stores"),
-    ("customer-psychology", "Customer Psychology Agent", "customer", "understand customer needs and communication patterns without diagnosing or manipulating people"),
+    ("customer-psychology", "Customer Psychology Agent", "customer", "understand customer needs and communication patterns without diagnosis or manipulation"),
     ("buyer-intent", "Buyer Intent Agent", "sales", "identify stated and observable buying intent"),
     ("communication", "Customer Communication Agent", "customer", "write natural customer-facing communication"),
     ("objections", "Objection Handling Agent", "sales", "answer objections honestly and helpfully"),
@@ -94,19 +89,24 @@ AGENTS = [
     ("logistics", "Logistics Agent", "industry", "support logistics planning"),
     ("education", "Education Agent", "industry", "support educational workflows"),
     ("hospitality", "Hospitality Agent", "industry", "support hospitality operations"),
+    ("linkedin-prospecting", "LinkedIn Prospecting Agent", "client-research", "research public professional leads and opportunities without bypassing access controls"),
+    ("meta-prospecting", "Facebook & Instagram Prospecting Agent", "client-research", "research public business profiles and opportunities using permitted access"),
+    ("short-video-prospecting", "TikTok & YouTube Prospecting Agent", "client-research", "identify public creator/business opportunities without spam or mass messaging"),
+    ("x-prospecting", "X Prospecting Agent", "client-research", "research public conversations and business opportunities while respecting platform rules"),
+    ("web-prospecting", "Web & Social Opportunity Agent", "client-research", "combine public web and social signals into qualified lead research"),
 ]
 
 AGENT_REGISTRY = {a[0]: AgentProfile(*a) for a in AGENTS}
 assert len(AGENT_REGISTRY) >= 80, "Hamed must ship with at least 80 specialist profiles"
 
-# Five dedicated client-research agents. They use public, permitted sources and
-# produce research/lead lists; they do not mass-message, spam, or bypass platform controls.
+# Five dedicated client-research agents. They research public, permitted information;
+# they never mass-message, spam, bypass controls, or collect sensitive personal data.
 CLIENT_RESEARCH_AGENTS = (
-    "lead-generation",
-    "market",
-    "competitor",
-    "buyer-intent",
-    "social",
+    "linkedin-prospecting",
+    "meta-prospecting",
+    "short-video-prospecting",
+    "x-prospecting",
+    "web-prospecting",
 )
 
 LEARNING_COUNCIL = (
