@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """Hamed AI Telegram bot entry point.
 
-Secrets are read only from environment variables. Telegram and OpenAI are
-required for this runtime; database, Twilio and Paymob integrations remain
-optional and must never block startup.
+Telegram and OpenAI are required. Database, Twilio and Paymob are optional.
+The FastAPI application is served in a background thread so /health remains
+available while Telegram polling is the primary runtime.
 """
 from __future__ import annotations
 
 import os
+import threading
 import time
 
 from dotenv import load_dotenv
 import telebot
+import uvicorn
 
 from app.agents.orchestrator import HamedOrchestrator
 from app.agents.provider import OpenAIProvider
@@ -22,6 +24,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
 HAMED_NAME = os.getenv("HAMED_NAME", "Hamed AI")
+PORT = int(os.getenv("PORT", "8000"))
 
 
 def validate_required_secrets() -> None:
@@ -93,15 +96,27 @@ def handle_text(message):
     bot.send_message(message.chat.id, reply)
 
 
+def start_health_server() -> threading.Thread:
+    """Keep the existing FastAPI /health endpoint available beside Telegram."""
+    config = uvicorn.Config("app.main:app", host="0.0.0.0", port=PORT, log_level="info")
+    server = uvicorn.Server(config)
+    thread = threading.Thread(target=server.run, name="hamed-health-server", daemon=True)
+    thread.start()
+    return thread
+
+
 def run() -> None:
     print("=" * 52, flush=True)
     print(f"{HAMED_NAME} Telegram Bot is STARTING...", flush=True)
     print("Telegram polling: READY", flush=True)
     print("AI Core: READY", flush=True)
+    print("Health endpoint: http://0.0.0.0:%d/health" % PORT, flush=True)
     print("Database: OPTIONAL", flush=True)
     print("Twilio: OPTIONAL", flush=True)
     print("Paymob: OPTIONAL", flush=True)
     print("=" * 52, flush=True)
+
+    start_health_server()
     while True:
         try:
             bot.infinity_polling(skip_pending=True, timeout=30, long_polling_timeout=30)
