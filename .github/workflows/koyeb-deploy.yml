@@ -1,9 +1,9 @@
 name: Deploy Hamed to Koyeb
 
+# Deployments are intentionally manual. Pre-launch CI must be green before
+# an operator starts this workflow; no push to main can deploy by accident.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 jobs:
   deploy:
