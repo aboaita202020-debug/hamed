@@ -28,12 +28,11 @@ class OpenAIProvider:
         return (response.choices[0].message.content or "").strip()
 
     def web_research(self, query, *, system=""):
-        instructions = system or "Research using supported evidence. Do not invent facts or sources."
-        return self.generate_response([{"role": "user", "content": query}], system=instructions)
+        return self.generate_response([{"role": "user", "content": query}], system=system or "Research using supported evidence. Do not invent facts or sources.")
 
 
 class OpenAICompatibleProvider:
-    """Adapter for OpenAI-compatible APIs such as DeepSeek, Kimi, Gemini, Qwen and others."""
+    """Adapter for OpenAI-compatible APIs."""
     def __init__(self, name, api_key, base_url, model, timeout=60):
         self.name, self.api_key, self.base_url, self.model, self.timeout = name, api_key, base_url.rstrip("/"), model, timeout
 
@@ -70,7 +69,7 @@ class AnthropicProvider:
 
 
 class MultiBrainProvider:
-    """Selects the best configured brain for a task and automatically falls back on failure."""
+    """Ten-brain router with task-aware selection and automatic fallback."""
     def __init__(self):
         self.providers = {}
         self._load()
@@ -88,6 +87,7 @@ class MultiBrainProvider:
             ("mistral", "MISTRAL_API_KEY", "https://api.mistral.ai/v1", "MISTRAL_MODEL", "mistral-small-latest"),
             ("qwen", "QWEN_API_KEY", "https://dashscope.aliyuncs.com/compatible-mode/v1", "QWEN_MODEL", "qwen-plus"),
             ("grok", "GROK_API_KEY", "https://api.x.ai/v1", "GROK_MODEL", "grok-3-mini"),
+            ("llama", "LLAMA_API_KEY", "https://api.groq.com/openai/v1", "LLAMA_MODEL", "llama-4-scout-17b-16e-instruct"),
             ("openrouter", "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1", "OPENROUTER_MODEL", "openai/gpt-4o-mini"),
         ]
         for name, env, url, model_env, default in compatible:
@@ -101,13 +101,13 @@ class MultiBrainProvider:
     def _order(self, task):
         t = task.lower()
         if any(x in t for x in ("code", "python", "javascript", "برمج", "كود", "docker", "github")):
-            preferred = ["deepseek", "claude", "openai", "qwen"]
+            preferred = ["deepseek", "claude", "openai", "qwen", "llama"]
         elif any(x in t for x in ("ملف", "مستند", "document", "long", "تحليل")):
-            preferred = ["kimi", "claude", "gemini", "openai"]
+            preferred = ["kimi", "claude", "gemini", "openai", "llama"]
         elif any(x in t for x in ("بيع", "مبيعات", "sales", "عميل", "تسويق", "marketing")):
-            preferred = ["claude", "openai", "gemini", "kimi"]
+            preferred = ["claude", "openai", "gemini", "kimi", "qwen"]
         else:
-            preferred = ["openai", "claude", "gemini", "deepseek", "kimi", "qwen", "mistral", "grok", "openrouter"]
+            preferred = ["openai", "claude", "gemini", "deepseek", "kimi", "qwen", "mistral", "grok", "llama", "openrouter"]
         return list(dict.fromkeys(preferred + list(self.providers)))
 
     def generate_response(self, messages, *, system=""):
