@@ -25,5 +25,8 @@ websockets==13.1
 Flask==3.0.3
 passlib[bcrypt]==1.7.4
 
+# QR menu generation
+qrcode==8.2
+
 # Testing
 pytest==8.3.3
