@@ -86,14 +86,18 @@ class MultiBrainProvider:
             ("gemini", "GEMINI_API_KEY", "https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_MODEL", "gemini-2.5-flash"),
             ("mistral", "MISTRAL_API_KEY", "https://api.mistral.ai/v1", "MISTRAL_MODEL", "mistral-small-latest"),
             ("qwen", "QWEN_API_KEY", "https://dashscope.aliyuncs.com/compatible-mode/v1", "QWEN_MODEL", "qwen-plus"),
-            ("grok", "GROK_API_KEY", "https://api.x.ai/v1", "GROK_MODEL", "grok-3-mini"),
+            ("grok", "XAI_API_KEY", "https://api.x.ai/v1", "XAI_MODEL", "grok-3-mini"),
             ("llama", "LLAMA_API_KEY", "https://api.groq.com/openai/v1", "LLAMA_MODEL", "llama-4-scout-17b-16e-instruct"),
             ("openrouter", "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1", "OPENROUTER_MODEL", "openai/gpt-4o-mini"),
         ]
         for name, env, url, model_env, default in compatible:
             value = os.getenv(env, "").strip()
+            if name == "grok" and not value:
+                value = os.getenv("GROK_API_KEY", "").strip()
+                model_env = "GROK_MODEL" if value else model_env
             if value:
-                self.providers[name] = OpenAICompatibleProvider(name, value, os.getenv(env + "_BASE_URL", url), os.getenv(model_env, default))
+                base_url = os.getenv(env + "_BASE_URL", url)
+                self.providers[name] = OpenAICompatibleProvider(name, value, base_url, os.getenv(model_env, default))
         key = os.getenv("ANTHROPIC_API_KEY", "").strip()
         if key:
             self.providers["claude"] = AnthropicProvider(key, os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-latest"))
