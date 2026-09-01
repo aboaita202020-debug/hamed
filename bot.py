@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hamed AI Telegram runtime: multi-brain, 80+ agents, learning and research."""
+"""Hamed AI Telegram runtime with an HTTP health server."""
 from __future__ import annotations
 
 import os
@@ -18,10 +18,16 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 HAMED_NAME = os.getenv("HAMED_NAME", "Hamed AI")
 PORT = int(os.getenv("PORT", "8000"))
+TELEGRAM_POLLING_ENABLED = os.getenv("HAMED_TELEGRAM_POLLING", "true").lower() == "true"
 
 
 def validate_required_secrets() -> None:
-    missing = [name for name, value in (("TELEGRAM_BOT_TOKEN", TELEGRAM_BOT_TOKEN), ("OPENAI_API_KEY", OPENAI_API_KEY)) if not value]
+    missing = [
+        name for name, value in (
+            ("TELEGRAM_BOT_TOKEN", TELEGRAM_BOT_TOKEN),
+            ("OPENAI_API_KEY", OPENAI_API_KEY),
+        ) if not value
+    ]
     if missing:
         raise RuntimeError("Missing required environment variable(s): " + ", ".join(missing))
 
@@ -32,7 +38,7 @@ hamed = HamedOrchestrator(MultiBrainProvider())
 
 
 def status_text() -> str:
-    brains = ", ".join(getattr(hamed.provider, "available_brains", lambda: ("openai",))())
+    brains = ", ".join(hamed.provider.available_brains())
     return (
         f"🟢 {HAMED_NAME} ONLINE\n\n"
         "📡 Telegram: CONNECTED\n"
@@ -52,7 +58,7 @@ def handle_start(message):
 
 @bot.message_handler(commands=["help"])
 def handle_help(message):
-    bot.send_message(message.chat.id, "أوامر حامد:\n\n/start — تشغيل واختبار الاتصال\n/status — حالة النظام\n/brains — عرض فريق الوكلاء والعقول\n/learn — بحث تعلمي في علم النفس/المبيعات/الخدمات\n/reset — بدء محادثة جديدة\n\nثم اكتب طلبك مباشرة.")
+    bot.send_message(message.chat.id, "أوامر حامد:\n\n/start — تشغيل واختبار الاتصال\n/status — حالة النظام\n/brains — عرض فريق الوكلاء والعقول\n/learn — بحث تعلمي\n/reset — بدء محادثة جديدة\n\nثم اكتب طلبك مباشرة.")
 
 
 @bot.message_handler(commands=["brains"])
@@ -97,7 +103,7 @@ def handle_text(message):
 
 
 def start_health_server() -> threading.Thread:
-    config = uvicorn.Config("app.main:app", host="0.0.0.0", port=PORT, log_level="info")
+    config = uvicorn.Config("app.main:app", host="0.0.0.0", port=PORT, log_level="warning")
     server = uvicorn.Server(config)
     thread = threading.Thread(target=server.run, name="hamed-health-server", daemon=True)
     thread.start()
@@ -105,10 +111,14 @@ def start_health_server() -> threading.Thread:
 
 
 def run() -> None:
-    print(f"{HAMED_NAME} Telegram Bot STARTING...", flush=True)
-    print("80+ agents / Learning Council / Client Research / Multi-Brain: READY", flush=True)
+    print(f"{HAMED_NAME} Telegram runtime STARTING...", flush=True)
+    print("Multi-Brain / agents / learning / approvals: READY", flush=True)
     print("Database / Twilio / Paymob: OPTIONAL", flush=True)
     start_health_server()
+    if not TELEGRAM_POLLING_ENABLED:
+        print("Telegram polling: DISABLED (test mode)", flush=True)
+        while True:
+            time.sleep(60)
     while True:
         try:
             bot.infinity_polling(skip_pending=True, timeout=30, long_polling_timeout=30)
