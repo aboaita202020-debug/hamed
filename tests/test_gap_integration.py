@@ -21,6 +21,13 @@ def test_ten_brain_configuration_with_fake_credentials(monkeypatch):
     assert set(router.available_brains()) == {"openai","claude","deepseek","kimi","gemini","mistral","qwen","grok","llama","openrouter"}
 
 
+def test_groq_api_key_alias_enables_llama(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "fake-groq")
+    monkeypatch.delenv("LLAMA_API_KEY", raising=False)
+    router = MultiBrainProvider()
+    assert "llama" in router.available_brains()
+
+
 def test_safety_and_outreach_boundaries():
     assert not OutreachPolicy().validate(evidence=[])
     assert not OutreachPolicy().validate(evidence=["public"], opted_out=True)
