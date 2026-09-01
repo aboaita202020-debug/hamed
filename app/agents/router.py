@@ -11,23 +11,23 @@ KEYWORDS = {
     "industry": ("مصنع", "تصنيع", "تعبئة", "تغليف", "مستحضرات", "عقارات", "لوجستيات"),
 }
 
+CLIENT_WORDS = ("عميل", "عملاء", "زبون", "زبائن", "lead", "leads", "prospect", "prospects", "عملاء محتملين", "عملاء محتملون", "prospecting", "social media", "سوشيال")
+LEARNING_WORDS = ("تعلم", "اتعلم", "علم النفس", "psychology", "استراتيجية بيع", "خدمة العملاء", "sales science")
+
 class AgentRouter:
-    def select(self, text: str, limit: int = 6) -> list[str]:
+    def select(self, text: str, limit: int = 12) -> list[str]:
         t = text.lower()
         selected: list[str] = ["chief", "planner"]
         for domain, words in KEYWORDS.items():
             if any(w.lower() in t for w in words):
-                matches = [a.id for a in AGENT_REGISTRY.values() if a.domain == domain]
-                selected.extend(matches[:2])
-        if any(w in t for w in ("عميل", "عملاء", "lead", "leads", "زبون")):
+                selected.extend(a.id for a in AGENT_REGISTRY.values() if a.domain == domain)
+        if any(w in t for w in CLIENT_WORDS):
             selected.extend(CLIENT_RESEARCH_AGENTS)
-        if any(w in t for w in ("تعلم", "علم النفس", "مبيعات", "بيع", "خدمة العملاء", "strategy")):
+        if any(w in t for w in LEARNING_WORDS):
             selected.extend(LEARNING_COUNCIL)
         selected.append("reviewer")
         return list(dict.fromkeys(selected))[:limit]
 
     def system_context(self, text: str) -> str:
-        ids = self.select(text)
-        profiles = [AGENT_REGISTRY[i] for i in ids]
-        lines = [f"- {p.name}: {p.goal}" for p in profiles]
-        return "Selected specialist team:\n" + "\n".join(lines)
+        profiles = [AGENT_REGISTRY[i] for i in self.select(text)]
+        return "Selected specialist team:\n" + "\n".join(f"- {p.name}: {p.goal}" for p in profiles)
