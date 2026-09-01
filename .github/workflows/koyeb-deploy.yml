@@ -18,7 +18,11 @@ jobs:
       - name: Deploy Hamed from GitHub
         env:
           KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
+          test -n "$TELEGRAM_BOT_TOKEN"
+          test -n "$OPENAI_API_KEY"
           koyeb apps init hamed \
             --git https://github.com/aboaita202020-debug/hamed \
             --git-branch main \
@@ -28,4 +32,6 @@ jobs:
             --routes /:8000 \
             --env HAMED_HOST=0.0.0.0 \
             --env HAMED_PORT=8000 \
+            --env "TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN" \
+            --env "OPENAI_API_KEY=$OPENAI_API_KEY" \
             --token "$KOYEB_API_TOKEN"
