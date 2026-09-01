@@ -1,0 +1,41 @@
+name: Hamed AI Prelaunch Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  prelaunch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Syntax check
+        run: python -m compileall -q .
+
+      - name: Run tests
+        env:
+          TELEGRAM_BOT_TOKEN: test-token-placeholder
+          OPENAI_API_KEY: test-key-placeholder
+        run: PYTHONPATH=. pytest -q
+
+      - name: Docker build
+        run: docker build -t hamed-prelaunch .
+
+      - name: Docker smoke test
+        run: |
+          docker run -d --name hamed-smoke -e TELEGRAM_BOT_TOKEN=test-token-placeholder -e OPENAI_API_KEY=test-key-placeholder -p 8080:8080 hamed-prelaunch
+          sleep 8
+          docker ps --filter name=hamed-smoke --format '{{.Status}}'
+          docker logs hamed-smoke
+          docker rm -f hamed-smoke
