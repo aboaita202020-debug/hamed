@@ -1,0 +1,86 @@
+# Hamed AI — JustRunMy.App / Runny deployment contract
+#
+# This file is declarative documentation for deployment agents.
+# It does NOT contain real secrets.
+#
+# REQUIRED: the application cannot start as a standalone Telegram bot without these.
+# OPTIONAL: leave unset; the corresponding integration/provider must remain disabled.
+
+version: 1
+application: hamed-ai
+runtime:
+  entrypoint: python bot.py
+  healthcheck: python -m pytest -q
+
+# Runny must request ONLY these two values before the first deployment.
+required_environment:
+  - TELEGRAM_BOT_TOKEN
+  - OPENAI_API_KEY
+
+# These values must never be requested as prerequisites for a Telegram-only deployment.
+optional_environment:
+  persistence:
+    - DATABASE_URL
+
+  ai_brains:
+    - ANTHROPIC_API_KEY
+    - DEEPSEEK_API_KEY
+    - KIMI_API_KEY
+    - GEMINI_API_KEY
+    - MISTRAL_API_KEY
+    - QWEN_API_KEY
+    - XAI_API_KEY
+    - GROK_API_KEY
+    - LLAMA_API_KEY
+    - GROQ_API_KEY
+    - OPENROUTER_API_KEY
+
+  telegram:
+    - TELEGRAM_CHAT_ID
+
+  twilio:
+    - TWILIO_ACCOUNT_SID
+    - TWILIO_AUTH_TOKEN
+    - TWILIO_FROM_NUMBER
+
+  paymob:
+    - PAYMOB_API_KEY
+    - PAYMOB_PUBLIC_KEY
+    - PAYMOB_HMAC_SECRET
+    - PAYMOB_INTEGRATION_ID
+    - PAYMOB_BASE_URL
+
+  runtime:
+    - HAMED_TELEGRAM_POLLING
+    - HAMED_WORKER_ENABLED
+    - APP_ENV
+    - LOG_LEVEL
+
+rules:
+  - name: telegram_standalone
+    description: Telegram bot must run with only TELEGRAM_BOT_TOKEN and OPENAI_API_KEY.
+  - name: database_optional
+    description: DATABASE_URL is optional; the application must use its local/default persistence when absent.
+  - name: twilio_optional
+    description: Missing Twilio variables disable voice integration; they are never deployment blockers.
+  - name: paymob_optional
+    description: Missing Paymob variables disable payment integration; they are never deployment blockers.
+  - name: ai_brains_optional
+    description: Missing provider keys disable only that provider; the brain router must use configured providers and fallback behavior.
+  - name: no_fake_secrets
+    description: Never invent placeholder credentials to satisfy a required/optional field.
+  - name: no_secret_storage
+    description: Never commit real API keys, tokens, auth tokens, or payment credentials to source control.
+
+runny_agent_instructions:
+  required_inputs: [TELEGRAM_BOT_TOKEN, OPENAI_API_KEY]
+  do_not_block_on:
+    - DATABASE_URL
+    - TWILIO_ACCOUNT_SID
+    - TWILIO_AUTH_TOKEN
+    - TWILIO_FROM_NUMBER
+    - PAYMOB_API_KEY
+    - PAYMOB_PUBLIC_KEY
+    - PAYMOB_HMAC_SECRET
+    - PAYMOB_INTEGRATION_ID
+  deployment_mode: telegram-first
