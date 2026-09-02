@@ -1,10 +1,6 @@
 # Hamed AI — JustRunMy.App / Runny deployment contract
 #
-# This file is declarative documentation for deployment agents.
-# It does NOT contain real secrets.
-#
-# REQUIRED: the application cannot start as a standalone Telegram bot without these.
-# OPTIONAL: leave unset; the corresponding integration/provider must remain disabled.
+# Declarative deployment documentation. No real secrets.
 
 version: 1
 application: hamed-ai
@@ -12,28 +8,36 @@ runtime:
   entrypoint: python bot.py
   healthcheck: python -m pytest -q
 
-# Runny must request ONLY these two values before the first deployment.
 required_environment:
   - TELEGRAM_BOT_TOKEN
   - OPENAI_API_KEY
 
-# These values must never be requested as prerequisites for a Telegram-only deployment.
 optional_environment:
   persistence:
     - DATABASE_URL
 
   ai_brains:
     - ANTHROPIC_API_KEY
+    - ANTHROPIC_MODEL
     - DEEPSEEK_API_KEY
+    - DEEPSEEK_MODEL
     - KIMI_API_KEY
+    - KIMI_MODEL
     - GEMINI_API_KEY
+    - GEMINI_MODEL
     - MISTRAL_API_KEY
+    - MISTRAL_MODEL
     - QWEN_API_KEY
+    - QWEN_MODEL
     - XAI_API_KEY
+    - XAI_MODEL
     - GROK_API_KEY
+    - GROK_MODEL
     - LLAMA_API_KEY
+    - LLAMA_MODEL
     - GROQ_API_KEY
     - OPENROUTER_API_KEY
+    - OPENROUTER_MODEL
 
   telegram:
     - TELEGRAM_CHAT_ID
@@ -60,17 +64,17 @@ rules:
   - name: telegram_standalone
     description: Telegram bot must run with only TELEGRAM_BOT_TOKEN and OPENAI_API_KEY.
   - name: database_optional
-    description: DATABASE_URL is optional; the application must use its local/default persistence when absent.
+    description: DATABASE_URL is optional; local/default persistence is used when absent.
   - name: twilio_optional
-    description: Missing Twilio variables disable voice integration; they are never deployment blockers.
+    description: Missing Twilio variables disable voice integration and never block deployment.
   - name: paymob_optional
-    description: Missing Paymob variables disable payment integration; they are never deployment blockers.
+    description: Missing Paymob variables disable payment integration and never block deployment.
   - name: ai_brains_optional
-    description: Missing provider keys disable only that provider; the brain router must use configured providers and fallback behavior.
+    description: Missing provider keys disable only that provider; configured providers are routed with fallback.
   - name: no_fake_secrets
-    description: Never invent placeholder credentials to satisfy a required/optional field.
+    description: Never invent placeholder credentials.
   - name: no_secret_storage
-    description: Never commit real API keys, tokens, auth tokens, or payment credentials to source control.
+    description: Never commit real API keys, tokens, auth tokens, or payment credentials.
 
 runny_agent_instructions:
   required_inputs: [TELEGRAM_BOT_TOKEN, OPENAI_API_KEY]
