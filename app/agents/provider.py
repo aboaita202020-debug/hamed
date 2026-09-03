@@ -63,7 +63,7 @@ class OpenAICompatibleProvider:
 
 
 class GeminiProvider:
-    """Native Gemini REST provider; avoids the OpenAI-compatibility 404 seen on this project."""
+    """Native Gemini REST provider; avoids the previous OpenAI-compatibility 404."""
 
     def __init__(self, api_key: str, model: str = "gemini-2.5-flash-lite", timeout: int = 60) -> None:
         if not api_key:
@@ -153,32 +153,45 @@ class BrainSelector:
 
 
 class MultiBrainProvider:
-    """Multi-brain router with free-first routing and automatic fallback."""
+    """Multi-brain router with a free-only default and optional paid expansion."""
 
     def __init__(self):
         self.providers = {}
         self._load()
         if not self.providers:
-            raise RuntimeError("At least one AI provider must be configured")
+            raise RuntimeError("At least one free AI provider must be configured (GEMINI_API_KEY or KIMI_API_KEY)")
 
     def _load(self):
-        # Gemini is loaded natively because the OpenAI-compatible URL used before
-        # returned 404 for this project. Flash-Lite is selected by default because
-        # Google documents a free tier for supported Gemini models.
+        # Free mode is the default. Only Gemini and Kimi are loaded unless the
+        # user explicitly sets HAMED_FREE_ONLY=0 to allow paid/other providers.
+        free_only = os.getenv("HAMED_FREE_ONLY", "1").strip().lower() not in ("0", "false", "no", "off")
+
         key = os.getenv("GEMINI_API_KEY", "").strip()
         if key:
             self.providers["gemini"] = GeminiProvider(
                 key, os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
             )
 
-        # Keep Kimi available as an optional fallback when its account quota permits.
+        key = os.getenv("KIMI_API_KEY", "").strip()
+        if key:
+            self.providers["kimi"] = OpenAICompatibleProvider(
+                "kimi",
+                key,
+                os.getenv("KIMI_API_BASE_URL", "https://api.moonshot.ai/v1"),
+                os.getenv("KIMI_MODEL", "kimi-k2-0905-preview"),
+            )
+
+        if free_only:
+            return
+
+        # Optional paid/other providers are explicitly enabled with HAMED_FREE_ONLY=0.
         compatible = [
-            ("kimi", "KIMI_API_KEY", "https://api.moonshot.ai/v1", "KIMI_MODEL", "kimi-k2-0905-preview"),
             ("mistral", "MISTRAL_API_KEY", "https://api.mistral.ai/v1", "MISTRAL_MODEL", "mistral-small-latest"),
             ("qwen", "QWEN_API_KEY", "https://dashscope.aliyuncs.com/compatible-mode/v1", "QWEN_MODEL", "qwen-plus"),
             ("grok", "XAI_API_KEY", "https://api.x.ai/v1", "XAI_MODEL", "grok-3-mini"),
             ("llama", "LLAMA_API_KEY", "https://api.groq.com/openai/v1", "LLAMA_MODEL", "llama-4-scout-17b-16e-instruct"),
             ("openrouter", "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1", "OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+            ("deepseek", "DEEPSEEK_API_KEY", "https://api.deepseek.com", "DEEPSEEK_MODEL", "deepseek-chat"),
         ]
         for name, env, url, model_env, default in compatible:
             value = os.getenv(env, "").strip()
@@ -192,28 +205,17 @@ class MultiBrainProvider:
                     name, value, os.getenv(env + "_BASE_URL", url), os.getenv(model_env, default)
                 )
 
-        # Paid/limited providers are optional. They are disabled by default in
-        # HAMED_FREE_ONLY mode so the user can run Hamed without paid API calls.
-        free_only = os.getenv("HAMED_FREE_ONLY", "1").strip().lower() not in ("0", "false", "no", "off")
-        if not free_only:
-            key = os.getenv("OPENAI_API_KEY", "").strip()
-            if key:
-                self.providers["openai"] = OpenAIProvider(key, os.getenv("OPENAI_MODEL", "gpt-5"))
+        key = os.getenv("OPENAI_API_KEY", "").strip()
+        if key:
+            self.providers["openai"] = OpenAIProvider(key, os.getenv("OPENAI_MODEL", "gpt-5"))
 
-            key = os.getenv("ANTHROPIC_API_KEY", "").strip()
-            if key:
-                self.providers["claude"] = AnthropicProvider(
-                    key,
-                    os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-latest"),
-                    os.getenv("ANTHROPIC_WORKSPACE_ID", "").strip(),
-                )
-
-            key = os.getenv("DEEPSEEK_API_KEY", "").strip()
-            if key:
-                self.providers["deepseek"] = OpenAICompatibleProvider(
-                    "deepseek", key, os.getenv("DEEPSEEK_API_BASE_URL", "https://api.deepseek.com"),
-                    os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
-                )
+        key = os.getenv("ANTHROPIC_API_KEY", "").strip()
+        if key:
+            self.providers["claude"] = AnthropicProvider(
+                key,
+                os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-latest"),
+                os.getenv("ANTHROPIC_WORKSPACE_ID", "").strip(),
+            )
 
     def _order(self, task):
         return BrainSelector().rank(task, tuple(self.providers))
