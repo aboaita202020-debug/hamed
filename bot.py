@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hamed AI Telegram runtime with an HTTP health server."""
+"""Hamed AI runtime: Telegram interface + independent 24/7 autonomous core."""
 from __future__ import annotations
 
 import os
@@ -12,6 +12,7 @@ import uvicorn
 
 from app.agents.orchestrator import HamedOrchestrator
 from app.agents.provider import MultiBrainProvider
+from app.agents.autonomous_core import AutonomousCore
 
 load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
@@ -19,6 +20,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 HAMED_NAME = os.getenv("HAMED_NAME", "Hamed AI")
 PORT = int(os.getenv("PORT", "8000"))
 TELEGRAM_POLLING_ENABLED = os.getenv("HAMED_TELEGRAM_POLLING", "true").lower() == "true"
+AUTONOMOUS_NOTIFY_CHAT_ID = os.getenv("HAMED_AUTONOMOUS_NOTIFY_CHAT_ID", "").strip()
 
 
 def validate_required_secrets() -> None:
@@ -37,16 +39,31 @@ bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN, parse_mode=None)
 hamed = HamedOrchestrator(MultiBrainProvider())
 
 
+def autonomous_notify(text: str) -> None:
+    if not AUTONOMOUS_NOTIFY_CHAT_ID:
+        print(text, flush=True)
+        return
+    try:
+        bot.send_message(int(AUTONOMOUS_NOTIFY_CHAT_ID), text)
+    except Exception as exc:
+        print(f"Autonomous notification error: {type(exc).__name__}: {exc}", flush=True)
+
+
+# This core runs independently of Telegram polling. Telegram is only an interface/notification channel.
+autonomous_core = AutonomousCore(hamed, notify=autonomous_notify)
+
+
 def status_text() -> str:
     brains = ", ".join(hamed.provider.available_brains())
     return (
         f"🟢 {HAMED_NAME} ONLINE\n\n"
-        "📡 Telegram: CONNECTED\n"
+        "🧠 Autonomous Core: 24/7 READY\n"
         f"🧠 AI Brains: {brains}\n"
         "🤖 80+ specialist agents: READY\n"
         "📚 Learning Council: READY\n"
         "🎯 Client Research Team: READY\n"
-        "🛡️ Safety & approvals: ACTIVE\n\n"
+        "🛡️ Safety & approvals: ACTIVE\n"
+        "📡 Telegram: INTERFACE ONLY\n\n"
         "اكتب /help لمعرفة الأوامر."
     )
 
@@ -111,10 +128,12 @@ def start_health_server() -> threading.Thread:
 
 
 def run() -> None:
-    print(f"{HAMED_NAME} Telegram runtime STARTING...", flush=True)
-    print("Multi-Brain / agents / learning / approvals: READY", flush=True)
+    print(f"{HAMED_NAME} runtime STARTING...", flush=True)
+    print("Autonomous Core / Multi-Brain / agents / learning / approvals: READY", flush=True)
+    print("Telegram is an interface; autonomous core is independent of Telegram polling.", flush=True)
     print("Database / Twilio / Paymob: OPTIONAL", flush=True)
     start_health_server()
+    autonomous_core.start()
     if not TELEGRAM_POLLING_ENABLED:
         print("Telegram polling: DISABLED (test mode)", flush=True)
         while True:
