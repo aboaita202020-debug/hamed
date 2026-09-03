@@ -13,6 +13,7 @@ import uvicorn
 from app.agents.orchestrator import HamedOrchestrator
 from app.agents.provider import MultiBrainProvider
 from app.agents.autonomous_core import AutonomousCore
+from app.voice.telegram_tts import TelegramTTS
 
 load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
@@ -24,19 +25,20 @@ AUTONOMOUS_NOTIFY_CHAT_ID = os.getenv("HAMED_AUTONOMOUS_NOTIFY_CHAT_ID", "").str
 
 
 def validate_required_secrets() -> None:
-    missing = [
-        name for name, value in (
-            ("TELEGRAM_BOT_TOKEN", TELEGRAM_BOT_TOKEN),
-            ("OPENAI_API_KEY", OPENAI_API_KEY),
-        ) if not value
-    ]
-    if missing:
-        raise RuntimeError("Missing required environment variable(s): " + ", ".join(missing))
+    free_only = os.getenv("HAMED_FREE_ONLY", "1").lower() not in ("0", "false", "no", "off")
+    free_brain = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("KIMI_API_KEY", "").strip()
+    if not TELEGRAM_BOT_TOKEN:
+        raise RuntimeError("Missing required environment variable(s): TELEGRAM_BOT_TOKEN")
+    if free_only and not free_brain:
+        raise RuntimeError("Missing free AI brain key: GEMINI_API_KEY or KIMI_API_KEY")
+    if not free_only and not OPENAI_API_KEY:
+        raise RuntimeError("Missing required environment variable(s): OPENAI_API_KEY")
 
 
 validate_required_secrets()
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN, parse_mode=None)
 hamed = HamedOrchestrator(MultiBrainProvider())
+voice_tts = TelegramTTS()
 
 
 def autonomous_notify(text: str) -> None:
@@ -53,8 +55,25 @@ def autonomous_notify(text: str) -> None:
 autonomous_core = AutonomousCore(hamed, notify=autonomous_notify)
 
 
+def send_hamed_reply(chat_id: int, reply: str) -> None:
+    """Prefer free voice output; always fall back to text if TTS/network fails."""
+    if voice_tts.enabled:
+        audio_path = voice_tts.synthesize(reply)
+        if audio_path:
+            try:
+                with open(audio_path, "rb") as audio:
+                    bot.send_audio(chat_id, audio, title="Hamed AI")
+                return
+            except Exception as exc:
+                print(f"Voice send error: {type(exc).__name__}: {exc}", flush=True)
+            finally:
+                voice_tts.cleanup(audio_path)
+    bot.send_message(chat_id, reply)
+
+
 def status_text() -> str:
     brains = ", ".join(hamed.provider.available_brains())
+    voice_status = "READY" if voice_tts.enabled else "OFF"
     return (
         f"🟢 {HAMED_NAME} ONLINE\n\n"
         "🧠 Autonomous Core: 24/7 READY\n"
@@ -63,6 +82,7 @@ def status_text() -> str:
         "📚 Learning Council: READY\n"
         "🎯 Client Research Team: READY\n"
         "🛡️ Safety & approvals: ACTIVE\n"
+        f"🔊 Voice Reply: {voice_status}\n"
         "📡 Telegram: INTERFACE ONLY\n\n"
         "اكتب /help لمعرفة الأوامر."
     )
@@ -75,7 +95,7 @@ def handle_start(message):
 
 @bot.message_handler(commands=["help"])
 def handle_help(message):
-    bot.send_message(message.chat.id, "أوامر حامد:\n\n/start — تشغيل واختبار الاتصال\n/status — حالة النظام\n/brains — عرض فريق الوكلاء والعقول\n/learn — بحث تعلمي\n/reset — بدء محادثة جديدة\n\nثم اكتب طلبك مباشرة.")
+    bot.send_message(message.chat.id, "أوامر حامد:\n\n/start — تشغيل واختبار الاتصال\n/status — حالة النظام\n/brains — عرض فريق الوكلاء والعقول\n/learn — بحث تعلمي\n/reset — بدء محادثة جديدة\n\n🔊 الرد الصوتي يعمل تلقائياً عند نجاح خدمة الصوت.\n\nثم اكتب طلبك مباشرة.")
 
 
 @bot.message_handler(commands=["brains"])
@@ -116,7 +136,7 @@ def handle_text(message):
     except Exception as exc:
         print(f"Hamed request error: {type(exc).__name__}: {exc}", flush=True)
         reply = "حصل خطأ مؤقت داخل Hamed. استخدم /status ثم حاول مرة أخرى."
-    bot.send_message(message.chat.id, reply)
+    send_hamed_reply(message.chat.id, reply)
 
 
 def start_health_server() -> threading.Thread:
