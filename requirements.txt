@@ -20,6 +20,8 @@ anthropic==0.34.2
 # Voice / realtime telephony (optional at runtime)
 twilio==9.3.6
 websockets==13.1
+# Free Telegram voice replies (MP3)
+gTTS==2.5.4
 
 # Optional local/dev compatibility
 Flask==3.0.3
