@@ -2,32 +2,39 @@
 setlocal EnableExtensions
 cd /d "%~dp0"
 title HAMED AI - WINDOWS 7 START
+
 echo ============================================
-echo       HAMED AI - START WITH DIAGNOSTICS
+echo        HAMED AI - WINDOWS 7 START
 echo ============================================
 echo.
 set "LOG=%~dp0hamed_start.log"
 echo [%date% %time%] Starting Hamed>>"%LOG%"
-echo [1] Checking Python...
-where python >nul 2>nul
-if errorlevel 1 goto NO_PYTHON
-python --version
-if errorlevel 1 goto NO_PYTHON
 
-echo [2] Starting Windows 7 compatibility server...
+echo [1] Checking Python 3.8...
+py -3.8 --version >>"%LOG%" 2>&1
+if errorlevel 1 goto NO_PYTHON
+py -3.8 --version
+
+echo [2] Checking Hamed server file...
 if not exist "%~dp0win7_server.py" goto NO_SERVER
+
+echo [3] Starting Hamed AI...
 echo Dashboard: http://127.0.0.1:8000/dashboard
 echo Health:    http://127.0.0.1:8000/health
 echo.
-echo IMPORTANT: keep this black window open while Hamed is running.
+start "" "http://127.0.0.1:8000/dashboard"
+echo Keep this black window open while Hamed is running.
 echo Press CTRL+C to stop Hamed.
 echo.
-python "%~dp0win7_server.py" >>"%LOG%" 2>&1
+
+py -3.8 "%~dp0win7_server.py" >>"%LOG%" 2>&1
 set "ERR=%ERRORLEVEL%"
 echo.
 if "%ERR%"=="0" goto END
 echo Hamed stopped with error code %ERR%.
 echo See the log file: %LOG%
+echo.
+type "%LOG%"
 echo.
 echo The window will remain open so you can read the error.
 pause
@@ -35,9 +42,10 @@ goto END
 
 :NO_PYTHON
 echo.
-echo ERROR: Python was not found in PATH.
-echo Windows 7 needs Python 3.8.x.
-echo Download: https://www.python.org/downloads/release/python-3810/
+echo ERROR: Python 3.8 was not found through py -3.8.
+echo Your Hamed Windows 7 launcher requires Python 3.8.x.
+echo.
+echo Run: py -3.8 --version
 pause
 goto END
 
