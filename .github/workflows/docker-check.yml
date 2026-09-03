@@ -23,6 +23,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: 12345:TEST_TOKEN_PLACEHOLDER
           OPENAI_API_KEY: sk-test-placeholder
+          HAMED_FREE_ONLY: "0"
         run: PYTHONPATH=. pytest -q
 
       - name: Build Hamed image
@@ -34,6 +35,7 @@ jobs:
           docker run -d --name hamed-ci -p 8000:8000 \
             -e TELEGRAM_BOT_TOKEN=12345:TEST_TOKEN_PLACEHOLDER \
             -e OPENAI_API_KEY=sk-test-placeholder \
+            -e HAMED_FREE_ONLY=0 \
             -e HAMED_TELEGRAM_POLLING=false \
             -e HAMED_WORKER_ENABLED=false \
             hamed:ci
