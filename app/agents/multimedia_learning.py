@@ -7,7 +7,6 @@ review. Safety and platform terms remain higher priority than learned tactics.
 """
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import List
 
 from .learning_engine import CommercialLearningEngine, LearningRecord, Skill
 
@@ -16,7 +15,7 @@ from .learning_engine import CommercialLearningEngine, LearningRecord, Skill
 class LearningSource:
     title: str
     url: str
-    source_type: str  # article, video, paper, book, course, discussion
+    source_type: str
     topic: str
     evidence: str = ""
     quality: float = 0.5
@@ -24,7 +23,7 @@ class LearningSource:
 
 
 class MultimediaLearningEngine:
-    """Builds a persistent, evidence-first learning corpus for commercial skills."""
+    """Builds an evidence-first learning corpus for commercial skills."""
 
     TOPICS = (
         "sales discovery and consultative selling",
@@ -37,11 +36,11 @@ class MultimediaLearningEngine:
         "Egypt and Gulf customer behavior and commercial practices",
     )
 
-    def __init__(self, commercial: CommercialLearningEngine | None = None) -> None:
+    def __init__(self, commercial=None):
         self.commercial = commercial or CommercialLearningEngine()
-        self.sources: List[LearningSource] = []
+        self.sources = []
 
-    def build_research_plan(self, topic: str | None = None) -> List[str]:
+    def build_research_plan(self, topic=None):
         selected = topic or "sales, marketing and customer psychology"
         return [
             f"{selected} peer reviewed research and university material",
@@ -52,19 +51,13 @@ class MultimediaLearningEngine:
             f"{selected} Egypt and Gulf market examples",
         ]
 
-    def ingest(self, *, title: str, url: str, source_type: str, topic: str,
-               evidence: str, quality: float = 0.5) -> LearningSource:
-        source = LearningSource(title, url, source_type, topic, evidence, max(0.0, min(1.0, quality)))
+    def ingest(self, *, title, url, source_type, topic, evidence, quality=0.5):
+        source = LearningSource(title, url, source_type, topic, evidence,
+                                max(0.0, min(1.0, quality)))
         self.sources.append(source)
         return source
 
-    def convert_evidence_to_lessons(self, source: LearningSource) -> List[LearningRecord]:
-        """Create candidate lessons from already extracted evidence.
-
-        The caller/provider is responsible for extracting the evidence from a
-        permitted source. We never invent a transcript or pretend a video was
-        watched when only metadata is available.
-        """
+    def convert_evidence_to_lessons(self, source):
         if not source.evidence.strip():
             return []
         skill = self._skill_for_topic(source.topic)
@@ -76,8 +69,7 @@ class MultimediaLearningEngine:
         return [LearningRecord(skill=skill, lesson=lesson, source=source.url,
                                evidence=source.evidence, confidence=source.quality)]
 
-    def add_verified_lesson(self, *, skill: Skill, lesson: str, source: str,
-                            evidence: str, confidence: float = 0.7) -> LearningRecord:
+    def add_verified_lesson(self, *, skill, lesson, source, evidence, confidence=0.7):
         if not evidence.strip():
             raise ValueError("evidence is required")
         return self.commercial.learn(LearningRecord(
@@ -86,7 +78,7 @@ class MultimediaLearningEngine:
         ))
 
     @staticmethod
-    def _skill_for_topic(topic: str) -> Skill:
+    def _skill_for_topic(topic):
         t = topic.lower()
         if "psychology" in t or "buyer" in t or "customer" in t:
             return Skill.CUSTOMER_INTELLIGENCE
@@ -100,7 +92,7 @@ class MultimediaLearningEngine:
             return Skill.WEBSITES
         return Skill.SALES
 
-    def summary(self) -> dict:
+    def summary(self):
         return {
             "sources": len(self.sources),
             "topics": list(self.TOPICS),
