@@ -153,19 +153,17 @@ class BrainSelector:
 
 
 class MultiBrainProvider:
-    """Multi-brain router with a free-only default and optional paid expansion."""
+    """Multi-brain router; free-capable brains are preferred, configured brains remain available."""
 
     def __init__(self):
         self.providers = {}
         self._load()
         if not self.providers:
-            raise RuntimeError("At least one free AI provider must be configured (GEMINI_API_KEY or KIMI_API_KEY)")
+            raise RuntimeError("At least one AI provider must be configured")
 
     def _load(self):
-        # Free mode is the default. Only Gemini and Kimi are loaded unless the
-        # user explicitly sets HAMED_FREE_ONLY=0 to allow paid/other providers.
-        free_only = os.getenv("HAMED_FREE_ONLY", "1").strip().lower() not in ("0", "false", "no", "off")
-
+        # Load every provider for which a credential is configured. Routing remains
+        # free-first, so free brains are preferred without silently hiding configured brains.
         key = os.getenv("GEMINI_API_KEY", "").strip()
         if key:
             self.providers["gemini"] = GeminiProvider(
@@ -181,10 +179,6 @@ class MultiBrainProvider:
                 os.getenv("KIMI_MODEL", "kimi-k2-0905-preview"),
             )
 
-        if free_only:
-            return
-
-        # Optional paid/other providers are explicitly enabled with HAMED_FREE_ONLY=0.
         compatible = [
             ("mistral", "MISTRAL_API_KEY", "https://api.mistral.ai/v1", "MISTRAL_MODEL", "mistral-small-latest"),
             ("qwen", "QWEN_API_KEY", "https://dashscope.aliyuncs.com/compatible-mode/v1", "QWEN_MODEL", "qwen-plus"),
