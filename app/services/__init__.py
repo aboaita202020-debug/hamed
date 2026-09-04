@@ -10,6 +10,7 @@ from .revenue_ceo import RevenueCEO, RevenueDecision
 from .supplier_database import SupplierDatabase, SupplierRecord
 from .digital_delivery import DigitalDeliveryEngine
 from .execution_adapters import ExecutionAdapters, ActionIntent
+from .customer_prospecting import CustomerProspectingEngine, ProspectAssessment
 
 __all__ = [
     "CRM", "EducationCouncil", "OpportunityEngine", "PackageEngine", "OfferEngine",
@@ -18,5 +19,5 @@ __all__ = [
     "QRMenu", "KnowledgeBase", "SocialGrowthEngine", "SocialGrowthPlan",
     "RevenueHub", "RevenueOpportunity", "RevenueCEO", "RevenueDecision",
     "SupplierDatabase", "SupplierRecord", "DigitalDeliveryEngine",
-    "ExecutionAdapters", "ActionIntent",
+    "ExecutionAdapters", "ActionIntent", "CustomerProspectingEngine", "ProspectAssessment",
 ]
