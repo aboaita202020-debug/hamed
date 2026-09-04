@@ -14,6 +14,7 @@ from .agents.commercial_brain import build_plan
 from .agents.orchestrator import HamedOrchestrator
 from .agents.provider import OpenAIProvider
 from .config import settings
+from .runtime import http_host, http_port
 
 
 class FallbackProvider:
@@ -197,4 +198,9 @@ def run_telegram_bot() -> None:
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=int(os.getenv("PORT", "8000")), reload=False)
+    uvicorn.run(
+        "app.main:app",
+        host=http_host(),
+        port=http_port(),
+        reload=False,
+    )
