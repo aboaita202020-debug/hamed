@@ -9,6 +9,7 @@ It plans and queues work; external actions still require authorized channels.
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
+import math
 
 
 REVENUE_MODES = (
@@ -25,6 +26,12 @@ REVENUE_MODES = (
     "tender_hunter", "market_intelligence", "seasonal_opportunities",
     "digital_services", "reorder_prediction", "deal_packaging",
     "revenue_radar",
+    "cross_border", "demand_predictor", "supplier_negotiator", "bulk_buyer",
+    "white_label_finder", "distributor_network", "commission_finder",
+    "corporate_accounts", "recurring_revenue", "unused_capacity_hunter",
+    "dead_stock_exchange", "bundle_optimizer", "churn_predictor",
+    "referral_network", "revenue_experiments", "profit_leak_detector",
+    "opportunity_portfolio", "daily_revenue_target", "revenue_brain",
 )
 
 
@@ -41,22 +48,25 @@ class RevenueHub:
     """Central commercial engine used to discover and grow legitimate revenue."""
 
     def discover_modes(self, customer_or_market: dict[str, Any] | None = None) -> list[str]:
-        """Return revenue modes relevant to supplied context without inventing facts."""
         data = customer_or_market or {}
         text = " ".join(str(v) for v in data.values()).lower()
-        modes = ["lead_hunting", "universal_services", "opportunity_hunting", "sales_analytics", "revenue_radar"]
+        modes = ["lead_hunting", "universal_services", "opportunity_hunting", "sales_analytics", "revenue_radar", "revenue_brain"]
         if any(x in text for x in ("affiliate", "عمولة", "افلييت")):
-            modes.append("affiliate")
+            modes.extend(["affiliate", "commission_finder", "commission_marketplace"])
         if any(x in text for x in ("شركة", "توريد", "b2b", "wholesale", "جملة")):
-            modes.extend(["b2b_deals", "procurement_service", "distributor_finder"])
-        if any(x in text for x in ("اشتراك", "subscription", "monthly")):
-            modes.append("subscriptions")
-        if any(x in text for x in ("تصدير", "export", "خارج مصر")):
-            modes.append("export_hunter")
+            modes.extend(["b2b_deals", "procurement_service", "distributor_finder", "corporate_accounts"])
+        if any(x in text for x in ("اشتراك", "subscription", "monthly", "شهري")):
+            modes.extend(["subscriptions", "recurring_revenue", "churn_predictor"])
+        if any(x in text for x in ("تصدير", "export", "خارج مصر", "دولي", "international")):
+            modes.extend(["export_hunter", "cross_border"])
         if any(x in text for x in ("مناقصة", "tender", "rfq", "طلب عرض")):
             modes.extend(["tender_hunter", "rfq_hunter"])
-        if any(x in text for x in ("مخزون", "inventory", "تصفيات", "clearance")):
-            modes.extend(["inventory_optimizer", "clearance_hunter"])
+        if any(x in text for x in ("مخزون", "inventory", "تصفيات", "clearance", "راكد")):
+            modes.extend(["inventory_optimizer", "clearance_hunter", "dead_stock_exchange"])
+        if any(x in text for x in ("مصنع", "factory", "طاقة", "capacity")):
+            modes.append("unused_capacity_hunter")
+        if any(x in text for x in ("منتج", "product", "طلب", "demand")):
+            modes.extend(["product_validation", "demand_predictor", "bulk_buyer", "white_label_finder"])
         return list(dict.fromkeys(modes))
 
     def build_pipeline(self, *, modes: list[str] | None = None) -> list[RevenueOpportunity]:
@@ -107,6 +117,25 @@ class RevenueHub:
             "reorder_prediction": ("Estimate reorder timing from actual customer/order history", "predict_reorder_timing"),
             "deal_packaging": ("Bundle complementary products or services into useful packages", "build_value_bundle"),
             "revenue_radar": ("Rank all evidence-backed revenue opportunities by expected value and effort", "rank_revenue_opportunities"),
+            "cross_border": ("Match verified cross-border demand and supply with trade constraints visible", "research_cross_border_trade"),
+            "demand_predictor": ("Estimate demand signals from observed evidence before committing resources", "predict_demand"),
+            "supplier_negotiator": ("Prepare evidence-based supplier negotiation targets and alternatives", "prepare_supplier_negotiation"),
+            "bulk_buyer": ("Aggregate compatible demand to unlock legitimate volume economics", "build_bulk_buying_plan"),
+            "white_label_finder": ("Find and validate private-label/white-label supply options", "research_white_label_supply"),
+            "distributor_network": ("Build a verified distributor and agent network by market", "map_distributor_network"),
+            "commission_finder": ("Find transparent commission/referral opportunities that fit Hamed's services", "research_commission_opportunities"),
+            "corporate_accounts": ("Build recurring B2B account opportunities and procurement relationships", "target_corporate_accounts"),
+            "recurring_revenue": ("Convert repeatable customer value into ethical recurring offers", "design_recurring_offer"),
+            "unused_capacity_hunter": ("Find verified unused business capacity that can be matched to demand", "research_unused_capacity"),
+            "dead_stock_exchange": ("Match verified surplus/dead stock with relevant buyers", "match_dead_stock"),
+            "bundle_optimizer": ("Optimize complementary bundles for customer value and margin", "optimize_bundle"),
+            "churn_predictor": ("Detect observable churn signals and prepare retention actions", "predict_churn"),
+            "referral_network": ("Turn satisfied customers and partners into a disclosed referral network", "grow_referral_network"),
+            "revenue_experiments": ("Run measurable low-risk offer, pricing and channel experiments", "run_revenue_experiment"),
+            "profit_leak_detector": ("Find margin leakage in pricing, costs, discounts and operations", "detect_profit_leaks"),
+            "opportunity_portfolio": ("Balance fast, recurring and high-value opportunities instead of chasing one bet", "build_opportunity_portfolio"),
+            "daily_revenue_target": ("Translate a daily revenue target into measurable pipeline requirements", "plan_daily_revenue_target"),
+            "revenue_brain": ("Choose the highest expected-return lawful revenue work from the whole opportunity portfolio", "decide_revenue_focus"),
         }
         return [RevenueOpportunity(m, actions[m][0], actions[m][1]) for m in selected]
 
@@ -137,7 +166,6 @@ class RevenueHub:
         return {"ready": True, "strategy": "contextual_non_spam_follow_up", "approval_required": False}
 
     def rank_opportunities(self, opportunities: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Rank opportunities using evidence, customer fit, value and effort; never invent missing values."""
         ranked = []
         for item in opportunities:
             score = self.score_opportunity(
@@ -151,6 +179,27 @@ class RevenueHub:
             item["score"] = round(score * (1.0 - 0.25 * risk) / effort * min(effort, 10.0), 2)
             ranked.append(item)
         return sorted(ranked, key=lambda x: x["score"], reverse=True)
+
+    def revenue_brain(self, opportunities: list[dict[str, Any]], *, daily_target: float = 0.0) -> dict[str, Any]:
+        """Select a focus from observed opportunities; this is prioritization, not a guarantee."""
+        if daily_target < 0:
+            raise ValueError("daily_target must be non-negative")
+        ranked = self.rank_opportunities(opportunities)
+        focus = ranked[0] if ranked else None
+        return {"daily_target": daily_target, "opportunity_count": len(ranked), "focus": focus,
+                "portfolio": ranked[:10], "next_action": focus.get("next_action") if focus else "collect_evidence",
+                "guaranteed_revenue": False}
+
+    def daily_revenue_plan(self, *, target: float, average_deal_value: float | None = None,
+                           close_rate: float | None = None) -> dict[str, Any]:
+        if target < 0 or (average_deal_value is not None and average_deal_value <= 0):
+            raise ValueError("invalid revenue target inputs")
+        if close_rate is not None and not 0 < close_rate <= 1:
+            raise ValueError("close_rate must be between 0 and 1")
+        deals_needed = None if average_deal_value is None else math.ceil(target / average_deal_value)
+        leads_needed = None if deals_needed is None or close_rate is None else math.ceil(deals_needed / close_rate)
+        return {"target": target, "average_deal_value": average_deal_value, "close_rate": close_rate,
+                "deals_needed": deals_needed, "leads_needed": leads_needed, "guaranteed_revenue": False}
 
     def client_growth_mode(self, *, goal: str, platforms: list[str] | None = None) -> dict[str, Any]:
         return {
