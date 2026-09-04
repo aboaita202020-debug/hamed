@@ -11,6 +11,7 @@ from .supplier_database import SupplierDatabase, SupplierRecord
 from .digital_delivery import DigitalDeliveryEngine
 from .execution_adapters import ExecutionAdapters, ActionIntent
 from .customer_prospecting import CustomerProspectingEngine, ProspectAssessment
+from .fast_cash import FastCashEngine, FastCashOffer
 
 __all__ = [
     "CRM", "EducationCouncil", "OpportunityEngine", "PackageEngine", "OfferEngine",
@@ -20,4 +21,5 @@ __all__ = [
     "RevenueHub", "RevenueOpportunity", "RevenueCEO", "RevenueDecision",
     "SupplierDatabase", "SupplierRecord", "DigitalDeliveryEngine",
     "ExecutionAdapters", "ActionIntent", "CustomerProspectingEngine", "ProspectAssessment",
+    "FastCashEngine", "FastCashOffer",
 ]
