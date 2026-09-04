@@ -6,6 +6,7 @@ The model cannot change these limits.
 """
 from dataclasses import dataclass
 import os
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -17,7 +18,7 @@ class AutonomyPolicy:
     max_payment_value: float = float(os.getenv("HAMED_MAX_PAYMENT_VALUE", "0"))
     max_discount_percent: float = float(os.getenv("HAMED_MAX_DISCOUNT_PERCENT", "20"))
 
-    def allows(self, action: str, value: float | None = None) -> bool:
+    def allows(self, action: str, value: Optional[float] = None) -> bool:
         if not self.enabled:
             return False
         if action == "purchase":
