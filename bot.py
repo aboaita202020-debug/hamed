@@ -13,13 +13,18 @@ import uvicorn
 from app.agents.orchestrator import HamedOrchestrator
 from app.agents.provider import MultiBrainProvider
 from app.agents.autonomous_core import AutonomousCore
+from app.runtime import http_host, http_port
 from app.voice.telegram_tts import TelegramTTS
 
 load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 HAMED_NAME = os.getenv("HAMED_NAME", "Hamed AI")
-PORT = int(os.getenv("PORT", "8000"))
+# PaaS manifests in this repository expose HAMED_HOST/HAMED_PORT, while
+# container platforms commonly inject PORT. Prefer the explicit Hamed settings
+# so the documented deployment configuration actually controls the listener.
+HOST = http_host()
+PORT = http_port()
 TELEGRAM_POLLING_ENABLED = os.getenv("HAMED_TELEGRAM_POLLING", "true").lower() == "true"
 AUTONOMOUS_NOTIFY_CHAT_ID = os.getenv("HAMED_AUTONOMOUS_NOTIFY_CHAT_ID", "").strip()
 
@@ -136,7 +141,7 @@ def handle_text(message):
 
 
 def start_health_server() -> threading.Thread:
-    config = uvicorn.Config("app.main:app", host="0.0.0.0", port=PORT, log_level="warning")
+    config = uvicorn.Config("app.main:app", host=HOST, port=PORT, log_level="warning")
     server = uvicorn.Server(config)
     thread = threading.Thread(target=server.run, name="hamed-health-server", daemon=True)
     thread.start()
