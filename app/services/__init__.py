@@ -6,6 +6,7 @@ from .platform import (
 )
 from .social_growth import SocialGrowthEngine, SocialGrowthPlan
 from .revenue_hub import RevenueHub, RevenueOpportunity
+from .revenue_ceo import RevenueCEO, RevenueDecision
 from .supplier_database import SupplierDatabase, SupplierRecord
 from .digital_delivery import DigitalDeliveryEngine
 
@@ -14,5 +15,6 @@ __all__ = [
     "NegotiationEngine", "RestaurantGrowthEngine", "ReputationEngine",
     "SalesMessageEngine", "ServiceCatalog", "WebsiteAnalyzer", "StoreAnalyzer",
     "QRMenu", "KnowledgeBase", "SocialGrowthEngine", "SocialGrowthPlan",
-    "RevenueHub", "RevenueOpportunity", "SupplierDatabase", "SupplierRecord", "DigitalDeliveryEngine",
+    "RevenueHub", "RevenueOpportunity", "RevenueCEO", "RevenueDecision",
+    "SupplierDatabase", "SupplierRecord", "DigitalDeliveryEngine",
 ]
