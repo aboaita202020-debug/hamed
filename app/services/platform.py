@@ -74,7 +74,21 @@ class SalesMessageEngine:
 class Service:
     service_id:str;name:str;category:str;description:str;target_customer:str;problems_solved:tuple[str,...];deliverables:tuple[str,...];required_agents:tuple[str,...]=();required_tools:tuple[str,...]=();duration:str="scope-dependent";pricing_model:str="custom";minimum_price:float=0;recommended_price:float=0;deposit_policy:str="policy-defined"
 class ServiceCatalog:
-    def __init__(self):self.services={"website-optimization":Service("website-optimization","Website Optimization","web","Evidence-based website improvements","business",("ux","conversion"),("audit","recommendations")),"qr-menu":Service("qr-menu","QR Menu","restaurant","Editable QR-linked menu","restaurant",("menu-access",),("mobile-menu","qr")),"seo":Service("seo","SEO","marketing","Search visibility improvements","business",("search-visibility",),("seo-audit","plan")),"reputation":Service("reputation","Reputation Analysis","customer","Public review analysis","local-business",("reputation",),("review-analysis",)),"store-optimization":Service("store-optimization","Store Optimization","commerce","Evidence-based store improvements","ecommerce",("conversion",),("store-audit","recommendations")),"marketing-plan":Service("marketing-plan","Marketing Plan","marketing","Actionable growth plan","business",("growth",),("strategy","roadmap"))}
+    def __init__(self):
+        self.services={
+            "website-optimization":Service("website-optimization","Website Optimization","web","Evidence-based website improvements","business",("ux","conversion"),("audit","recommendations")),
+            "qr-menu":Service("qr-menu","QR Menu","restaurant","Editable QR-linked menu","restaurant",("menu-access",),("mobile-menu","qr")),
+            "seo":Service("seo","SEO","marketing","Search visibility improvements","business",("search-visibility",),("seo-audit","plan")),
+            "reputation":Service("reputation","Reputation Analysis","customer","Public review analysis","local-business",("reputation",),("review-analysis",)),
+            "store-optimization":Service("store-optimization","Store Optimization","commerce","Evidence-based store improvements","ecommerce",("conversion",),("store-audit","recommendations")),
+            "marketing-plan":Service("marketing-plan","Marketing Plan","marketing","Actionable growth plan","business",("growth",),("strategy","roadmap")),
+            "social-media-management":Service("social-media-management","Social Media Management","social","Content, community and growth management","business",("inconsistent-content","low-engagement","weak-social-presence"),("audit","content-calendar","engagement-plan","analytics-report")),
+            "content-production":Service("content-production","Social Content Production","social","Platform-native content planning and production","business",("content-gap","weak-hooks"),("content-calendar","post-briefs","reels-ideas","stories")),
+            "social-growth":Service("social-growth","Social Growth","social","Authentic audience and reach growth","business",("slow-growth","low-reach"),("growth-plan","content-strategy","kpi-dashboard")),
+            "social-lead-generation":Service("social-lead-generation","Social Lead Generation","social","Evidence-based prospect discovery and conversion","business",("few-leads","low-conversion"),("prospect-plan","outreach-drafts","lead-funnel")),
+            "ads-management":Service("ads-management","Ads Management","marketing","Campaign planning and performance optimization","business",("paid-growth","high-acquisition-cost"),("campaign-plan","creative-brief","kpi-report")),
+            "conversion-optimization":Service("conversion-optimization","Conversion Optimization","marketing","Turn social interest into qualified leads and sales","business",("low-conversion","weak-cta"),("funnel-audit","cta-plan","conversion-roadmap")),
+        }
     def get(self,service_id:str)->Service:return self.services[service_id]
     def all(self)->list[Service]:return list(self.services.values())
 class PackageEngine:
