@@ -9,8 +9,12 @@ from .customer_intelligence import CustomerIntelligence
 from .registry import AGENT_REGISTRY, CLIENT_RESEARCH_AGENTS, LEARNING_COUNCIL
 from .execution import AgentExecutor
 from .food_trade import FoodTradeEngine
+from .opportunity_hunter import OpportunityHunter
 from app.services.commercial_rules import UniversalCommercialEngine
-from app.services import OpportunityEngine, WebsiteAnalyzer, StoreAnalyzer, RestaurantGrowthEngine, SalesMessageEngine, ServiceCatalog, PackageEngine, OfferEngine, NegotiationEngine, CRM, ReputationEngine, QRMenu, KnowledgeBase, EducationCouncil
+from app.services import (OpportunityEngine, WebsiteAnalyzer, StoreAnalyzer, RestaurantGrowthEngine,
+                          SalesMessageEngine, ServiceCatalog, PackageEngine, OfferEngine,
+                          NegotiationEngine, CRM, ReputationEngine, QRMenu, KnowledgeBase,
+                          EducationCouncil, SupplierDatabase, DigitalDeliveryEngine)
 
 SYSTEM_PROMPT = """You are Hamed AI, a professional autonomous commercial and technical operations assistant.
 Understand the user's real goal, plan the work, use the selected specialist team, research when useful,
@@ -25,6 +29,8 @@ For any commercial opportunity (food, clothing, electronics, home goods, beauty,
 Food/grocery commodities: default 1% margin, up to 2% when the market/quantity supports it.
 Clothing: target 8-20%; electronics: 3-10%; home goods: 8-20%; beauty: 10-30%; industrial: 5-15%; services: 20-60%; digital: 20-70%; general goods: 5-20%. These are operating targets, not claims about market prices, and can only be used after real costs are known.
 When a public post expresses a buying need, treat it as a potential sales opportunity: extract product, quantity, location, specifications and timing; research suppliers and prices; calculate a defensible offer; and prepare personalized outreach using only authorized channels. Do not spam or contact people through unauthorized automation.
+For digital services, Hamed can analyze a business/site/store, identify evidence-based gaps, create a project specification, build/test deliverables that its connected tools support, and prepare authorized deployment. Never claim a site/store was published unless a connected deployment tool confirms it.
+Maintain a supplier intelligence database from verified business evidence, with source/evidence, products, category, MOQ, availability and last verification. Never fabricate supplier records.
 High-impact actions such as purchases, payments, contracts, publishing, account changes and irreversible changes require explicit human approval.
 Communicate naturally in Egyptian Arabic when the user writes Arabic, and use English when appropriate.
 """
@@ -45,6 +51,9 @@ class HamedOrchestrator:
         self.agent_executor = AgentExecutor()
         self.food_trade_engine = FoodTradeEngine()
         self.commercial_engine = UniversalCommercialEngine()
+        self.supplier_database = SupplierDatabase()
+        self.digital_delivery = DigitalDeliveryEngine()
+        self.opportunity_hunter = OpportunityHunter(self, self.supplier_database)
         self.opportunity_engine = OpportunityEngine()
         self.website_analyzer = WebsiteAnalyzer()
         self.store_analyzer = StoreAnalyzer()
@@ -81,7 +90,6 @@ class HamedOrchestrator:
     def commercial_quote(self, *, product: str, cost_per_unit: float, quantity: float = 1.0,
                         category: str | None = None, expenses_per_unit: float = 0.0,
                         margin_percent: float | None = None) -> dict:
-        """Build a category-aware quote after verified cost research."""
         unit = self.commercial_engine.target_price(cost_per_unit, product=product, category=category,
                                                    margin_percent=margin_percent, expenses_per_unit=expenses_per_unit)
         unit["quantity"] = quantity
@@ -92,6 +100,23 @@ class HamedOrchestrator:
 
     def commercial_opportunity_plan(self, request: dict) -> dict:
         return self.commercial_engine.opportunity_plan(request)
+
+    def discover_opportunity(self, *, source: str, demand: str, evidence: list[str] | None = None) -> dict:
+        return self.opportunity_hunter.discover(source=source, demand=demand, evidence=evidence)
+
+    def research_opportunity(self, opportunity_id: str) -> dict:
+        return self.opportunity_hunter.research(opportunity_id)
+
+    def opportunity_outreach(self, opportunity_id: str, *, customer_name: str = "there") -> dict:
+        return self.opportunity_hunter.personalized_outreach(opportunity_id, customer_name=customer_name)
+
+    def build_digital_project(self, *, business_name: str, project_type: str = "website",
+                              requested_features: list[str] | None = None) -> dict:
+        return self.digital_delivery.build(business_name=business_name, project_type=project_type,
+                                           requested_features=requested_features)
+
+    def digital_deployment_plan(self, project: dict) -> dict:
+        return self.digital_delivery.deployment_plan(project)
 
     def food_quote(self, *, quantity: float, unit_cost: float, extra_cost_per_unit: float = 0.0, margin_percent: float = 1.0) -> dict[str, float]:
         """Calculate a food-commodity quote using the enforced 1-2% margin rule."""
