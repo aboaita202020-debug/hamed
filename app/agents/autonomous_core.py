@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Optional
 from app.services.revenue_ceo import RevenueCEO
+from app.services.execution_adapters import ExecutionAdapters
 from app.agents.autonomous_execution import AutonomousExecutionEngine
 
 
@@ -23,6 +24,7 @@ class AutonomousCore:
         self._thread = None
         self.state = self._load_state()
         self.revenue_ceo = RevenueCEO()
+        self.adapters = ExecutionAdapters()
         self.execution = AutonomousExecutionEngine(self._execute_action)
 
     def _load_state(self) -> dict:
@@ -55,16 +57,24 @@ class AutonomousCore:
             self._stop.wait(self.interval)
 
     def _execute_action(self, action: str, opportunity: dict) -> str:
-        """Execute only through existing reversible orchestrator capabilities."""
+        """Execute reversible work through guarded adapters; never invent a recipient."""
         if action == "market_research":
             return "research queued"
         if action == "offer_build":
             return "offer preparation queued"
         if action == "customer_reply":
-            return "customer response prepared; delivery adapter required"
+            prospect = opportunity.get("prospect") or opportunity.get("customer") or {}
+            message = opportunity.get("message") or opportunity.get("offer_message") or ""
+            if not isinstance(prospect, dict):
+                return "contact blocked: invalid prospect"
+            intent = self.adapters.send_telegram(prospect, message)
+            return json.dumps(self.adapters.queue(intent), ensure_ascii=False)
         if action == "negotiate":
             return "negotiation plan prepared within policy"
         if action == "followup":
+            prospect = opportunity.get("prospect") or opportunity.get("customer") or {}
+            if isinstance(prospect, dict) and prospect.get("opted_out"):
+                return "follow-up blocked: opted out"
             return "follow-up scheduled as a reversible task"
         return "action acknowledged"
 
