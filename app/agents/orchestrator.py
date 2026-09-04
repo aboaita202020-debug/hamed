@@ -9,6 +9,7 @@ from .customer_intelligence import CustomerIntelligence
 from .registry import AGENT_REGISTRY, CLIENT_RESEARCH_AGENTS, LEARNING_COUNCIL
 from .execution import AgentExecutor
 from .food_trade import FoodTradeEngine
+from app.services.commercial_rules import UniversalCommercialEngine
 from app.services import OpportunityEngine, WebsiteAnalyzer, StoreAnalyzer, RestaurantGrowthEngine, SalesMessageEngine, ServiceCatalog, PackageEngine, OfferEngine, NegotiationEngine, CRM, ReputationEngine, QRMenu, KnowledgeBase, EducationCouncil
 
 SYSTEM_PROMPT = """You are Hamed AI, a professional autonomous commercial and technical operations assistant.
@@ -20,7 +21,10 @@ mass-message, scrape behind access controls, evade rate limits, or collect sensi
 Psychology is for understanding observable communication and customer needs, not diagnosis or manipulation.
 Before answering a customer, prioritize their stated goal, identify relevant objections, adapt tone and detail,
 and provide a concrete useful next step. Do not pressure, deceive, manufacture urgency, or exploit vulnerabilities.
-For food and grocery commodities, use Hamed's FoodTradeEngine: competitive quotes use a 1% margin by default and may use up to 2% when the market/quantity supports it. Include verified landed costs before calculating the margin. Never invent a supplier price.
+For any commercial opportunity (food, clothing, electronics, home goods, beauty, industrial products, services, digital products or other goods), identify the category, research verified suppliers/market prices/demand/availability/delivery costs/competition, calculate landed cost, then build a competitive quote using Hamed's category-specific margin rule. Never invent a market price or supplier.
+Food/grocery commodities: default 1% margin, up to 2% when the market/quantity supports it.
+Clothing: target 8-20%; electronics: 3-10%; home goods: 8-20%; beauty: 10-30%; industrial: 5-15%; services: 20-60%; digital: 20-70%; general goods: 5-20%. These are operating targets, not claims about market prices, and can only be used after real costs are known.
+When a public post expresses a buying need, treat it as a potential sales opportunity: extract product, quantity, location, specifications and timing; research suppliers and prices; calculate a defensible offer; and prepare personalized outreach using only authorized channels. Do not spam or contact people through unauthorized automation.
 High-impact actions such as purchases, payments, contracts, publishing, account changes and irreversible changes require explicit human approval.
 Communicate naturally in Egyptian Arabic when the user writes Arabic, and use English when appropriate.
 """
@@ -40,6 +44,7 @@ class HamedOrchestrator:
         self.customer_intelligence = CustomerIntelligence()
         self.agent_executor = AgentExecutor()
         self.food_trade_engine = FoodTradeEngine()
+        self.commercial_engine = UniversalCommercialEngine()
         self.opportunity_engine = OpportunityEngine()
         self.website_analyzer = WebsiteAnalyzer()
         self.store_analyzer = StoreAnalyzer()
@@ -72,6 +77,21 @@ class HamedOrchestrator:
             f"CUSTOMER MESSAGE:\n{text}\n\nDRAFT:\n{draft}")
         reply = self.provider.generate_response([{"role": "user", "content": review_prompt}], system=SYSTEM_PROMPT + "\n\n" + customer_context)
         session.messages.append({"role": "assistant", "content": reply}); return reply or draft
+
+    def commercial_quote(self, *, product: str, cost_per_unit: float, quantity: float = 1.0,
+                        category: str | None = None, expenses_per_unit: float = 0.0,
+                        margin_percent: float | None = None) -> dict:
+        """Build a category-aware quote after verified cost research."""
+        unit = self.commercial_engine.target_price(cost_per_unit, product=product, category=category,
+                                                   margin_percent=margin_percent, expenses_per_unit=expenses_per_unit)
+        unit["quantity"] = quantity
+        unit["total_cost"] = round((cost_per_unit + expenses_per_unit) * quantity, 2)
+        unit["total_quote"] = round(unit["target_price_per_unit"] * quantity, 2)
+        unit["expected_profit"] = round(unit["total_quote"] - unit["total_cost"], 2)
+        return unit
+
+    def commercial_opportunity_plan(self, request: dict) -> dict:
+        return self.commercial_engine.opportunity_plan(request)
 
     def food_quote(self, *, quantity: float, unit_cost: float, extra_cost_per_unit: float = 0.0, margin_percent: float = 1.0) -> dict[str, float]:
         """Calculate a food-commodity quote using the enforced 1-2% margin rule."""
