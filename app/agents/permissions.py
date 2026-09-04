@@ -38,6 +38,9 @@ AUTONOMOUS_ACTIONS = {
     "referral", "crm_update", "market_research", "opportunity_hunt", "content_plan",
     "social_growth", "supplier_research", "offer_build", "customer_reply",
     "dynamic_pricing", "revenue_tracking", "purchase", "payment",
+    "cash_velocity_scan", "warm_reactivation", "approved_public_opportunity",
+    "ready_to_buy", "arbitrage", "payment_preclearance", "deposit_offer",
+    "single_approver_filter", "revenue_recycling",
 }
 
 # Calls are never treated as unrestricted automation: the voice adapter must
