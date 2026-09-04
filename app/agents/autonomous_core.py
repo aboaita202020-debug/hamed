@@ -22,6 +22,7 @@ class AutonomousCore:
         self.enabled = os.getenv("HAMED_AUTONOMOUS_MODE", "true").lower() == "true"
         self.opportunity_enabled = os.getenv("HAMED_OPPORTUNITY_HUNTER", "true").lower() == "true"
         self.interval = max(300, int(os.getenv("HAMED_OPPORTUNITY_INTERVAL", os.getenv("HAMED_AUTONOMOUS_INTERVAL", "1800"))))
+        self.daily_target = max(0.0, float(os.getenv("HAMED_DAILY_REVENUE_TARGET", "0")))
         self.state_path = Path(os.getenv("HAMED_AUTONOMOUS_STATE", "hamed_autonomous_state.json"))
         self._stop = threading.Event()
         self._thread = None
@@ -29,9 +30,15 @@ class AutonomousCore:
 
     def _load_state(self) -> dict:
         try:
-            return json.loads(self.state_path.read_text(encoding="utf-8"))
+            state = json.loads(self.state_path.read_text(encoding="utf-8"))
+            state.setdefault("cycles", 0)
+            state.setdefault("lessons", [])
+            state.setdefault("opportunities", [])
+            state.setdefault("revenue_focus", None)
+            state.setdefault("last_run", None)
+            return state
         except Exception:
-            return {"cycles": 0, "lessons": [], "opportunities": [], "last_run": None}
+            return {"cycles": 0, "lessons": [], "opportunities": [], "revenue_focus": None, "last_run": None}
 
     def _save_state(self) -> None:
         try:
@@ -68,6 +75,8 @@ class AutonomousCore:
             "affiliate programs, brokerage, referrals, commission partnerships and service-reseller opportunities",
             "pricing, competitor gaps, market intelligence and evidence-backed revenue opportunity scoring",
             "seasonal demand, repeat orders, upsell, cross-sell, lead recovery and customer retention",
+            "cross-border trade, demand prediction, supplier negotiation, corporate accounts and recurring revenue",
+            "unused capacity, dead stock, bundles, churn, referral networks, revenue experiments and profit leaks",
             "sales, negotiation and customer psychology: discovery, buyer signals, objections and conversion",
             "sales training videos and public transcripts about consultative selling and objection handling",
         ]
@@ -86,8 +95,10 @@ class AutonomousCore:
                 "Consider brokerage, service reselling, RFQs, tenders, wholesale arbitrage, export, import substitution, "
                 "distribution, private label, bulk deals, clearance, product validation, competitor gaps, quote comparison, "
                 "procurement services, sales/customer-service services, AI website agents, CRM services, pricing consulting, "
-                "inventory optimization, repeat orders, commission partnerships, market intelligence, seasonal demand and "
-                "bundled offers. For each opportunity extract product/service, customer need, location, quantity when present, "
+                "inventory optimization, repeat orders, commission partnerships, market intelligence, seasonal demand, "
+                "cross-border trade, demand prediction, supplier negotiation, corporate accounts, recurring revenue, unused capacity, "
+                "dead stock, bundle optimization, churn prevention, referral networks, measurable revenue experiments, profit leaks "
+                "and opportunity portfolios. For each opportunity extract product/service, customer need, location, quantity when present, "
                 "supplier/research targets, evidence, estimated value only when supported, effort, risk and next reversible step. "
                 "Rank opportunities by evidence, customer fit, value, effort and risk. Never invent facts, prices, suppliers, "
                 "demand, commissions or results. Never spam, deceive, bypass platform rules, scrape behind access controls, "
@@ -112,6 +123,29 @@ class AutonomousCore:
             except Exception as exc:
                 item["hunter_error"] = type(exc).__name__
 
+        # Revenue Brain: choose the best observed opportunity instead of blindly
+        # repeating one monetization method. Missing economics remain unknown.
+        try:
+            candidates = []
+            for opportunity in self.state.get("opportunities", [])[-20:]:
+                candidates.append({
+                    "title": opportunity.get("topic", "observed opportunity"),
+                    "next_action": "research_and_prepare_offer",
+                    "evidence_count": 1 if opportunity.get("evidence") else 0,
+                    "customer_fit": 0.5 if opportunity.get("opportunity_id") else 0.0,
+                    "estimated_value": 0.0,
+                    "effort": 1.0,
+                    "risk": 0.0,
+                })
+            focus = self.orchestrator.revenue_hub.revenue_brain(candidates, daily_target=self.daily_target)
+            self.state["revenue_focus"] = {"time": now, **focus}
+            item["revenue_focus"] = focus
+        except Exception as exc:
+            item["revenue_brain_error"] = type(exc).__name__
+
         self._save_state()
         if self.notify:
-            self.notify("🧠 Hamed Revenue Radar completed a new learning/opportunity cycle.\n\n" + summary[:3500])
+            focus_text = ""
+            if self.state.get("revenue_focus", {}).get("focus"):
+                focus_text = "\n\n🎯 Revenue Brain: " + str(self.state["revenue_focus"]["focus"].get("title", "next opportunity"))
+            self.notify("🧠 Hamed Revenue Radar completed a new learning/opportunity cycle." + focus_text + "\n\n" + summary[:3500])
