@@ -1,9 +1,9 @@
 """24/7 autonomous Hamed core.
 
-Runs independently of Telegram. It plans bounded, reversible commercial work,
-keeps lightweight persistent state, learns from research and public educational
-material, and never performs purchases, payments, contracts, account changes,
-publishing, or irreversible actions without an explicit authorization path.
+Runs independently of Telegram. It continuously learns, hunts evidence-backed
+commercial opportunities and prioritizes reversible revenue work. External
+purchases, payments, contracts, publishing, account changes and irreversible
+actions remain bounded by server-side authorization rules.
 """
 from __future__ import annotations
 
@@ -60,16 +60,19 @@ class AutonomousCore:
     def run_cycle(self) -> None:
         now = datetime.now(timezone.utc).isoformat()
         topics = [
-            "current public buying requests for food, clothing, electronics, home goods and industrial products",
-            "businesses with weak websites or online stores that publicly show a need for digital improvement",
-            "current demand for digital services, ecommerce, marketing, SEO, automation and AI services",
-            "affiliate and commercial opportunities with clear public evidence and ethical outreach paths",
-            "sales, marketing and customer psychology: discovery, buyer signals, objections and conversion",
-            "sales training videos and public transcripts about consultative selling, negotiation and objection handling",
+            "public buying requests, RFQs, tenders and procurement needs for products and services",
+            "B2B buyers, suppliers, distributors, agents, wholesalers and export opportunities",
+            "lawful wholesale arbitrage, clearance stock, inventory liquidation and bulk-deal opportunities",
+            "local alternatives to imports, private-label products and product-demand validation",
+            "digital services, AI agents, websites, CRM, customer support, sales and marketing services businesses need",
+            "affiliate programs, brokerage, referrals, commission partnerships and service-reseller opportunities",
+            "pricing, competitor gaps, market intelligence and evidence-backed revenue opportunity scoring",
+            "seasonal demand, repeat orders, upsell, cross-sell, lead recovery and customer retention",
+            "sales, negotiation and customer psychology: discovery, buyer signals, objections and conversion",
+            "sales training videos and public transcripts about consultative selling and objection handling",
         ]
         topic = topics[self.state.get("cycles", 0) % len(topics)]
 
-        # Broad learning pass: articles + research + public educational videos/transcripts when available.
         try:
             learning_item = self.orchestrator.learning_council.study(topic)
             evidence = learning_item.evidence
@@ -79,14 +82,17 @@ class AutonomousCore:
         summary = self.orchestrator.provider.generate_response(
             [{"role": "user", "content": "Analyze this research for actionable, ethical commercial opportunities and better customer responses.\n\n" + evidence[:12000]}],
             system=(
-                "You are Hamed's autonomous learning and opportunity-hunting layer. Identify concrete, "
-                "evidence-backed lessons and opportunities. For sales, infer only observable customer signals; "
-                "classify objections such as price, trust, fit, timing, authority and logistics when supported. "
-                "Turn lessons into better discovery questions, value framing, personalized offers and next steps. "
-                "For each opportunity extract product/service, quantity when present, location, customer need, "
-                "supplier/research targets and next reversible step. Never invent facts. Never propose bypassing "
-                "platform rules, spam, deception, unauthorized access, purchases, payments, contracts, publishing, "
-                "or irreversible actions. Psychology is for understanding needs, never manipulation or exploitation."
+                "You are Hamed's autonomous revenue radar. Identify concrete, evidence-backed and lawful revenue opportunities. "
+                "Consider brokerage, service reselling, RFQs, tenders, wholesale arbitrage, export, import substitution, "
+                "distribution, private label, bulk deals, clearance, product validation, competitor gaps, quote comparison, "
+                "procurement services, sales/customer-service services, AI website agents, CRM services, pricing consulting, "
+                "inventory optimization, repeat orders, commission partnerships, market intelligence, seasonal demand and "
+                "bundled offers. For each opportunity extract product/service, customer need, location, quantity when present, "
+                "supplier/research targets, evidence, estimated value only when supported, effort, risk and next reversible step. "
+                "Rank opportunities by evidence, customer fit, value, effort and risk. Never invent facts, prices, suppliers, "
+                "demand, commissions or results. Never spam, deceive, bypass platform rules, scrape behind access controls, "
+                "or exploit vulnerabilities. External purchases, payments, contracts, publishing and irreversible actions "
+                "must stay behind authorized execution controls. Psychology is for understanding needs, never manipulation."
             ),
         )
         item = {"time": now, "topic": topic, "summary": summary[:6000], "evidence": evidence[:6000]}
@@ -100,7 +106,7 @@ class AutonomousCore:
         if self.opportunity_enabled:
             try:
                 discovered = self.orchestrator.discover_opportunity(
-                    source="autonomous_web_research", demand=summary[:4000], evidence=[evidence[:6000]]
+                    source="autonomous_revenue_radar", demand=summary[:4000], evidence=[evidence[:6000]]
                 )
                 item["opportunity_id"] = discovered["opportunity_id"]
             except Exception as exc:
@@ -108,4 +114,4 @@ class AutonomousCore:
 
         self._save_state()
         if self.notify:
-            self.notify("🧠 Hamed autonomous learning/opportunity cycle completed.\n\n" + summary[:3500])
+            self.notify("🧠 Hamed Revenue Radar completed a new learning/opportunity cycle.\n\n" + summary[:3500])
