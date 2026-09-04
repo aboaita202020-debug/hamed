@@ -33,9 +33,10 @@ class ApprovalRequest:
 
 AUTONOMOUS_ACTIONS = {
     "sale", "negotiate", "affiliate_marketing", "marketing", "website_service",
-    "lead_generation", "lead_recovery", "marketing_automation", "followup", "upsell",
-    "cross_sell", "referral", "crm_update", "market_research", "opportunity_hunt",
-    "content_plan", "social_growth", "supplier_research", "offer_build", "customer_reply",
+    "lead_generation", "qualified_lead_sale", "b2b_brokerage", "buyer_first",
+    "lead_recovery", "marketing_automation", "followup", "upsell", "cross_sell",
+    "referral", "crm_update", "market_research", "opportunity_hunt", "content_plan",
+    "social_growth", "supplier_research", "offer_build", "customer_reply",
     "dynamic_pricing", "revenue_tracking", "purchase", "payment",
 }
 
