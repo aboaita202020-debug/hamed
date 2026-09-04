@@ -3,6 +3,8 @@
 Autonomous mode permits routine commercial actions without asking the owner again,
 while sensitive or irreversible actions remain blocked by server policy.
 """
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
 import os
@@ -43,8 +45,6 @@ AUTONOMOUS_ACTIONS = {
     "single_approver_filter", "revenue_recycling",
 }
 
-# Calls are never treated as unrestricted automation: the voice adapter must
-# enforce its own explicit allowlist/eligibility and opt-out policy.
 AUTONOMOUS_ACTIONS.add("voice_call")
 BLOCKED_ACTIONS = {"transfer", "contract", "account_change", "irreversible"}
 
