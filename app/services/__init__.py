@@ -1,4 +1,4 @@
-"""Safe business-service engines used by Hamed AI."""
+"""Business service engines exposed to Hamed."""
 from .platform import (
     CRM, EducationCouncil, OpportunityEngine, PackageEngine, OfferEngine,
     NegotiationEngine, RestaurantGrowthEngine, ReputationEngine, SalesMessageEngine,
