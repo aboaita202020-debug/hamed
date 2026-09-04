@@ -1,11 +1,32 @@
-import os
-
 from app.services.execution_adapters import ExecutionAdapters
 
 
 def test_contact_requires_verified_recipient():
     result = ExecutionAdapters().contact({}, "hello")
     assert result.status == "blocked"
+
+
+def test_contact_requires_explicit_verification():
+    result = ExecutionAdapters().contact({"telegram_chat_id": "123"}, "hello")
+    assert result.status == "blocked"
+    assert "verified" in result.reason
+
+
+def test_verified_telegram_contact_is_ready_when_delivery_is_disabled(monkeypatch):
+    monkeypatch.setenv("HAMED_AUTO_SEND_TELEGRAM", "false")
+    result = ExecutionAdapters().send_telegram(
+        {"telegram_chat_id": "123", "verified_contact": True}, "hello"
+    )
+    assert result.status == "ready"
+    assert result.channel == "telegram"
+
+
+def test_opted_out_contact_is_blocked():
+    result = ExecutionAdapters().contact(
+        {"telegram_chat_id": "123", "verified_contact": True, "opted_out": True}, "hello"
+    )
+    assert result.status == "blocked"
+    assert "opted out" in result.reason
 
 
 def test_payment_stays_below_server_limit(monkeypatch):
