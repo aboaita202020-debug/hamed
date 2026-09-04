@@ -1,4 +1,4 @@
-"""Autonomous execution pipeline for evidence-backed commercial opportunities."""
+"""Autonomous revenue execution pipeline for evidence-backed opportunities."""
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 from typing import Any, Callable, Optional
@@ -24,13 +24,22 @@ class AutonomousExecutionEngine:
         evidence = opportunity.get("evidence") or opportunity.get("summary")
         if not evidence:
             return [ExecutionStep("verify", "market_research", "blocked", "missing evidence")]
-        return [
+        steps = [
             ExecutionStep("verify", "market_research", "ready", "evidence present"),
+            ExecutionStep("hunt", "opportunity_hunt", "ready", "find the highest-value supported opportunity"),
+            ExecutionStep("leads", "lead_generation", "ready", "identify appropriate prospects and channels"),
             ExecutionStep("prepare", "offer_build", "ready", "prepare a truthful offer"),
+            ExecutionStep("price", "dynamic_pricing", "ready", "optimize price inside configured bounds"),
             ExecutionStep("contact", "customer_reply", "ready", "contact only an appropriate prospect/channel"),
             ExecutionStep("negotiate", "negotiate", "ready", "within configured limits"),
+            ExecutionStep("recover", "lead_recovery", "ready", "recover eligible lost opportunities without spam"),
             ExecutionStep("followup", "followup", "ready", "schedule non-spam follow-up"),
+            ExecutionStep("referral", "referral", "ready", "request eligible referrals transparently"),
+            ExecutionStep("measure", "revenue_tracking", "ready", "record funnel and profit metrics"),
         ]
+        if opportunity.get("voice_call"):
+            steps.insert(6, ExecutionStep("call", "voice_call", "ready", "call only an explicitly eligible/allowlisted prospect"))
+        return steps
 
     def execute(self, opportunity: dict[str, Any]) -> dict[str, Any]:
         steps = self.plan(opportunity)
