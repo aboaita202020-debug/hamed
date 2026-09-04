@@ -62,6 +62,9 @@ class AutonomousExecutionEngine:
         steps = self.plan(opportunity)
         results = []
         for step in steps:
+            if step.status == "blocked":
+                results.append(asdict(step))
+                continue
             allowed = can_execute(step.action, value=step.value, risk=Risk.LOW)
             if not allowed:
                 results.append(asdict(ExecutionStep(step.name, step.action, "blocked", "server policy denied", step.value)))
