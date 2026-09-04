@@ -1,4 +1,6 @@
 """Hamed supervisor: universal selling, multi-agent routing, research, learning and approvals."""
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from .provider import AIProvider
 from .research import ResearchAgent

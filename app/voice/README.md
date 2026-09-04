@@ -2,6 +2,12 @@
 
 Hamed can place outbound calls through Twilio and stream the live call audio to OpenAI Realtime.
 
+## Hamed work number
+
+The configured Hamed work caller ID is **+20104090623**. Set `TWILIO_FROM_NUMBER=+20104090623` explicitly in the deployment environment; the code also uses this number as its safe default when the variable is omitted.
+
+The number must be owned/verified and enabled for outbound calling by the Twilio account. Code changes cannot provision or verify the number with Twilio.
+
 ## Required environment
 
 ```text
@@ -9,7 +15,7 @@ OPENAI_API_KEY=...
 OPENAI_REALTIME_MODEL=gpt-realtime-2.1-mini
 TWILIO_ACCOUNT_SID=...
 TWILIO_AUTH_TOKEN=...
-TWILIO_FROM_NUMBER=...
+TWILIO_FROM_NUMBER=+20104090623
 PUBLIC_BASE_URL=https://your-public-https-host
 ```
 
@@ -34,6 +40,8 @@ call_sid = controller.start_call(
 )
 print(call_sid)
 ```
+
+The controller sends the call with `from_` set to Hamed's configured work number. Targets must still pass the existing allowlist and attempt policy.
 
 ## Safety
 

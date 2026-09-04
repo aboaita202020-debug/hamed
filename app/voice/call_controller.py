@@ -1,12 +1,16 @@
 """Outbound phone-call controller for Hamed.
 
 Credentials stay in environment variables. Targets must be explicitly allowlisted
-before a call is placed.
+before a call is placed. Hamed's configured business caller ID defaults to the
+registered work number when TWILIO_FROM_NUMBER is omitted.
 """
 import os
 from dataclasses import dataclass
 from twilio.rest import Client
 from .voice_policy import CallPolicy, validate_attempt_count, validate_outbound_target
+
+
+HAMED_WORK_NUMBER = "+20104090623"
 
 
 @dataclass(frozen=True)
@@ -22,9 +26,9 @@ class VoiceCallController:
     def __init__(self, policy: CallPolicy | None = None) -> None:
         self.account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
         self.auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
-        self.from_number = os.environ.get("TWILIO_FROM_NUMBER")
+        self.from_number = os.environ.get("TWILIO_FROM_NUMBER") or HAMED_WORK_NUMBER
         if not all((self.account_sid, self.auth_token, self.from_number)):
-            raise RuntimeError("TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and TWILIO_FROM_NUMBER are required")
+            raise RuntimeError("TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN are required")
         self.policy = policy or CallPolicy()
         self.client = Client(self.account_sid, self.auth_token)
 

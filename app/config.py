@@ -1,4 +1,6 @@
 """Environment-backed configuration for Hamed AI."""
+from __future__ import annotations
+
 from dataclasses import dataclass
 import os
 

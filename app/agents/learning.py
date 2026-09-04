@@ -1,5 +1,6 @@
 """Evidence-first continuous learning for Hamed's learning council."""
 from dataclasses import dataclass
+from typing import Tuple
 
 from .provider import AIProvider
 from .registry import LEARNING_COUNCIL
@@ -71,5 +72,5 @@ class LearningCouncil:
         return summary
 
     @staticmethod
-    def agent_ids() -> tuple[str, ...]:
+    def agent_ids() -> Tuple[str, ...]:
         return LEARNING_COUNCIL

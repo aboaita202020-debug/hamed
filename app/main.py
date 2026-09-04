@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import html
 import os
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
@@ -43,14 +43,14 @@ class ChatRequest(BaseModel):
 
 class PlanRequest(BaseModel):
     message: str = Field(min_length=1, max_length=12000)
-    action: str | None = Field(default=None, max_length=80)
+    action: Optional[str] = Field(default=None, max_length=80)
 
 
 class ActionRequest(BaseModel):
     session_id: str = Field(default="default", min_length=1, max_length=120)
     action: str = Field(min_length=1, max_length=80)
     description: str = Field(min_length=1, max_length=2000)
-    value: float | None = None
+    value: Optional[float] = None
 
 
 class DecisionRequest(BaseModel):
@@ -66,7 +66,7 @@ _worker = HamedWorker(interval_seconds=int(os.getenv("HAMED_WORKER_INTERVAL", "9
 _pending: dict[tuple[str, str], Any] = {}
 
 
-def autonomous_scan() -> dict[str, Any]:
+def autonomous_scan() -> dict:
     """Create the next safe commercial work agenda; no spending/publishing/calls occur here."""
     prompt = (
         "حدد أولويات العمل التجاري الآمن لحامد الآن. ركّز بالترتيب على: "
@@ -98,12 +98,12 @@ async def stop_worker() -> None:
 
 
 @app.get("/")
-def root() -> dict[str, str]:
+def root() -> dict:
     return {"name": "Hamed AI", "status": "running", "mode": settings.app_env}
 
 
 @app.get("/health")
-def health() -> dict[str, Any]:
+def health() -> dict:
     return {
         "status": "ok",
         "ai_provider": "openai" if settings.openai_api_key else "fallback",
@@ -115,26 +115,26 @@ def health() -> dict[str, Any]:
 
 
 @app.get("/worker/status")
-def worker_status() -> dict[str, Any]:
+def worker_status() -> dict:
     return _worker.status()
 
 
 @app.post("/worker/run")
-def worker_run() -> dict[str, Any]:
+def worker_run() -> dict:
     return _worker.run_once(hooks=[autonomous_scan])
 
 
 @app.post("/chat")
-def chat(request: ChatRequest) -> dict[str, str]:
+def chat(request: ChatRequest) -> dict:
     try:
         reply = _orchestrator.respond(request.session_id, request.message)
         return {"session_id": request.session_id, "reply": reply}
-    except Exception as exc:  # pragma: no cover
+    except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
 @app.post("/plan")
-def plan(request: PlanRequest) -> dict[str, Any]:
+def plan(request: PlanRequest) -> dict:
     result = build_plan(request.message, action=request.action)
     return {
         "objective": result.objective.value,
@@ -148,7 +148,7 @@ def plan(request: PlanRequest) -> dict[str, Any]:
 
 
 @app.post("/actions/prepare")
-def prepare(request: ActionRequest) -> dict[str, Any]:
+def prepare(request: ActionRequest) -> dict:
     message = _orchestrator.prepare_high_impact_action(
         request.session_id,
         request.action,
@@ -160,7 +160,7 @@ def prepare(request: ActionRequest) -> dict[str, Any]:
 
 
 @app.post("/actions/decide")
-def decide(request: DecisionRequest) -> dict[str, Any]:
+def decide(request: DecisionRequest) -> dict:
     key = (request.session_id, request.action)
     item = _pending.get(key)
     if item is None:
