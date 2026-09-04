@@ -1,23 +1,24 @@
-# Hamed AI — dependencies
-#
-# The Core (app/agents, app/db, app/tools, app/permissions) needs
-# NOTHING beyond Python's standard library — it will import and run
-# tests with just `python3`. Everything below is for the OPTIONAL
-# adapters. Comment out what you don't need for a given deployment.
+# Hamed AI — runtime and test dependencies
 
-# --- Dashboard / Health / Webhook API (app/api/server.py) ---
+# --- Dashboard / Health / Webhook API ---
 fastapi>=0.110,<1.0
 uvicorn[standard]>=0.29,<1.0
 
-# --- Telegram channel (app/channels/telegram_adapter.py) ---
-python-telegram-bot>=20,<21
+# --- Telegram runtime ---
+pyTelegramBotAPI>=4.16,<6.0
 
-# --- AI provider SDKs (wire into app/ai_providers, only if used) ---
+# --- Environment configuration ---
+python-dotenv>=1.0,<2.0
+
+# --- AI provider SDKs ---
 openai>=1.30,<2.0
 anthropic>=0.30,<1.0
 
-# --- Web search for real Opportunity Hunter / Fact Check data ---
+# --- Web search / external data ---
 requests>=2.31,<3.0
+
+# --- Tests ---
+pytest>=8,<9
 
 # --- Optional: Twilio (voice/SMS) and Paymob (payments) ---
 # twilio>=9.0,<10.0
