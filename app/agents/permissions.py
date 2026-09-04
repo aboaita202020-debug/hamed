@@ -32,16 +32,21 @@ class ApprovalRequest:
             self.token = secrets.token_urlsafe(24)
 
 
+# Routine commercial actions run autonomously. Sensitive irreversible actions
+# remain blocked unless an explicit authorization path exists.
 AUTONOMOUS_ACTIONS = {
-    "sale", "negotiate", "affiliate_marketing", "marketing",
-    "website_service", "purchase", "payment",
+    "sale", "negotiate", "affiliate_marketing", "marketing", "website_service",
+    "lead_generation", "lead_recovery", "followup", "upsell", "cross_sell",
+    "referral", "crm_update", "market_research", "opportunity_hunt", "content_plan",
+    "social_growth", "supplier_research", "offer_build", "customer_reply",
+    "purchase", "payment",
 }
 
 BLOCKED_ACTIONS = {"transfer", "contract", "account_change", "irreversible"}
 
 
 def _autonomous_mode() -> bool:
-    return os.getenv("HAMED_AUTONOMOUS_MODE", "false").lower() == "true"
+    return os.getenv("HAMED_AUTONOMOUS_MODE", "true").lower() == "true"
 
 
 def _limit_for(action: str) -> float:

@@ -16,7 +16,9 @@ class Settings:
     database_url: str = os.getenv("DATABASE_URL", "sqlite:///hamed.db")
     app_env: str = os.getenv("APP_ENV", "development")
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
-    autonomous_mode: bool = os.getenv("HAMED_AUTONOMOUS_MODE", "false").lower() == "true"
+    # Autonomous mode is the default operating mode. Execution remains bounded
+    # by the server-side policy and platform/legal constraints.
+    autonomous_mode: bool = os.getenv("HAMED_AUTONOMOUS_MODE", "true").lower() == "true"
     max_purchase_value: float = float(os.getenv("HAMED_MAX_PURCHASE_VALUE", "0"))
     max_payment_value: float = float(os.getenv("HAMED_MAX_PAYMENT_VALUE", "0"))
     max_discount_percent: float = float(os.getenv("HAMED_MAX_DISCOUNT_PERCENT", "20"))
