@@ -9,6 +9,7 @@ It plans and queues work; external actions still require authorized channels.
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
+import math
 
 
 REVENUE_MODES = (
@@ -25,7 +26,6 @@ REVENUE_MODES = (
     "tender_hunter", "market_intelligence", "seasonal_opportunities",
     "digital_services", "reorder_prediction", "deal_packaging",
     "revenue_radar",
-    # Revenue expansion engines: each is a decision path, not a promise of income.
     "cross_border", "demand_predictor", "supplier_negotiator", "bulk_buyer",
     "white_label_finder", "distributor_network", "commission_finder",
     "corporate_accounts", "recurring_revenue", "unused_capacity_hunter",
@@ -48,7 +48,6 @@ class RevenueHub:
     """Central commercial engine used to discover and grow legitimate revenue."""
 
     def discover_modes(self, customer_or_market: dict[str, Any] | None = None) -> list[str]:
-        """Return revenue modes relevant to supplied context without inventing facts."""
         data = customer_or_market or {}
         text = " ".join(str(v) for v in data.values()).lower()
         modes = ["lead_hunting", "universal_services", "opportunity_hunting", "sales_analytics", "revenue_radar", "revenue_brain"]
@@ -59,8 +58,7 @@ class RevenueHub:
         if any(x in text for x in ("اشتراك", "subscription", "monthly", "شهري")):
             modes.extend(["subscriptions", "recurring_revenue", "churn_predictor"])
         if any(x in text for x in ("تصدير", "export", "خارج مصر", "دولي", "international")):
-            modes.append("export_hunter")
-            modes.append("cross_border")
+            modes.extend(["export_hunter", "cross_border"])
         if any(x in text for x in ("مناقصة", "tender", "rfq", "طلب عرض")):
             modes.extend(["tender_hunter", "rfq_hunter"])
         if any(x in text for x in ("مخزون", "inventory", "تصفيات", "clearance", "راكد")):
@@ -168,7 +166,6 @@ class RevenueHub:
         return {"ready": True, "strategy": "contextual_non_spam_follow_up", "approval_required": False}
 
     def rank_opportunities(self, opportunities: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Rank opportunities using evidence, customer fit, value and effort; never invent missing values."""
         ranked = []
         for item in opportunities:
             score = self.score_opportunity(
@@ -184,35 +181,25 @@ class RevenueHub:
         return sorted(ranked, key=lambda x: x["score"], reverse=True)
 
     def revenue_brain(self, opportunities: list[dict[str, Any]], *, daily_target: float = 0.0) -> dict[str, Any]:
-        """Select a focus from observed opportunities and convert a target into pipeline math.
-
-        Missing values remain unknown. This is a prioritization engine, not a revenue guarantee.
-        """
+        """Select a focus from observed opportunities; this is prioritization, not a guarantee."""
         if daily_target < 0:
             raise ValueError("daily_target must be non-negative")
         ranked = self.rank_opportunities(opportunities)
         focus = ranked[0] if ranked else None
-        return {
-            "daily_target": daily_target,
-            "opportunity_count": len(ranked),
-            "focus": focus,
-            "portfolio": ranked[:10],
-            "next_action": focus.get("next_action") if focus else "collect_evidence",
-            "guaranteed_revenue": False,
-        }
+        return {"daily_target": daily_target, "opportunity_count": len(ranked), "focus": focus,
+                "portfolio": ranked[:10], "next_action": focus.get("next_action") if focus else "collect_evidence",
+                "guaranteed_revenue": False}
 
     def daily_revenue_plan(self, *, target: float, average_deal_value: float | None = None,
                            close_rate: float | None = None) -> dict[str, Any]:
-        """Turn a target into required wins/leads when the required inputs are known."""
         if target < 0 or (average_deal_value is not None and average_deal_value <= 0):
             raise ValueError("invalid revenue target inputs")
         if close_rate is not None and not 0 < close_rate <= 1:
             raise ValueError("close_rate must be between 0 and 1")
-        deals_needed = None if average_deal_value is None else int((target + average_deal_value - 1) // average_deal_value)
-        leads_needed = None if deals_needed is None or close_rate is None else int((deals_needed + close_rate - 1) // close_rate)
+        deals_needed = None if average_deal_value is None else math.ceil(target / average_deal_value)
+        leads_needed = None if deals_needed is None or close_rate is None else math.ceil(deals_needed / close_rate)
         return {"target": target, "average_deal_value": average_deal_value, "close_rate": close_rate,
-                "deals_needed": deals_needed, "leads_needed": leads_needed,
-                "guaranteed_revenue": False}
+                "deals_needed": deals_needed, "leads_needed": leads_needed, "guaranteed_revenue": False}
 
     def client_growth_mode(self, *, goal: str, platforms: list[str] | None = None) -> dict[str, Any]:
         return {
