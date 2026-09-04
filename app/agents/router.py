@@ -1,4 +1,7 @@
 """Task router for Hamed's specialist agents and multi-brain provider selection."""
+from __future__ import annotations
+
+from typing import List
 from .registry import AGENT_REGISTRY, CLIENT_RESEARCH_AGENTS, LEARNING_COUNCIL
 
 KEYWORDS = {
@@ -15,9 +18,9 @@ CLIENT_WORDS = ("عميل", "عملاء", "زبون", "زبائن", "lead", "lea
 LEARNING_WORDS = ("تعلم", "اتعلم", "علم النفس", "psychology", "استراتيجية بيع", "خدمة العملاء", "sales science")
 
 class AgentRouter:
-    def select(self, text: str, limit: int = 12) -> list[str]:
+    def select(self, text: str, limit: int = 12) -> List[str]:
         t = text.lower()
-        selected: list[str] = ["chief", "planner"]
+        selected: List[str] = ["chief", "planner"]
         for domain, words in KEYWORDS.items():
             if any(w.lower() in t for w in words):
                 selected.extend(a.id for a in AGENT_REGISTRY.values() if a.domain == domain)
