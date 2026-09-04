@@ -1,11 +1,9 @@
 name: Northflank Docker readiness
 
+# Keep the provider-specific readiness check available on demand without
+# duplicating the main CI run on every push.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
   docker-readiness:
