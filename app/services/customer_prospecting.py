@@ -20,8 +20,8 @@ class CustomerProspectingEngine:
     """Turn public/authorized business evidence into a conservative sales lead."""
 
     DIGITAL_GAP_TERMS = (
-        "no website", "without website", "doesn't have a website", "no store",
-        "without online store", "doesn't have an online store", "no ecommerce",
+        "no website", "without website", "doesn't have a website", "don't have a website", "no site", "no store",
+        "without online store", "doesn't have an online store", "don't have an online store", "no ecommerce",
         "مفيش موقع", "معندوش موقع", "ما عندوش موقع", "بدون موقع",
         "مفيش متجر", "معندوش متجر", "ما عندوش متجر", "بدون متجر", "متجر إلكتروني",
     )
@@ -55,7 +55,7 @@ class CustomerProspectingEngine:
             return {"approved": False, "message": "", "reason": assessment.reason}
         if assessment.opportunity_type == "digital_presence_gap":
             message = (
-                f"أهلًا {name}، لاحظت من المعلومات العامة عن نشاطك إن وجودك الرقمي ممكن يتطور، "
+                f"أهلًا {name}، لاحظت من المعلومات العامة المتاحة عن نشاطك إن وجودك الرقمي ممكن يتطور، "
                 "خصوصًا لو محتاج موقع أو متجر إلكتروني. إحنا بنصمم ونطوّر الحل كاملًا حسب طبيعة النشاط. "
                 "لو حابب، أقدر أبعث لك تصور مختصر مناسب لنشاطك من غير التزام."
             )
