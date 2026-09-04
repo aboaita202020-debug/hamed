@@ -8,6 +8,7 @@ from .learning import LearningCouncil
 from .customer_intelligence import CustomerIntelligence
 from .registry import AGENT_REGISTRY, CLIENT_RESEARCH_AGENTS, LEARNING_COUNCIL
 from .execution import AgentExecutor
+from .food_trade import FoodTradeEngine
 from app.services import OpportunityEngine, WebsiteAnalyzer, StoreAnalyzer, RestaurantGrowthEngine, SalesMessageEngine, ServiceCatalog, PackageEngine, OfferEngine, NegotiationEngine, CRM, ReputationEngine, QRMenu, KnowledgeBase, EducationCouncil
 
 SYSTEM_PROMPT = """You are Hamed AI, a professional autonomous commercial and technical operations assistant.
@@ -19,6 +20,7 @@ mass-message, scrape behind access controls, evade rate limits, or collect sensi
 Psychology is for understanding observable communication and customer needs, not diagnosis or manipulation.
 Before answering a customer, prioritize their stated goal, identify relevant objections, adapt tone and detail,
 and provide a concrete useful next step. Do not pressure, deceive, manufacture urgency, or exploit vulnerabilities.
+For food and grocery commodities, use Hamed's FoodTradeEngine: competitive quotes use a 1% margin by default and may use up to 2% when the market/quantity supports it. Include verified landed costs before calculating the margin. Never invent a supplier price.
 High-impact actions such as purchases, payments, contracts, publishing, account changes and irreversible changes require explicit human approval.
 Communicate naturally in Egyptian Arabic when the user writes Arabic, and use English when appropriate.
 """
@@ -37,6 +39,7 @@ class HamedOrchestrator:
         self.router = AgentRouter()
         self.customer_intelligence = CustomerIntelligence()
         self.agent_executor = AgentExecutor()
+        self.food_trade_engine = FoodTradeEngine()
         self.opportunity_engine = OpportunityEngine()
         self.website_analyzer = WebsiteAnalyzer()
         self.store_analyzer = StoreAnalyzer()
@@ -70,10 +73,12 @@ class HamedOrchestrator:
         reply = self.provider.generate_response([{"role": "user", "content": review_prompt}], system=SYSTEM_PROMPT + "\n\n" + customer_context)
         session.messages.append({"role": "assistant", "content": reply}); return reply or draft
 
-    def execute_agent(self, agent_id: str, task: str) -> dict:
-        return self.agent_executor.execute(agent_id, task)
-    def agent_contracts(self) -> list[dict]:
-        return [c.__dict__ for c in self.agent_executor.contracts()]
+    def food_quote(self, *, quantity: float, unit_cost: float, extra_cost_per_unit: float = 0.0, margin_percent: float = 1.0) -> dict[str, float]:
+        """Calculate a food-commodity quote using the enforced 1-2% margin rule."""
+        return self.food_trade_engine.quote(quantity=quantity, unit_cost=unit_cost, extra_cost_per_unit=extra_cost_per_unit, margin_percent=margin_percent).__dict__
+
+    def execute_agent(self, agent_id: str, task: str) -> dict: return self.agent_executor.execute(agent_id, task)
+    def agent_contracts(self) -> list[dict]: return [c.__dict__ for c in self.agent_executor.contracts()]
     def research_for_learning(self, topic: str) -> str: return self.learning_council.research(topic).evidence
     def available_agents(self) -> list[str]: return [p.name for p in AGENT_REGISTRY.values()]
     def learning_agents(self) -> tuple[str, ...]: return LEARNING_COUNCIL
