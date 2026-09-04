@@ -1,8 +1,7 @@
 """Secure manual-payment workflow for Hamed AI.
 
-This module deliberately fails closed for production confirmation when no trusted
-reviewer identity provider is configured. A reviewer id supplied by an HTTP
-request body is never accepted as authentication.
+The workflow is intentionally fail-closed: production confirmation requires a
+trusted authenticated reviewer identity and a non-empty server-side allowlist.
 """
 from __future__ import annotations
 
@@ -25,23 +24,23 @@ class PaymentState(str, Enum):
 
 
 class PaymentError(Exception):
-    """Base payment workflow error."""
+    pass
 
 
 class AuthorizationError(PaymentError):
-    """Raised when the trusted reviewer identity is not authorized."""
+    pass
 
 
 class ProductionAuthUnavailable(AuthorizationError):
-    """Raised when no trusted reviewer authentication mechanism exists."""
+    pass
 
 
 class InvalidTransition(PaymentError):
-    """Raised when a payment state transition is not permitted."""
+    pass
 
 
 class PaymentNotFound(PaymentError):
-    """Raised when a payment is not visible to the supplied customer."""
+    pass
 
 
 @dataclass(frozen=True)
@@ -73,20 +72,12 @@ class Payment:
 
 
 class ManualPaymentService:
-    """In-memory first-stage payment workflow with strict server-side gates.
+    """First-stage manual payment service with strict state and authorization gates."""
 
-    Storage is intentionally injected/replaceable. For real money, use durable
-    transactional storage and a real authenticated reviewer identity provider.
-    """
-
-    def __init__(
-        self,
-        *,
-        reviewer_authenticator: Optional[Callable[[object], Optional[ReviewerIdentity]]] = None,
-        notifier: Optional[Callable[[Payment], None]] = None,
-        clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
-        reference_factory: Optional[Callable[[], str]] = None,
-    ) -> None:
+    def __init__(self, *, reviewer_authenticator: Optional[Callable[[object], Optional[ReviewerIdentity]]] = None,
+                 notifier: Optional[Callable[[Payment], None]] = None,
+                 clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+                 reference_factory: Optional[Callable[[], str]] = None) -> None:
         self._payments: dict[str, Payment] = {}
         self._audit: list[dict] = []
         self._reviewer_authenticator = reviewer_authenticator
@@ -101,16 +92,15 @@ class ManualPaymentService:
     def create_payment(self, customer_id: str, amount: float, currency: str = "EGP", *, expires_hours: int = 24) -> Payment:
         if not customer_id:
             raise ValueError("customer_id is required")
-        reference = self._unique_reference()
         now = self._clock()
         payment = Payment(
             payment_id=secrets.token_urlsafe(16),
             customer_id=customer_id,
             amount=float(amount),
             currency=currency.upper(),
-            reference_code=reference,
+            reference_code=self._unique_reference(),
             created_at=now,
-            expires_at=now + timedelta(hours=expires_hours) if expires_hours > 0 else None,
+            expires_at=now + timedelta(hours=expires_hours),
         )
         self._payments[payment.payment_id] = payment
         self._audit_event("system", "payment_created", payment, "pending", {})
@@ -124,10 +114,15 @@ class ManualPaymentService:
 
     def submit_proof(self, payment_id: str, customer_id: str, proof: str) -> Payment:
         payment = self.get_customer_payment(payment_id, customer_id)
-        self._transition(payment, PaymentState.SUBMITTED)
+        self._ensure_not_expired(payment)
+        if payment.state != PaymentState.PENDING:
+            raise InvalidTransition("only pending payments can receive proof")
+        if not proof:
+            raise ValueError("proof is required")
+        payment.state = PaymentState.SUBMITTED
         payment.proof = str(proof)[:2000]
         payment.submitted_at = self._clock()
-        self._transition(payment, PaymentState.UNDER_REVIEW)
+        payment.state = PaymentState.UNDER_REVIEW
         self._audit_event("customer", "payment_submitted", payment, "under_review", {})
         if self._notifier:
             try:
@@ -209,17 +204,6 @@ class ManualPaymentService:
             payment.state = PaymentState.EXPIRED
             self._audit_event("system", "payment_expired", payment, "expired", {})
             raise InvalidTransition("payment has expired")
-
-    @staticmethod
-    def _transition(payment: Payment, target: PaymentState) -> None:
-        allowed = {
-            PaymentState.PENDING: {PaymentState.SUBMITTED},
-            PaymentState.SUBMITTED: {PaymentState.UNDER_REVIEW},
-            PaymentState.UNDER_REVIEW: {PaymentState.CONFIRMED, PaymentState.REJECTED},
-        }
-        if target not in allowed.get(payment.state, set()):
-            raise InvalidTransition(f"invalid transition: {payment.state} -> {target}")
-        payment.state = target
 
     def _unique_reference(self) -> str:
         for _ in range(10):
