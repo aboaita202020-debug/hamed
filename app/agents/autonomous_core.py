@@ -1,9 +1,9 @@
 """24/7 autonomous Hamed core.
 
 Runs independently of Telegram. It plans bounded, reversible commercial work,
-keeps lightweight persistent state, learns from research, and never performs
-purchases, payments, contracts, account changes, publishing, or irreversible
-actions without an explicit authorization path.
+keeps lightweight persistent state, learns from research and public educational
+material, and never performs purchases, payments, contracts, account changes,
+publishing, or irreversible actions without an explicit authorization path.
 """
 from __future__ import annotations
 
@@ -64,27 +64,39 @@ class AutonomousCore:
             "businesses with weak websites or online stores that publicly show a need for digital improvement",
             "current demand for digital services, ecommerce, marketing, SEO, automation and AI services",
             "affiliate and commercial opportunities with clear public evidence and ethical outreach paths",
+            "sales, marketing and customer psychology: discovery, buyer signals, objections and conversion",
+            "sales training videos and public transcripts about consultative selling, negotiation and objection handling",
         ]
         topic = topics[self.state.get("cycles", 0) % len(topics)]
-        evidence = self.orchestrator.research_for_learning(topic)
+
+        # Broad learning pass: articles + research + public educational videos/transcripts when available.
+        try:
+            learning_item = self.orchestrator.learning_council.study(topic)
+            evidence = learning_item.evidence
+        except Exception:
+            evidence = self.orchestrator.research_for_learning(topic)
+
         summary = self.orchestrator.provider.generate_response(
-            [{"role": "user", "content": "Analyze this research for actionable, ethical commercial opportunities.\n\n" + evidence[:12000]}],
+            [{"role": "user", "content": "Analyze this research for actionable, ethical commercial opportunities and better customer responses.\n\n" + evidence[:12000]}],
             system=(
-                "You are Hamed's autonomous opportunity-hunting layer. Identify concrete opportunities "
-                "from verified public evidence. For each opportunity extract product/service, quantity when present, "
-                "location, customer need, supplier/research targets and next reversible step. Never invent facts. "
-                "Never propose bypassing platform rules, spam, deception, unauthorized access, purchases, payments, "
-                "contracts, publishing, or irreversible actions."
+                "You are Hamed's autonomous learning and opportunity-hunting layer. Identify concrete, "
+                "evidence-backed lessons and opportunities. For sales, infer only observable customer signals; "
+                "classify objections such as price, trust, fit, timing, authority and logistics when supported. "
+                "Turn lessons into better discovery questions, value framing, personalized offers and next steps. "
+                "For each opportunity extract product/service, quantity when present, location, customer need, "
+                "supplier/research targets and next reversible step. Never invent facts. Never propose bypassing "
+                "platform rules, spam, deception, unauthorized access, purchases, payments, contracts, publishing, "
+                "or irreversible actions. Psychology is for understanding needs, never manipulation or exploitation."
             ),
         )
         item = {"time": now, "topic": topic, "summary": summary[:6000], "evidence": evidence[:6000]}
         self.state["cycles"] = int(self.state.get("cycles", 0)) + 1
         self.state["last_run"] = now
+        self.state.setdefault("lessons", []).append({"time": now, "topic": topic, "evidence": evidence[:6000]})
+        self.state["lessons"] = self.state["lessons"][-100:]
         self.state.setdefault("opportunities", []).append(item)
         self.state["opportunities"] = self.state["opportunities"][-50:]
 
-        # Register the research as a traceable opportunity. The hunter does not send outreach itself;
-        # outreach stays behind an authorized channel and the existing approval/safety layer.
         if self.opportunity_enabled:
             try:
                 discovered = self.orchestrator.discover_opportunity(
@@ -96,4 +108,4 @@ class AutonomousCore:
 
         self._save_state()
         if self.notify:
-            self.notify("🧠 Hamed autonomous opportunity cycle completed.\n\n" + summary[:3500])
+            self.notify("🧠 Hamed autonomous learning/opportunity cycle completed.\n\n" + summary[:3500])
