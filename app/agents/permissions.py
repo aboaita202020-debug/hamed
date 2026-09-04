@@ -1,8 +1,7 @@
 """Server-side commercial authority policy for Hamed AI.
 
-Autonomous mode permits Hamed to execute routine commercial actions without
-asking the owner again, but only inside server-enforced value and risk limits.
-The model cannot change these limits at runtime.
+Autonomous mode permits routine commercial actions without asking the owner again,
+while sensitive or irreversible actions remain blocked by server policy.
 """
 from dataclasses import dataclass
 from enum import Enum
@@ -32,16 +31,17 @@ class ApprovalRequest:
             self.token = secrets.token_urlsafe(24)
 
 
-# Routine commercial actions run autonomously. Sensitive irreversible actions
-# remain blocked unless an explicit authorization path exists.
 AUTONOMOUS_ACTIONS = {
     "sale", "negotiate", "affiliate_marketing", "marketing", "website_service",
-    "lead_generation", "lead_recovery", "followup", "upsell", "cross_sell",
-    "referral", "crm_update", "market_research", "opportunity_hunt", "content_plan",
-    "social_growth", "supplier_research", "offer_build", "customer_reply",
-    "purchase", "payment",
+    "lead_generation", "lead_recovery", "marketing_automation", "followup", "upsell",
+    "cross_sell", "referral", "crm_update", "market_research", "opportunity_hunt",
+    "content_plan", "social_growth", "supplier_research", "offer_build", "customer_reply",
+    "dynamic_pricing", "revenue_tracking", "purchase", "payment",
 }
 
+# Calls are never treated as unrestricted automation: the voice adapter must
+# enforce its own explicit allowlist/eligibility and opt-out policy.
+AUTONOMOUS_ACTIONS.add("voice_call")
 BLOCKED_ACTIONS = {"transfer", "contract", "account_change", "irreversible"}
 
 
@@ -66,7 +66,7 @@ def can_execute(action: str, approved: bool = False, value: float | None = None,
     if action not in AUTONOMOUS_ACTIONS:
         return True
     if not _autonomous_mode():
-        return False if action in {"purchase", "payment"} else True
+        return False if action in {"purchase", "payment", "voice_call"} else True
     if risk == Risk.HIGH:
         return False
     if action in {"purchase", "payment"}:
