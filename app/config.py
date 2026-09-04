@@ -20,6 +20,10 @@ class Settings:
     max_purchase_value: float = float(os.getenv("HAMED_MAX_PURCHASE_VALUE", "0"))
     max_payment_value: float = float(os.getenv("HAMED_MAX_PAYMENT_VALUE", "0"))
     max_discount_percent: float = float(os.getenv("HAMED_MAX_DISCOUNT_PERCENT", "20"))
+    whatsapp_number: str | None = os.getenv("HAMED_WHATSAPP_NUMBER")
+    vodafone_cash_wallets: tuple[str, ...] = tuple(x.strip() for x in os.getenv("HAMED_VODAFONE_CASH_WALLETS", "").split(",") if x.strip())
+    opportunity_hunter_enabled: bool = os.getenv("HAMED_OPPORTUNITY_HUNTER", "true").lower() == "true"
+    opportunity_interval: int = max(300, int(os.getenv("HAMED_OPPORTUNITY_INTERVAL", "1800")))
 
 
 settings = Settings()
