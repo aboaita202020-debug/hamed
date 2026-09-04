@@ -26,7 +26,9 @@ class RevenueCEO:
         ranked = []
         for raw in opportunities:
             item = dict(raw)
-            evidence = min(1.0, max(0.0, float(item.get("evidence", item.get("evidence_count", 0))) / 5.0))
+            evidence_raw = item.get("evidence", item.get("evidence_count", 0))
+            evidence_count = float(evidence_raw) if isinstance(evidence_raw, (int, float)) else (1.0 if str(evidence_raw).strip() else 0.0)
+            evidence = min(1.0, max(0.0, evidence_count / 5.0))
             fit = min(1.0, max(0.0, float(item.get("fit", item.get("customer_fit", 0.0)))))
             value = min(1.0, max(0.0, float(item.get("value", item.get("estimated_value", 0.0))) / 100000.0))
             speed = min(1.0, max(0.0, float(item.get("speed", 0.5))))
