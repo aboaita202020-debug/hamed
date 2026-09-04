@@ -1,34 +1,23 @@
-# Hamed AI - dependency set
-# Telegram runtime uses pyTelegramBotAPI (telebot).
+# Hamed AI — dependencies
+#
+# The Core (app/agents, app/db, app/tools, app/permissions) needs
+# NOTHING beyond Python's standard library — it will import and run
+# tests with just `python3`. Everything below is for the OPTIONAL
+# adapters. Comment out what you don't need for a given deployment.
 
-fastapi==0.115.0
-uvicorn==0.30.6
-sqlmodel==0.0.22
-pydantic==2.9.2
-pydantic-settings==2.5.2
-python-dotenv==1.0.1
-requests==2.32.3
-httpx==0.27.2
+# --- Dashboard / Health / Webhook API (app/api/server.py) ---
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.29,<1.0
 
-# Telegram
-pyTelegramBotAPI==4.36.1
+# --- Telegram channel (app/channels/telegram_adapter.py) ---
+python-telegram-bot>=20,<21
 
-# AI providers
-openai==1.51.0
-anthropic==0.34.2
+# --- AI provider SDKs (wire into app/ai_providers, only if used) ---
+openai>=1.30,<2.0
+anthropic>=0.30,<1.0
 
-# Voice / realtime telephony (optional at runtime)
-twilio==9.3.6
-websockets==13.1
-# Free Telegram voice replies (MP3)
-gTTS==2.5.4
+# --- Web search for real Opportunity Hunter / Fact Check data ---
+requests>=2.31,<3.0
 
-# Optional local/dev compatibility
-Flask==3.0.3
-passlib[bcrypt]==1.7.4
-
-# QR menu generation
-qrcode==8.2
-
-# Testing
-pytest==8.3.3
+# --- Optional: Twilio (voice/SMS) and Paymob (payments) ---
+# twilio>=9.0,<10.0

@@ -1,50 +1,93 @@
-# 🤖 Hamed AI
+# Hamed AI — دليل التشغيل
 
-Hamed is an AI commercial operating system evolving from the original Telegram/Claude MVP into a modular sales, purchasing, research, negotiation, finance, customer-service and website-assistance platform.
+نظام Multi-Agent Business Operating System. الـ Core لا يحتاج أي مكتبة
+خارجية (Python stdlib فقط) — كل شيء آخر (Telegram, Dashboard API, AI
+Providers) طبقات اختيارية منفصلة.
 
-## 🚀 One-click Koyeb deployment
+## 1) التشغيل محليًا بدون Docker
 
-Use the official Koyeb deployment flow for this public GitHub repository:
+```bash
+python3 -m venv venv
+source venv/bin/activate        # على ويندوز: venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env             # عدّل القيم اللي محتاجها بس
+python -m unittest discover -s tests -v   # للتأكد إن كل حاجة شغالة
+python scripts/run_server.py     # يفتح على http://127.0.0.1:8000
+```
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&builder=docker&repository=github.com/aboaita202020-debug/hamed&branch=main&name=hamed-ai&ports=8000%3Bhttp%3B%2F)
+نقاط الوصول:
+- `GET /health` — فحص حياة السيرفر.
+- `GET /readiness` — فحص جاهزية قاعدة البيانات.
+- `GET /dashboard` — ملخص الأداء (Leads, Opportunities, Revenue).
+- `GET /leads`, `GET /opportunities`, `GET /audit-logs`
+- `POST /dispatch/{agent_name}` — تشغيل أي Agent يدويًا (body: JSON payload).
 
-This opens Koyeb with Hamed preconfigured from the `main` branch and the repository Dockerfile. You still need to sign in to Koyeb and authorize the deployment from your own account.
+لتشغيل بوت تليجرام (بعد ضبط `TELEGRAM_BOT_TOKEN` في `.env`):
+```bash
+python scripts/run_telegram.py
+```
 
-## Current implementation
-- AI provider abstraction with OpenAI as the primary provider.
-- Hamed orchestration layer with conversational session memory.
-- Deterministic commercial calculations for landed cost, revenue, gross profit and margin.
-- Server-side approval primitives for high-impact actions.
-- Structured audit events.
-- Commercial learning engine for sales, purchasing, negotiation, affiliate marketing, services, websites and stores.
-- Voice bridge architecture for Twilio + OpenAI Realtime.
-- Local Windows server and cloud deployment configurations.
-- Telegram MVP remains in the repository during migration.
+## 2) التشغيل عبر Docker (بدون الحاجة لـ Docker على جهازك)
 
-## Security rules
-- Never commit `.env` or real API keys.
-- Research and drafting can be autonomous; purchases, payments, contracts, publishing and irreversible actions require explicit approval.
-- The model must never bypass server-side authorization.
-- Unknown commercial inputs must be presented as unknown/estimated, not invented.
-- Voice calls must follow the configured allowlist/permission policy.
+بما إن **Docker Desktop لا يدعم Windows 7** (يحتاج Windows 10/11 مع
+WSL2)، الطريقة المضبوطة هنا هي إن GitHub نفسه يبني صورة الـ Docker
+وينشرها، مش جهازك:
 
-## Local setup
-1. Copy `.env.example` to `.env` and add your credentials only when required.
-2. Install dependencies:
-   `pip install -r requirements.txt`
-3. Run tests:
-   `pytest -q`
-4. Local server:
-   `python local_server.py`
-5. The legacy Telegram entry point is `python bot.py` while the migration continues.
+1. ارفع الكود على مستودع GitHub جديد (فارغ الأول، عادي).
+2. الملف `.github/workflows/docker-publish.yml` موجود جاهز — أول ما
+   تعمل `git push` على فرع `main`، GitHub Actions هيشغّل الاختبارات
+   تلقائيًا، وبعدين يبني صورة Docker وينشرها على
+   `ghcr.io/<اسم-المستخدم>/<اسم-المستودع>:latest`.
+3. من إعدادات المستودع على GitHub: Settings → Packages، تأكد إن الصورة
+   ظاهرة بعد أول Push ناجح (تقدر كمان تتابع التقدم من تبويب Actions).
+4. في `justrunmy.app` (أو أي منصة Docker تانية)، وجّهها لسحب الصورة من
+   `ghcr.io/<اسم-المستخدم>/<اسم-المستودع>:latest` بدل ما تعمل
+   `docker build`/`push` بنفسك.
+   - لو المنصة محتاجة الصورة على Docker Hub تحديدًا بدل GHCR، فعّل
+     الجزء المعلّق (commented) في نفس ملف الـ workflow وضيف
+     `DOCKERHUB_USERNAME` و `DOCKERHUB_TOKEN` كـ Secrets في إعدادات
+     المستودع (Settings → Secrets and variables → Actions).
+5. اضبط متغيرات البيئة (نفس اللي في `.env.example`) من لوحة تحكم
+   المنصة نفسها — منها التوكن، مفاتيح الـ AI، وحدود الموافقات.
+6. اعمل Mount لمجلد `/app/data` كـ Volume دائم لو المنصة بتدعم كده، عشان
+   بيانات الـ CRM متضيعش عند إعادة تشغيل الحاوية.
 
-## Production/cloud setup
-See:
-- `HAMED_AI_CODEX.md` for the complete architecture and execution specification.
-- `FREE_FIRST.md` for the low-cost/free-first strategy.
-- `DEPLOY_FREE.md` and `deploy/oracle/` for Oracle Cloud deployment.
-- `deploy/koyeb/` for Koyeb deployment.
-- `app/voice/` for the voice agent integration.
+## 3) البنية
 
-## Important
-The free hosting layer does not make third-party AI inference or telephone carrier minutes unlimited/free. Keep paid integrations disabled until the project has revenue or an explicit budget, then enable them with server-side limits and approval controls.
+```
+app/
+  config.py            # كل الإعدادات من Environment Variables
+  db/                   # SQLite (stdlib) + Repository + CRM Dedup + Audit Log
+  permissions/           # Permission Layer / Approval Gate
+  tools/                 # Tool Registry + WebSearchTool + CRMTool
+  agents/
+    orchestrator.py      # HamedOrchestrator
+    *_agent.py            # كل Agent قابل للاختبار منفردًا
+  ai_providers/          # Router + Fallback بين المزودين
+  channels/telegram_adapter.py   # اختياري
+  api/server.py                    # اختياري (FastAPI)
+scripts/
+  run_server.py           # نقطة تشغيل الـ Dashboard/Webhook
+  run_telegram.py         # نقطة تشغيل بوت تليجرام (Polling)
+tests/                     # 23 اختبار unittest (stdlib فقط، بدون أي pip install)
+```
+
+## 4) قاعدة أساسية
+
+كل Agent وكل Tool بيتحقنوا (dependency injection) بدل الاستيراد
+المباشر — عشان تقدر تضيف Agent جديد أو تستبدل قاعدة البيانات من غير
+ما تلمس بقية الكود. راجع `app/agents/orchestrator.py` لمعرفة إزاي
+تسجّل Agent جديد عبر `register_agent()`.
+
+## 5) الخطوة الجاية المقترحة
+
+الوثيقة الأصلية بتحدد 17 Phase. اللي اتنفذ فعليًا دلوقتي يغطي:
+Phase 1 (Core مستقر بدون ImportError)، Phase 3 (Agent/Tool Interfaces +
+Orchestrator)، جزء من Phase 4 (CRM)، جزء من Phase 5 (Sales)، جزء من
+Phase 6 (Opportunity Hunter)، جزء من Phase 7 (Revenue)، جزء من Phase 9
+(Negotiation + Approval)، جزء من Phase 10 (Dashboard كـ JSON API)، وكل
+من Phase 2 و14 و15 (Telegram أساسي، CI عبر GitHub Actions، Docker).
+
+لسه محتاج: Purchasing Engine، Web/Social Intelligence حقيقي (بدل الـ
+mock provider)، RAG/Knowledge Base، WhatsApp/Voice، Dashboard UI بصري
+(الحالي JSON فقط).
