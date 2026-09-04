@@ -14,6 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def run_bot(env: dict[str, str]):
     clean = os.environ.copy()
+    # Prevent the repository's local .env from satisfying missing-secret tests.
+    # Production startup still loads .env normally; this subprocess intentionally
+    # validates the environment contract in isolation.
+    clean["PYTHON_DOTENV_DISABLED"] = "1"
     for key in (
         "TELEGRAM_BOT_TOKEN",
         "OPENAI_API_KEY",
