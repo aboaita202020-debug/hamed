@@ -10,6 +10,11 @@ def test_ceo_selects_fast_evidence_backed_focus():
     assert result["guaranteed_revenue"] is False
 
 
+def test_ceo_accepts_research_text_as_evidence():
+    result = RevenueCEO().decide([{"title": "research", "evidence": "verified public evidence", "fit": 0.5}])
+    assert result["focus"]["ceo_score"] > 0
+
+
 def test_ceo_guardrails_are_enabled():
     guards = RevenueCEO().guardrails()
     assert all(guards.values())
