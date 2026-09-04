@@ -68,8 +68,15 @@ def send_hamed_reply(chat_id: int, reply: str) -> None:
 
 
 def status_text() -> str:
-    brains = ", ".join(hamed.provider.available_brains())
-    voice_status = "READY" if voice_tts.enabled else "OFF"
+    """Build status without calling any AI provider or network service."""
+    try:
+        brains = ", ".join(hamed.provider.available_brains()) or "none"
+    except Exception as exc:
+        brains = "unavailable (" + type(exc).__name__ + ")"
+    try:
+        voice_status = "READY" if voice_tts.enabled else "OFF"
+    except Exception as exc:
+        voice_status = "ERROR (" + type(exc).__name__ + ")"
     return (
         f"🟢 {HAMED_NAME} ONLINE\n\n"
         "🧠 Autonomous Core: 24/7 READY\n"
@@ -86,7 +93,20 @@ def status_text() -> str:
 
 @bot.message_handler(commands=["start", "status"])
 def handle_start(message):
-    bot.send_message(message.chat.id, status_text())
+    """Status is local-only and must never fail because an AI provider is unavailable."""
+    try:
+        bot.send_message(message.chat.id, status_text())
+    except Exception as exc:
+        print(f"Status send error: {type(exc).__name__}: {exc}", flush=True)
+
+
+@bot.message_handler(func=lambda m: (m.text or "").strip().lower() in {"status", "ستاتس", "ستيتس"}, content_types=["text"])
+def handle_status_text(message):
+    """Also accept a plain status message without requiring the slash command."""
+    try:
+        bot.send_message(message.chat.id, status_text())
+    except Exception as exc:
+        print(f"Status text send error: {type(exc).__name__}: {exc}", flush=True)
 
 
 @bot.message_handler(commands=["help"])
