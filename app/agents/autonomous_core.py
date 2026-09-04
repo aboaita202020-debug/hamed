@@ -14,6 +14,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Optional
 
+from app.services.revenue_ceo import RevenueCEO
+
 
 class AutonomousCore:
     def __init__(self, orchestrator, notify: Optional[Callable[[str], None]] = None) -> None:
@@ -27,6 +29,7 @@ class AutonomousCore:
         self._stop = threading.Event()
         self._thread = None
         self.state = self._load_state()
+        self.revenue_ceo = RevenueCEO()
 
     def _load_state(self) -> dict:
         try:
@@ -35,10 +38,11 @@ class AutonomousCore:
             state.setdefault("lessons", [])
             state.setdefault("opportunities", [])
             state.setdefault("revenue_focus", None)
+            state.setdefault("ceo_revenue_focus", None)
             state.setdefault("last_run", None)
             return state
         except Exception:
-            return {"cycles": 0, "lessons": [], "opportunities": [], "revenue_focus": None, "last_run": None}
+            return {"cycles": 0, "lessons": [], "opportunities": [], "revenue_focus": None, "ceo_revenue_focus": None, "last_run": None}
 
     def _save_state(self) -> None:
         try:
@@ -77,8 +81,8 @@ class AutonomousCore:
             "seasonal demand, repeat orders, upsell, cross-sell, lead recovery and customer retention",
             "cross-border trade, demand prediction, supplier negotiation, corporate accounts and recurring revenue",
             "unused capacity, dead stock, bundles, churn, referral networks, revenue experiments and profit leaks",
+            "deal hunting, price arbitrage, buyer intent, quote auctions, customer lifetime value and cashflow",
             "sales, negotiation and customer psychology: discovery, buyer signals, objections and conversion",
-            "sales training videos and public transcripts about consultative selling and objection handling",
         ]
         topic = topics[self.state.get("cycles", 0) % len(topics)]
 
@@ -97,10 +101,11 @@ class AutonomousCore:
                 "procurement services, sales/customer-service services, AI website agents, CRM services, pricing consulting, "
                 "inventory optimization, repeat orders, commission partnerships, market intelligence, seasonal demand, "
                 "cross-border trade, demand prediction, supplier negotiation, corporate accounts, recurring revenue, unused capacity, "
-                "dead stock, bundle optimization, churn prevention, referral networks, measurable revenue experiments, profit leaks "
-                "and opportunity portfolios. For each opportunity extract product/service, customer need, location, quantity when present, "
-                "supplier/research targets, evidence, estimated value only when supported, effort, risk and next reversible step. "
-                "Rank opportunities by evidence, customer fit, value, effort and risk. Never invent facts, prices, suppliers, "
+                "dead stock, bundle optimization, churn prevention, referral networks, measurable revenue experiments, profit leaks, "
+                "deal hunting, price arbitrage, buyer intent, quote auctions, customer lifetime value and cashflow. "
+                "For each opportunity extract product/service, customer need, location, quantity when present, supplier/research targets, "
+                "evidence, estimated value only when supported, speed, effort, risk and next reversible step. "
+                "Rank opportunities by evidence, customer fit, value, speed, effort and risk. Never invent facts, prices, suppliers, "
                 "demand, commissions or results. Never spam, deceive, bypass platform rules, scrape behind access controls, "
                 "or exploit vulnerabilities. External purchases, payments, contracts, publishing and irreversible actions "
                 "must stay behind authorized execution controls. Psychology is for understanding needs, never manipulation."
@@ -123,17 +128,16 @@ class AutonomousCore:
             except Exception as exc:
                 item["hunter_error"] = type(exc).__name__
 
-        # Revenue Brain: choose the best observed opportunity instead of blindly
-        # repeating one monetization method. Missing economics remain unknown.
         try:
             candidates = []
             for opportunity in self.state.get("opportunities", [])[-20:]:
                 candidates.append({
                     "title": opportunity.get("topic", "observed opportunity"),
                     "next_action": "research_and_prepare_offer",
-                    "evidence_count": 1 if opportunity.get("evidence") else 0,
-                    "customer_fit": 0.5 if opportunity.get("opportunity_id") else 0.0,
-                    "estimated_value": 0.0,
+                    "evidence": 1 if opportunity.get("evidence") else 0,
+                    "fit": 0.5 if opportunity.get("opportunity_id") else 0.0,
+                    "value": 0.0,
+                    "speed": 0.5,
                     "effort": 1.0,
                     "risk": 0.0,
                 })
@@ -143,9 +147,19 @@ class AutonomousCore:
         except Exception as exc:
             item["revenue_brain_error"] = type(exc).__name__
 
+        try:
+            ceo_focus = self.revenue_ceo.decide(
+                self.state.get("opportunities", [])[-20:], daily_target=self.daily_target
+            )
+            self.state["ceo_revenue_focus"] = {"time": now, **ceo_focus}
+            item["ceo_revenue_focus"] = ceo_focus
+        except Exception as exc:
+            item["ceo_revenue_brain_error"] = type(exc).__name__
+
         self._save_state()
         if self.notify:
             focus_text = ""
-            if self.state.get("revenue_focus", {}).get("focus"):
-                focus_text = "\n\n🎯 Revenue Brain: " + str(self.state["revenue_focus"]["focus"].get("title", "next opportunity"))
+            focus = self.state.get("ceo_revenue_focus", {}).get("focus")
+            if focus:
+                focus_text = "\n\n👑 CEO Revenue Brain: " + str(focus.get("title", "next opportunity"))
             self.notify("🧠 Hamed Revenue Radar completed a new learning/opportunity cycle." + focus_text + "\n\n" + summary[:3500])
