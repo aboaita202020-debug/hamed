@@ -8,6 +8,8 @@ from __future__ import annotations
 from dataclasses import dataclass, asdict
 from typing import Any
 
+from .compliance_checkpoint import ExternalComplianceCheckpoint
+
 
 @dataclass(frozen=True)
 class CashAssessment:
@@ -22,6 +24,7 @@ class CashAssessment:
     risk_penalty: float
     status: str
     reason: str
+    compliance_status: str = "not_required"
 
 
 class CashVelocityEngine:
@@ -36,6 +39,9 @@ class CashVelocityEngine:
         "qualified_lead_sale",
     )
 
+    def __init__(self, compliance: ExternalComplianceCheckpoint | None = None) -> None:
+        self.compliance = compliance or ExternalComplianceCheckpoint()
+
     def assess(self, opportunity: dict[str, Any]) -> CashAssessment:
         route = str(opportunity.get("route") or opportunity.get("channel") or "ready_to_buy")
         if route not in self.ROUTES:
@@ -44,6 +50,14 @@ class CashVelocityEngine:
         evidence = opportunity.get("evidence") or opportunity.get("summary")
         if not evidence:
             return CashAssessment(route, 0, 0, 9999, 0, 0, 0, 0, 100, "blocked", "missing evidence")
+
+        compliance_review = self.compliance.evaluate(opportunity)
+        if compliance_review.required and not opportunity.get("external_compliance_approved"):
+            return CashAssessment(
+                route, 0, 0, 9999, 0, 0, 0, 0, 100, "blocked",
+                "external compliance review required before autonomous execution",
+                compliance_review.status,
+            )
 
         decision = self._bounded(opportunity.get("decision_speed", 0.5))
         payment = self._bounded(opportunity.get("payment_ready", 0.5))
@@ -61,7 +75,7 @@ class CashVelocityEngine:
         score = max(0.0, min(100.0, speed - risk * 25 + min(profit / 1000.0, 20) + (12 if route == "warm_reactivation" else 0)))
         status = "fast_track" if score >= 70 and approvals <= 1 and payment >= 0.6 else "slow_track"
         reason = "fast decision/payment/fulfillment path" if status == "fast_track" else "requires more evidence, approvals, payment readiness, or fulfillment readiness"
-        return CashAssessment(route, round(score, 2), round(profit, 2), round(hours, 2), round(decision, 3), round(payment, 3), round(fulfillment, 3), round(probability, 3), round(risk, 3), status, reason)
+        return CashAssessment(route, round(score, 2), round(profit, 2), round(hours, 2), round(decision, 3), round(payment, 3), round(fulfillment, 3), round(probability, 3), round(risk, 3), status, reason, compliance_review.status)
 
     def rank(self, opportunities: list[dict[str, Any]], limit: int = 10) -> list[dict[str, Any]]:
         assessed = [self.assess(item) for item in opportunities]
