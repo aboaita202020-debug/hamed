@@ -93,15 +93,7 @@ class ManualPaymentService:
         if not customer_id:
             raise ValueError("customer_id is required")
         now = self._clock()
-        payment = Payment(
-            payment_id=secrets.token_urlsafe(16),
-            customer_id=customer_id,
-            amount=float(amount),
-            currency=currency.upper(),
-            reference_code=self._unique_reference(),
-            created_at=now,
-            expires_at=now + timedelta(hours=expires_hours),
-        )
+        payment = Payment(payment_id=secrets.token_urlsafe(16), customer_id=customer_id, amount=float(amount), currency=currency.upper(), reference_code=self._unique_reference(), created_at=now, expires_at=now + timedelta(hours=expires_hours))
         self._payments[payment.payment_id] = payment
         self._audit_event("system", "payment_created", payment, "pending", {})
         return payment
@@ -135,10 +127,10 @@ class ManualPaymentService:
         payment = self._payments.get(payment_id)
         if payment is None:
             raise PaymentNotFound("payment not found")
-        reviewer = self._authenticate_reviewer(auth_context)
         self._ensure_not_expired(payment)
         if payment.state != PaymentState.UNDER_REVIEW:
             raise InvalidTransition("only under_review payments can be confirmed")
+        reviewer = self._authenticate_reviewer(auth_context)
         payment.state = PaymentState.CONFIRMED
         payment.reviewer = reviewer.subject
         payment.review_note = note[:1000]
@@ -150,10 +142,10 @@ class ManualPaymentService:
         payment = self._payments.get(payment_id)
         if payment is None:
             raise PaymentNotFound("payment not found")
-        reviewer = self._authenticate_reviewer(auth_context)
         self._ensure_not_expired(payment)
         if payment.state != PaymentState.UNDER_REVIEW:
             raise InvalidTransition("only under_review payments can be rejected")
+        reviewer = self._authenticate_reviewer(auth_context)
         payment.state = PaymentState.REJECTED
         payment.reviewer = reviewer.subject
         payment.review_note = note[:1000]
@@ -218,14 +210,4 @@ class ManualPaymentService:
         return "HAMD" + "".join(secrets.choice(alphabet) for _ in range(6))
 
     def _audit_event(self, actor: str, action: str, payment: Payment, status: str, details: dict) -> None:
-        self._audit.append({
-            "actor": actor,
-            "action": action,
-            "status": status,
-            "payment_id": payment.payment_id,
-            "reference_code": payment.reference_code,
-            "amount": payment.amount,
-            "currency": payment.currency,
-            "details": details,
-            "timestamp": self._clock().isoformat(),
-        })
+        self._audit.append({"actor": actor, "action": action, "status": status, "payment_id": payment.payment_id, "reference_code": payment.reference_code, "amount": payment.amount, "currency": payment.currency, "details": details, "timestamp": self._clock().isoformat()})
