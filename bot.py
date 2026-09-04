@@ -25,13 +25,9 @@ AUTONOMOUS_NOTIFY_CHAT_ID = os.getenv("HAMED_AUTONOMOUS_NOTIFY_CHAT_ID", "").str
 
 
 def validate_required_secrets() -> None:
-    free_only = os.getenv("HAMED_FREE_ONLY", "1").lower() not in ("0", "false", "no", "off")
-    free_brain = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("KIMI_API_KEY", "").strip()
     if not TELEGRAM_BOT_TOKEN:
         raise RuntimeError("Missing required environment variable(s): TELEGRAM_BOT_TOKEN")
-    if free_only and not free_brain:
-        raise RuntimeError("Missing free AI brain key: GEMINI_API_KEY or KIMI_API_KEY")
-    if not free_only and not OPENAI_API_KEY:
+    if not OPENAI_API_KEY:
         raise RuntimeError("Missing required environment variable(s): OPENAI_API_KEY")
 
 
