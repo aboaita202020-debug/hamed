@@ -1,4 +1,6 @@
 """Approval-aware end-to-end commercial workflow for Hamed."""
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
 from .permissions import ApprovalRequest, can_execute
