@@ -17,10 +17,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Persistent SQLite data lives here; mount a volume onto this path
-# in production so leads/deals survive container restarts.
+# Persistent SQLite data directory. Configure a Railway Volume separately
+# and mount it at /app/data in Railway service settings.
 RUN mkdir -p /app/data
-VOLUME ["/app/data"]
 
 EXPOSE 8000
 
