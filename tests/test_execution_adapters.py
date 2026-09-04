@@ -21,6 +21,26 @@ def test_verified_telegram_contact_is_ready_when_delivery_is_disabled(monkeypatc
     assert result.channel == "telegram"
 
 
+def test_verified_whatsapp_is_ready_when_delivery_is_disabled(monkeypatch):
+    monkeypatch.setenv("HAMED_AUTO_SEND_WHATSAPP", "false")
+    result = ExecutionAdapters().send_whatsapp(
+        {"whatsapp": "+201001234567", "verified_contact": True}, "hello"
+    )
+    assert result.status == "ready"
+    assert result.channel == "whatsapp"
+
+
+def test_whatsapp_requires_credentials_when_auto_send_enabled(monkeypatch):
+    monkeypatch.setenv("HAMED_AUTO_SEND_WHATSAPP", "true")
+    monkeypatch.delenv("WHATSAPP_ACCESS_TOKEN", raising=False)
+    monkeypatch.delenv("WHATSAPP_PHONE_NUMBER_ID", raising=False)
+    result = ExecutionAdapters().send_whatsapp(
+        {"whatsapp": "+201001234567", "verified_contact": True}, "hello"
+    )
+    assert result.status == "blocked"
+    assert "WHATSAPP_ACCESS_TOKEN" in result.reason
+
+
 def test_opted_out_contact_is_blocked():
     result = ExecutionAdapters().contact(
         {"telegram_chat_id": "123", "verified_contact": True, "opted_out": True}, "hello"
