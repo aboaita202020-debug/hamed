@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import html
 import os
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
@@ -43,14 +43,14 @@ class ChatRequest(BaseModel):
 
 class PlanRequest(BaseModel):
     message: str = Field(min_length=1, max_length=12000)
-    action: str | None = Field(default=None, max_length=80)
+    action: Optional[str] = Field(default=None, max_length=80)
 
 
 class ActionRequest(BaseModel):
     session_id: str = Field(default="default", min_length=1, max_length=120)
     action: str = Field(min_length=1, max_length=80)
     description: str = Field(min_length=1, max_length=2000)
-    value: float | None = None
+    value: Optional[float] = None
 
 
 class DecisionRequest(BaseModel):
@@ -129,7 +129,7 @@ def chat(request: ChatRequest) -> dict:
     try:
         reply = _orchestrator.respond(request.session_id, request.message)
         return {"session_id": request.session_id, "reply": reply}
-    except Exception as exc:  # pragma: no cover
+    except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
