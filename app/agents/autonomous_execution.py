@@ -4,6 +4,7 @@ from dataclasses import dataclass, asdict
 from typing import Any, Callable, Optional
 from .permissions import Risk, can_execute
 from .revenue_os import RevenueOS
+from .cash_velocity import CashVelocityEngine
 
 
 @dataclass(frozen=True)
@@ -19,17 +20,24 @@ class AutonomousExecutionEngine:
     """Turns an observed opportunity into bounded, reversible commercial work."""
 
     def __init__(self, executor: Optional[Callable[[str, dict[str, Any]], Any]] = None,
-                 revenue_os: Optional[RevenueOS] = None) -> None:
+                 revenue_os: Optional[RevenueOS] = None,
+                 cash_engine: Optional[CashVelocityEngine] = None) -> None:
         self.executor = executor
         self.revenue_os = revenue_os or RevenueOS()
+        self.cash_engine = cash_engine or CashVelocityEngine()
 
     def plan(self, opportunity: dict[str, Any]) -> list[ExecutionStep]:
         evidence = opportunity.get("evidence") or opportunity.get("summary")
         if not evidence:
             return [ExecutionStep("verify", "market_research", "blocked", "missing evidence")]
+
+        cash = self.cash_engine.assess(opportunity)
         ranked = self.revenue_os.rank(opportunity, limit=1)
         steps = [
             ExecutionStep("verify", "market_research", "ready", "evidence present"),
+            ExecutionStep("cash_scan", "cash_velocity_scan", cash.status, f"time-to-cash score {cash.score}; {cash.reason}"),
+            ExecutionStep("decision", "single_approver_filter", "ready" if not opportunity.get("requires_escalation") else "slow_track", "single approver preferred; escalation moves opportunity to slow track"),
+            ExecutionStep("payment", "payment_preclearance", "ready" if cash.payment_ready >= 0.6 else "slow_track", "confirm a mutually available payment rail before negotiation"),
             ExecutionStep("hunt", "opportunity_hunt", "ready", "find the highest-value supported opportunity"),
             ExecutionStep("leads", "lead_generation", "ready", "identify appropriate prospects and channels"),
             ExecutionStep("prepare", "offer_build", "ready", "prepare a truthful offer"),
@@ -38,15 +46,16 @@ class AutonomousExecutionEngine:
         if ranked:
             steps.append(ExecutionStep("money_route", ranked[0]["action"], "ready", f"top revenue channel: {ranked[0]['channel']} (score {ranked[0]['score']})"))
         steps.extend([
+            ExecutionStep("deposit", "deposit_offer", "ready", "offer an optional, clearly documented deposit-first structure when commercially appropriate"),
             ExecutionStep("contact", "customer_reply", "ready", "contact only an appropriate prospect/channel"),
             ExecutionStep("negotiate", "negotiate", "ready", "within configured limits"),
             ExecutionStep("recover", "lead_recovery", "ready", "recover eligible lost opportunities without spam"),
             ExecutionStep("followup", "followup", "ready", "schedule non-spam follow-up"),
             ExecutionStep("referral", "referral", "ready", "request eligible referrals transparently"),
-            ExecutionStep("measure", "revenue_tracking", "ready", "record funnel and profit metrics"),
+            ExecutionStep("measure", "revenue_tracking", "ready", "record funnel, cash collected, time-to-cash and profit metrics"),
         ])
         if opportunity.get("voice_call"):
-            steps.insert(7, ExecutionStep("call", "voice_call", "ready", "call only an explicitly eligible/allowlisted prospect"))
+            steps.insert(10, ExecutionStep("call", "voice_call", "ready", "call only an explicitly eligible/allowlisted prospect"))
         return steps
 
     def execute(self, opportunity: dict[str, Any]) -> dict[str, Any]:
