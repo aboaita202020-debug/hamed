@@ -6,7 +6,8 @@ import os
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .agent_worker import HamedWorker
@@ -60,7 +61,7 @@ class DecisionRequest(BaseModel):
     approved: bool
 
 
-app = FastAPI(title="Hamed AI", version="0.4.0", docs_url="/docs")
+app = FastAPI(title="Hamed AI", version="0.5.0", docs_url="/docs")
 _provider = OpenAIProvider(settings.openai_api_key, settings.openai_model) if settings.openai_api_key else FallbackProvider()
 _orchestrator = HamedOrchestrator(_provider)
 _worker = HamedWorker(interval_seconds=int(os.getenv("HAMED_WORKER_INTERVAL", "900")))
@@ -178,17 +179,28 @@ def decide(request: DecisionRequest) -> dict[str, Any]:
     return {"status": "approved", "executed": executed}
 
 
-@app.get("/dashboard", response_class=HTMLResponse)
-def dashboard() -> str:
-    pending_rows = []
+@app.get("/dashboard/data")
+def dashboard_data() -> dict[str, Any]:
+    pending = []
     for (session_id, action), item in _pending.items():
         approval = getattr(item, "approval", None)
         if approval is not None and not approval.approved:
-            pending_rows.append(
-                f"<tr><td>{html.escape(session_id)}</td><td>{html.escape(action)}</td><td>{html.escape(item.description)}</td><td>{item.value if item.value is not None else ''}</td></tr>"
-            )
-    rows = "".join(pending_rows) or "<tr><td colspan='4'>لا توجد موافقات معلّقة</td></tr>"
-    return f"""<!doctype html><html lang='ar' dir='rtl'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Hamed AI</title><style>body{{font-family:Arial,sans-serif;max-width:1100px;margin:40px auto;padding:0 20px}}table{{width:100%;border-collapse:collapse}}th,td{{padding:10px;border:1px solid #ddd;text-align:right}}.ok{{font-weight:700}}</style></head><body><h1>Hamed AI</h1><p>الحالة: <span class='ok'>تشغيل</span></p><p>مزود الذكاء: <span class='ok'>{'OpenAI' if settings.openai_api_key else 'Fallback مجاني'}</span></p><h2>الموافقات المعلّقة</h2><table><thead><tr><th>Session</th><th>Action</th><th>Description</th><th>Value</th></tr></thead><tbody>{rows}</tbody></table><p><a href='/worker/status'>Worker</a> | <a href='/docs'>API Docs</a> | <a href='/health'>Health</a></p></body></html>"""
+            pending.append({
+                "session_id": session_id,
+                "action": action,
+                "description": getattr(item, "description", ""),
+                "value": getattr(item, "value", None),
+            })
+    return {"pending_approvals": pending, "count": len(pending)}
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def dashboard() -> str:
+    ui_path = os.path.join(os.path.dirname(__file__), "ui", "dashboard.html")
+    if os.path.exists(ui_path):
+        with open(ui_path, "r", encoding="utf-8") as fh:
+            return fh.read()
+    return "<h1>Hamed AI</h1><p>واجهة التحكم غير متاحة حاليًا.</p>"
 
 
 def run_telegram_bot() -> None:
