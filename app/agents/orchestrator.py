@@ -33,6 +33,7 @@ from .universal_human_opportunity_agent import UniversalHumanOpportunityAgent
 from .website_ecommerce_intelligence_agent import WebsiteEcommerceIntelligenceAgent
 from .million_idea_agent import MillionIdeaAgent
 from .revenue_path_agent import RevenuePathAgent
+from .business_asset_network_agent import BusinessAssetNetworkAgent
 from .sales_agent import SalesAgent
 from .negotiation_agent import NegotiationAgent
 from .revenue_agent import RevenueAgent
@@ -50,7 +51,7 @@ class HamedOrchestrator:
         self.db = db or get_database(); self.repo = Repository(self.db); self.permissions = PermissionLayer(self.repo); self.tools = ToolRegistry(self.permissions)
         self.max_retries = max_retries; self.brain_provider = brain_provider; self.brain_council = BrainCouncil(brain_provider) if brain_provider is not None else None
         self.tools.register(WebSearchTool(provider=search_provider)); self.tools.register(CRMTool(self.repo)); self.agents: dict[str, BaseAgent] = {}
-        for agent_cls in (OpportunityHunterAgent, OpportunityMachineAgent, CustomerRelationshipAgent, CustomerPsychologyAgent, CustomerAcquisitionAgent, CustomerConversationAgent, OfferCompilerAgent, RevenueCompilerAgent, MarketingCampaignAgent, FreelanceRevenueAgent, VideoCommerceAgent, VideoProductionAgent, ServiceCompilerAgent, RevenueOpportunitySuiteAgent, RevenueExpansionSuiteAgent, BusinessOpportunityFactoryAgent, RevenueInfrastructureSuiteAgent, UniversalCustomerExecutionAgent, UniversalHumanOpportunityAgent, WebsiteEcommerceIntelligenceAgent, MillionIdeaAgent, RevenuePathAgent, SalesAgent, NegotiationAgent, RevenueAgent, ReportingAgent, FactCheckAgent): self.register_agent(agent_cls(self.tools, self.repo))
+        for agent_cls in (OpportunityHunterAgent, OpportunityMachineAgent, CustomerRelationshipAgent, CustomerPsychologyAgent, CustomerAcquisitionAgent, CustomerConversationAgent, OfferCompilerAgent, RevenueCompilerAgent, MarketingCampaignAgent, FreelanceRevenueAgent, VideoCommerceAgent, VideoProductionAgent, ServiceCompilerAgent, RevenueOpportunitySuiteAgent, RevenueExpansionSuiteAgent, BusinessOpportunityFactoryAgent, RevenueInfrastructureSuiteAgent, UniversalCustomerExecutionAgent, UniversalHumanOpportunityAgent, WebsiteEcommerceIntelligenceAgent, MillionIdeaAgent, RevenuePathAgent, BusinessAssetNetworkAgent, SalesAgent, NegotiationAgent, RevenueAgent, ReportingAgent, FactCheckAgent): self.register_agent(agent_cls(self.tools, self.repo))
     def register_agent(self, agent: BaseAgent) -> None: self.agents[agent.name] = agent
     def dispatch(self, agent_name: str, payload: dict) -> OrchestratorResult:
         if agent_name not in self.agents: return OrchestratorResult(agent_name, AgentResult(success=False, error=f"unknown_agent:{agent_name}"))
