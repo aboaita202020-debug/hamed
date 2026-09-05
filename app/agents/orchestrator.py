@@ -1,4 +1,4 @@
-"""Central coordinator for Hamed AI revenue, service compilation and opportunity discovery."""
+"""Central coordinator for Hamed AI revenue expansion and autonomous opportunity discovery."""
 from __future__ import annotations
 import time
 from dataclasses import dataclass
@@ -24,6 +24,7 @@ from .freelance_revenue_agent import FreelanceRevenueAgent
 from .video_commerce_agent import VideoCommerceAgent
 from .service_compiler_agent import ServiceCompilerAgent
 from .revenue_opportunity_suite_agent import RevenueOpportunitySuiteAgent
+from .revenue_expansion_suite_agent import RevenueExpansionSuiteAgent
 from .sales_agent import SalesAgent
 from .negotiation_agent import NegotiationAgent
 from .revenue_agent import RevenueAgent
@@ -37,12 +38,11 @@ class OrchestratorResult:
     result: AgentResult
     attempts: int = 1
 class HamedOrchestrator:
-    """Central coordinator for business agents and autonomous opportunity missions."""
     def __init__(self, db: Optional[Database] = None, search_provider: Optional[SearchProvider] = None, max_retries: int = 2, brain_provider=None):
         self.db = db or get_database(); self.repo = Repository(self.db); self.permissions = PermissionLayer(self.repo); self.tools = ToolRegistry(self.permissions)
         self.max_retries = max_retries; self.brain_provider = brain_provider; self.brain_council = BrainCouncil(brain_provider) if brain_provider is not None else None
         self.tools.register(WebSearchTool(provider=search_provider)); self.tools.register(CRMTool(self.repo)); self.agents: dict[str, BaseAgent] = {}
-        for agent_cls in (OpportunityHunterAgent, OpportunityMachineAgent, CustomerRelationshipAgent, CustomerPsychologyAgent, CustomerAcquisitionAgent, CustomerConversationAgent, OfferCompilerAgent, RevenueCompilerAgent, MarketingCampaignAgent, FreelanceRevenueAgent, VideoCommerceAgent, ServiceCompilerAgent, RevenueOpportunitySuiteAgent, SalesAgent, NegotiationAgent, RevenueAgent, ReportingAgent, FactCheckAgent): self.register_agent(agent_cls(self.tools, self.repo))
+        for agent_cls in (OpportunityHunterAgent, OpportunityMachineAgent, CustomerRelationshipAgent, CustomerPsychologyAgent, CustomerAcquisitionAgent, CustomerConversationAgent, OfferCompilerAgent, RevenueCompilerAgent, MarketingCampaignAgent, FreelanceRevenueAgent, VideoCommerceAgent, ServiceCompilerAgent, RevenueOpportunitySuiteAgent, RevenueExpansionSuiteAgent, SalesAgent, NegotiationAgent, RevenueAgent, ReportingAgent, FactCheckAgent): self.register_agent(agent_cls(self.tools, self.repo))
     def register_agent(self, agent: BaseAgent) -> None: self.agents[agent.name] = agent
     def dispatch(self, agent_name: str, payload: dict) -> OrchestratorResult:
         if agent_name not in self.agents: return OrchestratorResult(agent_name, AgentResult(success=False, error=f"unknown_agent:{agent_name}"))
