@@ -1,4 +1,4 @@
-"""Central coordinator for Hamed AI, including adaptive customer conversations."""
+"""Central coordinator for Hamed AI, including adaptive customer conversations and revenue compilation."""
 from __future__ import annotations
 import time
 from dataclasses import dataclass
@@ -18,6 +18,7 @@ from .customer_psychology_agent import CustomerPsychologyAgent
 from .customer_acquisition_agent import CustomerAcquisitionAgent
 from .customer_conversation_agent import CustomerConversationAgent
 from .offer_compiler_agent import OfferCompilerAgent
+from .revenue_compiler_agent import RevenueCompilerAgent
 from .sales_agent import SalesAgent
 from .negotiation_agent import NegotiationAgent
 from .revenue_agent import RevenueAgent
@@ -43,7 +44,7 @@ class HamedOrchestrator:
         self.tools.register(WebSearchTool(provider=search_provider))
         self.tools.register(CRMTool(self.repo))
         self.agents: dict[str, BaseAgent] = {}
-        for agent_cls in (OpportunityHunterAgent, OpportunityMachineAgent, CustomerRelationshipAgent, CustomerPsychologyAgent, CustomerAcquisitionAgent, CustomerConversationAgent, OfferCompilerAgent, SalesAgent, NegotiationAgent, RevenueAgent, ReportingAgent, FactCheckAgent):
+        for agent_cls in (OpportunityHunterAgent, OpportunityMachineAgent, CustomerRelationshipAgent, CustomerPsychologyAgent, CustomerAcquisitionAgent, CustomerConversationAgent, OfferCompilerAgent, RevenueCompilerAgent, SalesAgent, NegotiationAgent, RevenueAgent, ReportingAgent, FactCheckAgent):
             self.register_agent(agent_cls(self.tools, self.repo))
     def register_agent(self, agent: BaseAgent) -> None:
         self.agents[agent.name] = agent
