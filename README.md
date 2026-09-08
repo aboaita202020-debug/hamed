@@ -1,93 +1,75 @@
-# Hamed AI — دليل التشغيل
+# 🤖 Hamed AI - Complete Business Operating System
 
-نظام Multi-Agent Business Operating System. الـ Core لا يحتاج أي مكتبة
-خارجية (Python stdlib فقط) — كل شيء آخر (Telegram, Dashboard API, AI
-Providers) طبقات اختيارية منفصلة.
+## 📁 الملف الرئيسي
 
-## 1) التشغيل محليًا بدون Docker
+**`HAMED_AI_COMPLETE.html`** - المشروع الكامل في ملف واحد!
 
-```bash
-python3 -m venv venv
-source venv/bin/activate        # على ويندوز: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env             # عدّل القيم اللي محتاجها بس
-python -m unittest discover -s tests -v   # للتأكد إن كل حاجة شغالة
-python scripts/run_server.py     # يفتح على http://127.0.0.1:8000
-```
+---
 
-نقاط الوصول:
-- `GET /health` — فحص حياة السيرفر.
-- `GET /readiness` — فحص جاهزية قاعدة البيانات.
-- `GET /dashboard` — ملخص الأداء (Leads, Opportunities, Revenue).
-- `GET /leads`, `GET /opportunities`, `GET /audit-logs`
-- `POST /dispatch/{agent_name}` — تشغيل أي Agent يدويًا (body: JSON payload).
+## 🚀 رفع المشروع على GitHub
 
-لتشغيل بوت تليجرام (بعد ضبط `TELEGRAM_BOT_TOKEN` في `.env`):
-```bash
-python scripts/run_telegram.py
-```
+### الخطوات:
 
-## 2) التشغيل عبر Docker (بدون الحاجة لـ Docker على جهازك)
+1. **افتح المستودع:**
+   ```
+   https://github.com/aboaita202020-debug/hamed-ai
+   ```
 
-بما إن **Docker Desktop لا يدعم Windows 7** (يحتاج Windows 10/11 مع
-WSL2)، الطريقة المضبوطة هنا هي إن GitHub نفسه يبني صورة الـ Docker
-وينشرها، مش جهازك:
+2. **ارفع الملف:**
+   - اضغط **"Add file"** → **"Upload files"**
+   - اسحب ملف `HAMED_AI_COMPLETE.html`
+   - اضغط **"Commit changes"**
 
-1. ارفع الكود على مستودع GitHub جديد (فارغ الأول، عادي).
-2. الملف `.github/workflows/docker-publish.yml` موجود جاهز — أول ما
-   تعمل `git push` على فرع `main`، GitHub Actions هيشغّل الاختبارات
-   تلقائيًا، وبعدين يبني صورة Docker وينشرها على
-   `ghcr.io/<اسم-المستخدم>/<اسم-المستودع>:latest`.
-3. من إعدادات المستودع على GitHub: Settings → Packages، تأكد إن الصورة
-   ظاهرة بعد أول Push ناجح (تقدر كمان تتابع التقدم من تبويب Actions).
-4. في `justrunmy.app` (أو أي منصة Docker تانية)، وجّهها لسحب الصورة من
-   `ghcr.io/<اسم-المستخدم>/<اسم-المستودع>:latest` بدل ما تعمل
-   `docker build`/`push` بنفسك.
-   - لو المنصة محتاجة الصورة على Docker Hub تحديدًا بدل GHCR، فعّل
-     الجزء المعلّق (commented) في نفس ملف الـ workflow وضيف
-     `DOCKERHUB_USERNAME` و `DOCKERHUB_TOKEN` كـ Secrets في إعدادات
-     المستودع (Settings → Secrets and variables → Actions).
-5. اضبط متغيرات البيئة (نفس اللي في `.env.example`) من لوحة تحكم
-   المنصة نفسها — منها التوكن، مفاتيح الـ AI، وحدود الموافقات.
-6. اعمل Mount لمجلد `/app/data` كـ Volume دائم لو المنصة بتدعم كده، عشان
-   بيانات الـ CRM متضيعش عند إعادة تشغيل الحاوية.
+3. **فعّل GitHub Pages:**
+   - روح على **Settings** → **Pages**
+   - في **Source** اختار:
+     - Branch: `main`
+     - Folder: `/ (root)`
+   - اضغط **Save**
 
-## 3) البنية
+4. **افتح الداشبورد:**
+   ```
+   https://aboaita202020-debug.github.io/hamed-ai/HAMED_AI_COMPLETE.html
+   ```
 
-```
-app/
-  config.py            # كل الإعدادات من Environment Variables
-  db/                   # SQLite (stdlib) + Repository + CRM Dedup + Audit Log
-  permissions/           # Permission Layer / Approval Gate
-  tools/                 # Tool Registry + WebSearchTool + CRMTool
-  agents/
-    orchestrator.py      # HamedOrchestrator
-    *_agent.py            # كل Agent قابل للاختبار منفردًا
-  ai_providers/          # Router + Fallback بين المزودين
-  channels/telegram_adapter.py   # اختياري
-  api/server.py                    # اختياري (FastAPI)
-scripts/
-  run_server.py           # نقطة تشغيل الـ Dashboard/Webhook
-  run_telegram.py         # نقطة تشغيل بوت تليجرام (Polling)
-tests/                     # 23 اختبار unittest (stdlib فقط، بدون أي pip install)
-```
+---
 
-## 4) قاعدة أساسية
+## 🎯 محتويات الملف
 
-كل Agent وكل Tool بيتحقنوا (dependency injection) بدل الاستيراد
-المباشر — عشان تقدر تضيف Agent جديد أو تستبدل قاعدة البيانات من غير
-ما تلمس بقية الكود. راجع `app/agents/orchestrator.py` لمعرفة إزاي
-تسجّل Agent جديد عبر `register_agent()`.
+الملف الواحد فيه **9 صفحات تفاعلية**:
 
-## 5) الخطوة الجاية المقترحة
+1. 📊 **لوحة التحكم** - نظرة عامة على النظام
+2. 🤖 **العقول الذكية** - 6 عقول ذكية متخصصة
+3. 📱 **بوت تيليجرام** - معلومات البوت والأوامر
+4. 💰 **خطة الدخل** - مصادر الدخل والأسعار
+5. 🎯 **الاستراتيجيات** - استراتيجيات البيع
+6. 🧠 **علم نفس العميل** - مبادئ التأثير
+7. 📣 **التسويق الذكي** - استراتيجيات التسويق
+8. 🛠️ **الأدوات المجانية** - أدوات مجانية
+9. 📞 **التواصل** - معلومات التواصل
 
-الوثيقة الأصلية بتحدد 17 Phase. اللي اتنفذ فعليًا دلوقتي يغطي:
-Phase 1 (Core مستقر بدون ImportError)، Phase 3 (Agent/Tool Interfaces +
-Orchestrator)، جزء من Phase 4 (CRM)، جزء من Phase 5 (Sales)، جزء من
-Phase 6 (Opportunity Hunter)، جزء من Phase 7 (Revenue)، جزء من Phase 9
-(Negotiation + Approval)، جزء من Phase 10 (Dashboard كـ JSON API)، وكل
-من Phase 2 و14 و15 (Telegram أساسي، CI عبر GitHub Actions، Docker).
+---
 
-لسه محتاج: Purchasing Engine، Web/Social Intelligence حقيقي (بدل الـ
-mock provider)، RAG/Knowledge Base، WhatsApp/Voice، Dashboard UI بصري
-(الحالي JSON فقط).
+## 📞 معلومات التواصل
+
+- **واتساب**: 01061245527
+- **فودافون كاش**: 01040900623
+- **تيليجرام**: @hamed_ai_bot
+
+---
+
+## 🎊 الخلاصة
+
+**ملف واحد فيه كل حاجة!** 🚀💰
+
+- ✅ 9 صفحات تفاعلية
+- ✅ 6 عقول ذكية
+- ✅ 4 AI APIs
+- ✅ بوت تيليجرام
+- ✅ استراتيجيات البيع
+- ✅ علم نفس العميل
+- ✅ التسويق الذكي
+- ✅ أدوات مجانية
+- ✅ معلومات التواصل
+
+**يلا ارفع المشروع دلوقتي!** 🚀💰

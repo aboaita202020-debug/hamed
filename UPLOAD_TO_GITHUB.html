@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 ارفع المشروع على GitHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .copy-btn { transition: all 0.3s; }
+        .copy-btn:hover { transform: scale(1.05); }
+        .copy-btn.copied { background: #10b981 !important; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-green-400 mb-2">🚀 ارفع المشروع على GitHub</h1>
+            <p class="text-gray-400">خطوات بسيطة جداً - من غير تعقيد</p>
+        </div>
+
+        <!-- Step 1: Create Repository -->
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">
+                <span class="bg-green-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center ml-2">1</span>
+                اعمل Repository على GitHub
+            </h2>
+            
+            <div class="space-y-4">
+                <p class="text-gray-300">اضغط على الزر ده هيفتح صفحة إنشاء Repository:</p>
+                
+                <a href="https://github.com/new" target="_blank" 
+                   class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold transition-all hover:scale-105">
+                    🌐 افتح صفحة إنشاء Repository
+                </a>
+
+                <div class="bg-gray-900/50 rounded-lg p-4 mt-4">
+                    <h3 class="text-lg font-bold text-green-400 mb-2">املأ البيانات زي كده:</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>✅ <strong>Repository name:</strong> hamed-ai</li>
+                        <li>✅ <strong>Description:</strong> Hamed AI - Complete Business Operating System</li>
+                        <li>✅ <strong>Public</strong> (اختار Public)</li>
+                        <li>✅ <strong>Add a README</strong> (علّم عليه)</li>
+                        <li>✅ اضغط <strong>Create repository</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Download Project -->
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">
+                <span class="bg-blue-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center ml-2">2</span>
+                حمّل المشروع
+            </h2>
+            
+            <div class="space-y-4">
+                <p class="text-gray-300">بما إن المشروع هنا، هتحتاج تنزله:</p>
+                
+                <div class="bg-gray-900/50 rounded-lg p-4">
+                    <h3 class="text-lg font-bold text-blue-400 mb-2">الطريقة الأسهل:</h3>
+                    <ol class="space-y-2 text-gray-300 list-decimal list-inside">
+                        <li>افتح GitHub Desktop (لو مش مثبت، حمّله من <a href="https://desktop.github.com" target="_blank" class="text-blue-400 hover:underline">هنا</a>)</li>
+                        <li>اضغط <strong>File</strong> → <strong>Add Local Repository</strong></li>
+                        <li>اختار مجلد المشروع</li>
+                        <li>اضغط <strong>Publish repository</strong></li>
+                    </ol>
+                </div>
+
+                <div class="bg-gray-900/50 rounded-lg p-4">
+                    <h3 class="text-lg font-bold text-blue-400 mb-2">أو من CMD (لو عايز):</h3>
+                    <div class="flex gap-2">
+                        <code class="flex-1 bg-black rounded px-4 py-2 text-green-400 font-mono text-sm">cd path/to/project && git init && git add . && git commit -m "Initial commit" && git remote add origin https://github.com/YOUR-USERNAME/hamed-ai.git && git push -u origin main</code>
+                        <button onclick="copyCommand('cd path/to/project && git init && git add . && git commit -m \"Initial commit\" && git remote add origin https://github.com/YOUR-USERNAME/hamed-ai.git && git push -u origin main')" 
+                                class="copy-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-bold">
+                            📋 نسخ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Enable GitHub Pages -->
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">
+                <span class="bg-purple-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center ml-2">3</span>
+                فعّل GitHub Pages (عشان الداشبورد يشتغل)
+            </h2>
+            
+            <div class="space-y-4">
+                <p class="text-gray-300">بعد ما ترفع المشروع، فعّل GitHub Pages:</p>
+                
+                <ol class="space-y-3 text-gray-300 list-decimal list-inside">
+                    <li>روح على الـ Repository في GitHub</li>
+                    <li>اضغط <strong>Settings</strong> (إعدادات)</li>
+                    <li>من القائمة الجانبية، اضغط <strong>Pages</strong></li>
+                    <li>في <strong>Source</strong> اختار:
+                        <ul class="mr-6 mt-2 space-y-1">
+                            <li>• Branch: <code class="bg-black px-2 py-1 rounded">main</code></li>
+                            <li>• Folder: <code class="bg-black px-2 py-1 rounded">/ (root)</code></li>
+                        </ul>
+                    </li>
+                    <li>اضغط <strong>Save</strong></li>
+                    <li>استنى 1-2 دقيقة</li>
+                </ol>
+
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mt-4">
+                    <h3 class="text-lg font-bold text-green-400 mb-2">✅ الداشبورد هيكون متاح على:</h3>
+                    <code class="text-green-400 text-sm">https://YOUR-USERNAME.github.io/hamed-ai/dashboard.html</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">🔗 روابط سريعة</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <a href="https://github.com/new" target="_blank" 
+                   class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold text-center transition-all hover:scale-105">
+                    🌐 إنشاء Repository
+                </a>
+                
+                <a href="https://desktop.github.com" target="_blank" 
+                   class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-bold text-center transition-all hover:scale-105">
+                    💻 حمّل GitHub Desktop
+                </a>
+                
+                <a href="dashboard.html" target="_blank" 
+                   class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-bold text-center transition-all hover:scale-105">
+                    📊 افتح الداشبورد
+                </a>
+                
+                <a href="https://t.me/hamed_ai_bot" target="_blank" 
+                   class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-bold text-center transition-all hover:scale-105">
+                    📱 افتح البوت في تيليجرام
+                </a>
+            </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+            <h2 class="text-2xl font-bold mb-4">📞 معلومات التواصل</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-gray-900/50 rounded-lg p-4">
+                    <div class="text-lg font-bold text-green-400 mb-2">📱 واتساب</div>
+                    <div class="text-xl font-bold">01061245527</div>
+                </div>
+                <div class="bg-gray-900/50 rounded-lg p-4">
+                    <div class="text-lg font-bold text-red-400 mb-2">💳 فودافون كاش</div>
+                    <div class="text-xl font-bold">01040900623</div>
+                </div>
+                <div class="bg-gray-900/50 rounded-lg p-4">
+                    <div class="text-lg font-bold text-blue-400 mb-2">📱 تيليجرام</div>
+                    <div class="text-xl font-bold">@hamed_ai_bot</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-gray-400">
+            <p>🚀 يلا ارفع المشروع وابدأ شغل!</p>
+        </div>
+    </div>
+
+    <script>
+        function copyCommand(command) {
+            navigator.clipboard.writeText(command).then(() => {
+                const buttons = document.querySelectorAll('.copy-btn');
+                buttons.forEach(btn => {
+                    if (btn.onclick.toString().includes(command.substring(0, 20))) {
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '✅ تم النسخ!';
+                        btn.classList.add('copied');
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.classList.remove('copied');
+                        }, 2000);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,35 +1,86 @@
 @echo off
-setlocal
-cd /d "%~dp0"
-title Hamed AI - Launcher
+chcp 65001 >nul
+title 🤖 Hamed AI - Complete Business Operating System
+color 0A
 
-echo ========================================
-echo          HAMED AI - STARTING
-echo ========================================
+echo.
+echo ╔═══════════════════════════════════════════════════════════╗
+echo ║                                                           ║
+echo ║              🤖 Hamed AI Dashboard                        ║
+echo ║         Complete Business Operating System                ║
+echo ║                                                           ║
+echo ║   ✅ 21 Interactive Pages                                 ║
+echo ║   ✅ Advanced AI Brain (6 Brains)                         ║
+echo ║   ✅ Smart Sales System                                   ║
+echo ║   ✅ Call Center                                          ║
+echo ║   ✅ Smart Responses (WhatsApp/Telegram/Voice)            ║
+echo ║   ✅ Social Media Management                              ║
+echo ║   ✅ Learning System                                      ║
+echo ║   ✅ 24/7 Auto-Processing                                 ║
+echo ║                                                           ║
+echo ╚═══════════════════════════════════════════════════════════╝
 echo.
 
-echo [1/3] Checking Python...
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo ERROR: Python is not installed or not in PATH.
-    echo Install Python, then run this file again.
+:: Check Node.js
+where node >nul 2>nul
+if %errorlevel% neq 0 (
+    echo ❌ Node.js is not installed!
+    echo.
+    echo Please install Node.js 18 or newer:
+    echo https://nodejs.org/
+    echo.
     pause
     exit /b 1
 )
 
-echo [2/3] Starting Hamed AI...
+echo ✓ Node.js found
+node --version
 echo.
-start "Hamed AI Server" cmd /k "cd /d "%~dp0" && python -m app.main"
 
-timeout /t 3 /nobreak >nul
+:: Check if node_modules exists
+if not exist "node_modules" (
+    echo 📦 Installing dependencies...
+    echo.
+    call npm install
+    if %errorlevel% neq 0 (
+        echo.
+        echo ❌ Failed to install dependencies
+        pause
+        exit /b 1
+    )
+    echo.
+    echo ✓ Dependencies installed successfully
+    echo.
+)
 
-echo [3/3] Opening Hamed Dashboard...
-start "" "http://127.0.0.1:8000/dashboard"
-
+:: Run tests
+echo 🧪 Running tests...
 echo.
-echo Hamed AI is starting.
-echo Dashboard: http://127.0.0.1:8000/dashboard
+call npm test
+if %errorlevel% neq 0 (
+    echo.
+    echo ⚠️  Some tests failed, but continuing...
+    echo.
+) else (
+    echo.
+    echo ✓ All tests passed
+    echo.
+)
+
+:: Start the development server
+echo 🚀 Starting Hamed AI Dashboard...
 echo.
-echo Keep the Hamed AI Server window open while using Hamed.
-echo You can close this launcher window.
-endlocal
+echo The dashboard will open automatically in your browser
+echo.
+echo Press Ctrl+C to stop the server
+echo.
+echo ═══════════════════════════════════════════════════════════
+echo.
+
+:: Open browser after 3 seconds
+start "" cmd /c "timeout /t 3 /nobreak >nul && start http://localhost:5173"
+
+:: Start the dev server
+call npm run dev
+
+pause

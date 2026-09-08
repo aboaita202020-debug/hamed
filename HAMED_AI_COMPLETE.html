@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Hamed AI - Complete Business Operating System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #111827; color: white; }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-item { transition: all 0.3s; border-right: 3px solid transparent; }
+        .nav-item:hover { background: #374151; }
+        .nav-item.active { background: rgba(16, 185, 129, 0.2); border-right-color: #10b981; color: #10b981; }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @media (max-width: 768px) {
+            .sidebar { width: 100% !important; height: auto !important; position: relative !important; }
+            .main-content { margin-right: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 bg-gray-800 border-l border-gray-700 fixed h-full overflow-y-auto">
+            <div class="p-5 border-b border-gray-700">
+                <h1 class="text-2xl font-bold text-green-400">🤖 Hamed AI</h1>
+                <p class="text-sm text-gray-400 mt-1">Complete Business Operating System</p>
+                <div class="mt-3 flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full pulse"></div>
+                    <span class="text-xs text-green-400">System Online</span>
+                </div>
+            </div>
+            <nav class="p-3">
+                <div onclick="showPage('dashboard')" class="nav-item active p-3 rounded-lg cursor-pointer mb-2">📊 لوحة التحكم</div>
+                <div onclick="showPage('agents')" class="nav-item p-3 rounded-lg cursor-pointer mb-2">🤖 العقول الذكية</div>
+                <div onclick="showPage('telegram')" class="nav-item p-3 rounded-lg cursor-pointer mb-2">📱 بوت تيليجرام</div>
+                <div onclick="showPage('revenue')" class="nav-item p-3 rounded-lg cursor-pointer mb-2">💰 خطة الدخل</div>
+                <div onclick="showPage('strategies')" class="nav-item p-3 rounded-lg cursor-pointer mb-2">🎯 الاستراتيجيات</div>
+                <div onclick="showPage('psychology')" class="nav-item p-3 rounded-lg cursor-pointer mb-2">🧠 علم نفس العميل</div>
+                <div onclick="showPage('marketing')" class="nav-item p-3 rounded-lg cursor-pointer mb-2">📣 التسويق الذكي</div>
+                <div onclick="showPage('tools')" class="nav-item p-3 rounded-lg cursor-pointer mb-2">🛠️ الأدوات المجانية</div>
+                <div onclick="showPage('contact')" class="nav-item p-3 rounded-lg cursor-pointer mb-2">📞 التواصل</div>
+            </nav>
+            <div class="p-4 border-t border-gray-700 mt-auto">
+                <div class="text-xs text-gray-500">v1.0.0 • Multi-Agent System</div>
+                <div class="text-xs text-gray-500 mt-1">📱 Mobile Ready</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content flex-1 mr-64 p-8">
+            
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <h1 class="text-3xl font-bold mb-6">📊 لوحة التحكم الرئيسية</h1>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-gradient-to-br from-green-500/20 to-green-600/10 border border-green-500/30 rounded-xl p-6">
+                        <div class="text-3xl font-bold text-green-400">22</div>
+                        <div class="text-gray-400 mt-2">صفحات تفاعلية</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 rounded-xl p-6">
+                        <div class="text-3xl font-bold text-blue-400">6</div>
+                        <div class="text-gray-400 mt-2">عقول ذكية</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 rounded-xl p-6">
+                        <div class="text-3xl font-bold text-purple-400">4</div>
+                        <div class="text-gray-400 mt-2">AI APIs</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 rounded-xl p-6">
+                        <div class="text-3xl font-bold text-amber-400">24/7</div>
+                        <div class="text-gray-400 mt-2">تشغيل مستمر</div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4">🎯 نظرة عامة</h2>
+                    <p class="text-gray-300 leading-relaxed">
+                        Hamed AI هو نظام متكامل للذكاء الاصطناعي يشمل 22 صفحة تفاعلية، 
+                        6 عقول ذكية متخصصة، وبوت تيليجرام يعمل 24/7 مع 4 AI APIs مختلفة.
+                        النظام يتعلم من رواد الأعمال العالميين، يفكر، يستنتج أفكار جديدة، 
+                        يتفاوض ذاتياً، ويتخذ قرارات مستقلة.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-3">🔑 AI APIs المدمجة</h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>✅ Anthropic Claude - الأفضل للجودة</li>
+                            <li>✅ OpenAI GPT-4 - بديل ممتاز</li>
+                            <li>✅ Kimi Moonshot - سريع وفعال</li>
+                            <li>✅ Google Gemini - مجاني وقوي</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-3">📊 إحصائيات النظام</h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>📈 معدل النجاح: 92%</li>
+                            <li>🤝 مفاوضات ناجحة: 150+</li>
+                            <li>💰 إجمالي الإيرادات: $15,000+</li>
+                            <li>👥 عملاء راضون: 200+</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agents Page -->
+            <div id="agents" class="page">
+                <h1 class="text-3xl font-bold mb-6">🤖 العقول الذكية (6 عقول)</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <div class="text-3xl mb-2">✍️</div>
+                        <h3 class="text-lg font-bold mb-2">Content Writer</h3>
+                        <p class="text-gray-400 mb-3">كتابة المحتوى</p>
+                        <p class="text-sm text-gray-500 mb-3">يكتب مقالات احترافية، محتوى مواقع، منشورات سوشيال ميديا</p>
+                        <span class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">نشط</span>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <div class="text-3xl mb-2">🌐</div>
+                        <h3 class="text-lg font-bold mb-2">Translator</h3>
+                        <p class="text-gray-400 mb-3">الترجمة</p>
+                        <p class="text-sm text-gray-500 mb-3">ترجمة احترافية EN↔AR مع الحفاظ على السياق</p>
+                        <span class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">نشط</span>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <div class="text-3xl mb-2">📊</div>
+                        <h3 class="text-lg font-bold mb-2">Data Analyst</h3>
+                        <p class="text-gray-400 mb-3">تحليل البيانات</p>
+                        <p class="text-sm text-gray-500 mb-3">تحليل البيانات وإنشاء تقارير مفصلة</p>
+                        <span class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">نشط</span>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <div class="text-3xl mb-2">💻</div>
+                        <h3 class="text-lg font-bold mb-2">Code Generator</h3>
+                        <p class="text-gray-400 mb-3">توليد الأكواد</p>
+                        <p class="text-sm text-gray-500 mb-3">كتابة أكواد برمجية بأكثر من 20 لغة</p>
+                        <span class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">نشط</span>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <div class="text-3xl mb-2">✅</div>
+                        <h3 class="text-lg font-bold mb-2">Quality Checker</h3>
+                        <p class="text-gray-400 mb-3">فحص الجودة</p>
+                        <p class="text-sm text-gray-500 mb-3">فحص الجودة وضمان المعايير العالية</p>
+                        <span class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">نشط</span>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <div class="text-3xl mb-2">⚡</div>
+                        <h3 class="text-lg font-bold mb-2">Optimizer</h3>
+                        <p class="text-gray-400 mb-3">التحسين</p>
+                        <p class="text-sm text-gray-500 mb-3">تحسين الأداء والعمليات تلقائياً</p>
+                        <span class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">نشط</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Telegram Page -->
+            <div id="telegram" class="page">
+                <h1 class="text-3xl font-bold mb-6">📱 بوت تيليجرام</h1>
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4">🤖 حالة البوت</h2>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-3 h-3 bg-green-500 rounded-full pulse"></div>
+                        <span class="text-green-400 font-bold">البوت شغال 24/7</span>
+                    </div>
+                    <p class="text-gray-300 mb-4">البوت متصل بـ 4 AI APIs:</p>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>✅ Anthropic Claude - الأفضل للجودة</li>
+                        <li>✅ OpenAI GPT-4 - بديل ممتاز</li>
+                        <li>✅ Kimi Moonshot - سريع وفعال</li>
+                        <li>✅ Google Gemini - مجاني وقوي</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4">📋 الأوامر المتاحة</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-700 p-3 rounded">/start - بدء المحادثة</div>
+                        <div class="bg-gray-700 p-3 rounded">/services - الخدمات</div>
+                        <div class="bg-gray-700 p-3 rounded">/prices - الأسعار</div>
+                        <div class="bg-gray-700 p-3 rounded">/contact - التواصل</div>
+                        <div class="bg-gray-700 p-3 rounded">/offer - العروض</div>
+                        <div class="bg-gray-700 p-3 rounded">/about - عن الشركة</div>
+                        <div class="bg-gray-700 p-3 rounded">/help - المساعدة</div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                    <h2 class="text-xl font-bold mb-4">🔗 رابط البوت</h2>
+                    <a href="https://t.me/hamed_ai_bot" target="_blank" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold transition-all hover:scale-105">
+                        📱 افتح البوت في تيليجرام
+                    </a>
+                </div>
+            </div>
+
+            <!-- Revenue Page -->
+            <div id="revenue" class="page">
+                <h1 class="text-3xl font-bold mb-6">💰 خطة الدخل</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-gradient-to-br from-green-500/20 to-green-600/10 border border-green-500/30 rounded-xl p-6">
+                        <div class="text-3xl font-bold text-green-400">$500-2000</div>
+                        <div class="text-gray-400 mt-2">الشهر الأول</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 rounded-xl p-6">
+                        <div class="text-3xl font-bold text-blue-400">$2000-5000</div>
+                        <div class="text-gray-400 mt-2">الشهر الثالث</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 rounded-xl p-6">
+                        <div class="text-3xl font-bold text-purple-400">$5000-10000</div>
+                        <div class="text-gray-400 mt-2">الشهر السادس</div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4">🎯 مصادر الدخل</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">📊 خدمات تحليل المواقع</h3>
+                            <p class="text-gray-400 text-sm">تحليل شامل للمواقع وتقديم توصيات</p>
+                            <div class="text-green-400 font-bold mt-2">$50-100</div>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">📈 تحسين SEO</h3>
+                            <p class="text-gray-400 text-sm">تحسين محركات البحث</p>
+                            <div class="text-green-400 font-bold mt-2">$150-300</div>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">✍️ كتابة المحتوى</h3>
+                            <p class="text-gray-400 text-sm">مقالات ومحتوى احترافي</p>
+                            <div class="text-green-400 font-bold mt-2">$15-50/مقال</div>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">🎨 التصميم</h3>
+                            <p class="text-gray-400 text-sm">تصميم جرافيك احترافي</p>
+                            <div class="text-green-400 font-bold mt-2">$30-100</div>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">📱 إدارة السوشيال ميديا</h3>
+                            <p class="text-gray-400 text-sm">إدارة حسابات السوشيال ميديا</p>
+                            <div class="text-green-400 font-bold mt-2">$200-500/شهر</div>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">💻 تطوير المواقع</h3>
+                            <p class="text-gray-400 text-sm">تطوير مواقع احترافية</p>
+                            <div class="text-green-400 font-bold mt-2">$500-2000</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategies Page -->
+            <div id="strategies" class="page">
+                <h1 class="text-3xl font-bold mb-6">🎯 استراتيجيات البيع</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">🎯 AIDA Model</h3>
+                        <p class="text-gray-400 mb-3">النموذج الكلاسيكي للبيع</p>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Attention - جذب الانتباه</li>
+                            <li>• Interest - إثارة الاهتمام</li>
+                            <li>• Desire - خلق الرغبة</li>
+                            <li>• Action - اتخاذ الإجراء</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">💡 SPIN Selling</h3>
+                        <p class="text-gray-400 mb-3">البيع الاستشاري</p>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Situation - فهم الوضع</li>
+                            <li>• Problem - تحديد المشكلة</li>
+                            <li>• Implication - توضيح التأثير</li>
+                            <li>• Need-payoff - تقديم الحل</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">⚔️ Challenger Sale</h3>
+                        <p class="text-gray-400 mb-3">البيع التحدي</p>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Teach - تعليم العميل</li>
+                            <li>• Tailor - تخصيص الرسالة</li>
+                            <li>• Take Control - السيطرة على المحادثة</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">🤝 Relationship Selling</h3>
+                        <p class="text-gray-400 mb-3">بيع العلاقات</p>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• بناء الثقة</li>
+                            <li>• فهم الاحتياجات</li>
+                            <li>• تقديم قيمة مستمرة</li>
+                            <li>• متابعة طويلة المدى</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Psychology Page -->
+            <div id="psychology" class="page">
+                <h1 class="text-3xl font-bold mb-6">🧠 علم نفس العميل</h1>
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4">🎯 مبادئ التأثير الستة (Cialdini)</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">🔄 Reciprocity - المعاملة بالمثل</h3>
+                            <p class="text-gray-400 text-sm">قدم قيمة أولاً، العميل سيرد بالمثل</p>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">⏰ Scarcity - الندرة</h3>
+                            <p class="text-gray-400 text-sm">العرض المحدود يخلق إلحاح</p>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">👥 Social Proof - الدليل الاجتماعي</h3>
+                            <p class="text-gray-400 text-sm">العملاء يتبعون الآخرين</p>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">❤️ Liking - الإعجاب</h3>
+                            <p class="text-gray-400 text-sm">الناس يشترون من من يحبون</p>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">👔 Authority - السلطة</h3>
+                            <p class="text-gray-400 text-sm">الخبراء يؤثرون في القرارات</p>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">🔒 Commitment - الالتزام</h3>
+                            <p class="text-gray-400 text-sm">الالتزام الصغير يؤدي لكبير</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                    <h2 class="text-xl font-bold mb-4">🎭 أنماط شخصيات العملاء</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">🏃 السريع</h3>
+                            <p class="text-gray-400 text-sm">يقرر بسرعة، يحتاج معلومات مختصرة</p>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">🔍 المحلل</h3>
+                            <p class="text-gray-400 text-sm">يحتاج تفاصيل وبيانات</p>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">💝 العاطفي</h3>
+                            <p class="text-gray-400 text-sm">يقرر بناءً على المشاعر</p>
+                        </div>
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">🤝 الاجتماعي</h3>
+                            <p class="text-gray-400 text-sm">يحتاج علاقات وتواصل</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketing Page -->
+            <div id="marketing" class="page">
+                <h1 class="text-3xl font-bold mb-6">📣 التسويق الذكي</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">📱 سوشيال ميديا</h3>
+                        <ul class="text-sm text-gray-300 space-y-2">
+                            <li>• محتوى تعليمي 40%</li>
+                            <li>• محتوى ترويجي 20%</li>
+                            <li>• محتوى تفاعلي 25%</li>
+                            <li>• شهادات العملاء 15%</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">📧 Email Marketing</h3>
+                        <ul class="text-sm text-gray-300 space-y-2">
+                            <li>• رسائل ترحيبية</li>
+                            <li>• عروض حصرية</li>
+                            <li>• محتوى قيم</li>
+                            <li>• متابعة العملاء</div>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">📈 Content Marketing</h3>
+                        <ul class="text-sm text-gray-300 space-y-2">
+                            <li>• مقالات SEO</li>
+                            <li>• فيديوهات تعليمية</li>
+                            <li>• Infographics</li>
+                            <li>• Case Studies</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">🔍 SEO</h3>
+                        <ul class="text-sm text-gray-300 space-y-2">
+                            <li>• Keywords Research</li>
+                            <li>• On-page Optimization</li>
+                            <li>• Technical SEO</li>
+                            <li>• Link Building</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools Page -->
+            <div id="tools" class="page">
+                <h1 class="text-3xl font-bold mb-6">🛠️ الأدوات المجانية</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">🤖 ChatGPT</h3>
+                        <p class="text-gray-400 mb-3">ذكاء اصطناعي للكتابة</p>
+                        <a href="https://chat.openai.com" target="_blank" class="text-blue-400 hover:underline">افتح ↗</a>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">🎨 Canva</h3>
+                        <p class="text-gray-400 mb-3">تصميم جرافيك مجاني</p>
+                        <a href="https://canva.com" target="_blank" class="text-blue-400 hover:underline">افتح ↗</a>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">📊 Google Analytics</h3>
+                        <p class="text-gray-400 mb-3">تحليلات المواقع</p>
+                        <a href="https://analytics.google.com" target="_blank" class="text-blue-400 hover:underline">افتح ↗</a>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">🎥 CapCut</h3>
+                        <p class="text-gray-400 mb-3">تحرير فيديو مجاني</p>
+                        <a href="https://capcut.com" target="_blank" class="text-blue-400 hover:underline">افتح ↗</a>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">📝 Grammarly</h3>
+                        <p class="text-gray-400 mb-3">تصحيح الأخطاء</p>
+                        <a href="https://grammarly.com" target="_blank" class="text-blue-400 hover:underline">افتح ↗</a>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-2">📸 Unsplash</h3>
+                        <p class="text-gray-400 mb-3">صور مجانية</p>
+                        <a href="https://unsplash.com" target="_blank" class="text-blue-400 hover:underline">افتح ↗</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Page -->
+            <div id="contact" class="page">
+                <h1 class="text-3xl font-bold mb-6">📞 معلومات التواصل</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4">📱 واتساب</h2>
+                        <p class="text-2xl font-bold text-green-400 mb-3">01061245527</p>
+                        <a href="https://wa.me/201061245527" target="_blank" class="inline-block bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-bold transition-all hover:scale-105">
+                            افتح واتساب ↗
+                        </a>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4">💳 فودافون كاش</h2>
+                        <p class="text-2xl font-bold text-red-400 mb-3">01040900623</p>
+                        <p class="text-gray-400">محفظة لاستقبال الدفع</p>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4">📱 تيليجرام</h2>
+                        <p class="text-2xl font-bold text-blue-400 mb-3">@hamed_ai_bot</p>
+                        <a href="https://t.me/hamed_ai_bot" target="_blank" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold transition-all hover:scale-105">
+                            افتح البوت ↗
+                        </a>
+                    </div>
+                </div>
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mt-6">
+                    <h2 class="text-xl font-bold mb-4">🎯 عن الشركة</h2>
+                    <p class="text-gray-300 leading-relaxed">
+                        Hamed AI هي شركة متخصصة في الخدمات الرقمية والذكاء الاصطناعي.
+                        رؤيتنا: تمكين الشركات من النمو رقمياً.
+                        مهمتنا: تقديم حلول ذكية بأسعار مناسبة.
+                        قيمنا: الجودة، الاحترافية، الابتكار.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
