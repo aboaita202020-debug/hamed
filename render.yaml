@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: hamed-ai
+    runtime: docker
+    plan: free
+    branch: main
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: HAMED_ENV
+        value: production
+      - key: HAMED_DEBUG
+        value: "false"
+      - key: HAMED_HOST
+        value: 0.0.0.0
+      - key: HAMED_AUTONOMOUS_MODE
+        value: "true"
+      - key: HAMED_OPPORTUNITY_HUNTER
+        value: "true"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
