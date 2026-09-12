@@ -1,13 +1,11 @@
 """Unified Hamed AI application entrypoint."""
 from __future__ import annotations
 
-import html
 import os
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from .agent_worker import HamedWorker
@@ -20,7 +18,6 @@ from .runtime import http_host, http_port
 
 class FallbackProvider:
     """No-cost deterministic provider used when no AI credential is configured."""
-
     def generate_response(self, messages: list[dict[str, str]], *, system: str = "") -> str:
         text = messages[-1].get("content", "") if messages else ""
         lower = text.lower()
@@ -61,7 +58,12 @@ class DecisionRequest(BaseModel):
     approved: bool
 
 
-app = FastAPI(title="Hamed AI", version="0.6.0", docs_url="/docs")
+class MissionRequest(BaseModel):
+    goal: str = Field(min_length=1, max_length=4000)
+    tasks: list[str] | None = Field(default=None, max_length=30)
+
+
+app = FastAPI(title="Hamed AI", version="0.7.0", docs_url="/docs")
 
 if settings.openai_api_key:
     _provider = CentralBrainProvider(settings.openai_api_key, settings.openai_model)
@@ -80,7 +82,6 @@ _pending: dict[tuple[str, str], Any] = {}
 
 
 def autonomous_scan() -> dict[str, Any]:
-    """Create the next safe commercial work agenda; no spending/publishing/calls occur here."""
     prompt = (
         "حدد أولويات العمل التجاري الآمن لحامد الآن. ركّز بالترتيب على: "
         "اكتشاف فرص خدمات مواقع ومتاجر، فرص تسويق بالعمولة عالية الملاءمة، "
@@ -88,15 +89,7 @@ def autonomous_scan() -> dict[str, Any]:
         "أخرج 3 مهام عملية قابلة للبحث أو التحليل، بدون شراء أو دفع أو نشر أو تعاقد."
     )
     plan = build_plan(prompt)
-    return {
-        "status": "ok",
-        "task_type": "commercial_scan",
-        "objective": plan.objective.value,
-        "next_steps": plan.next_steps,
-        "requires_research": plan.requires_research,
-        "approval_required": plan.approval_required,
-        "safe_mode": True,
-    }
+    return {"status": "ok", "task_type": "commercial_scan", "objective": plan.objective.value, "next_steps": plan.next_steps, "requires_research": plan.requires_research, "approval_required": plan.approval_required, "safe_mode": True}
 
 
 @app.on_event("startup")
@@ -123,15 +116,7 @@ def health() -> dict[str, Any]:
     else:
         ai_provider = "fallback"
         brains = []
-    return {
-        "status": "ok",
-        "ai_provider": ai_provider,
-        "brains": brains,
-        "telegram": bool(settings.telegram_bot_token),
-        "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")),
-        "autonomous_mode": settings.autonomous_mode,
-        "worker": _worker.status(),
-    }
+    return {"status": "ok", "ai_provider": ai_provider, "brains": brains, "telegram": bool(settings.telegram_bot_token), "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")), "autonomous_mode": settings.autonomous_mode, "worker": _worker.status()}
 
 
 @app.get("/worker/status")
@@ -142,6 +127,38 @@ def worker_status() -> dict[str, Any]:
 @app.post("/worker/run")
 def worker_run() -> dict[str, Any]:
     return _worker.run_once(hooks=[autonomous_scan])
+
+
+@app.post("/missions")
+def create_mission(request: MissionRequest) -> dict[str, Any]:
+    mission = _worker.submit_mission(request.goal, request.tasks)
+    return {"status": "ok", "mission": mission, "safe_mode": True}
+
+
+@app.get("/missions")
+def list_missions() -> dict[str, Any]:
+    missions = _worker.missions.list()
+    return {"status": "ok", "missions": missions, "count": len(missions)}
+
+
+@app.get("/missions/{mission_id}")
+def get_mission(mission_id: str) -> dict[str, Any]:
+    mission = _worker.missions.get(mission_id)
+    if mission is None:
+        raise HTTPException(status_code=404, detail="Mission not found")
+    return {"status": "ok", "mission": mission}
+
+
+@app.post("/missions/{mission_id}/run")
+def run_mission(mission_id: str) -> dict[str, Any]:
+    def execute(description: str) -> dict[str, Any]:
+        plan = build_plan(description)
+        return {"objective": plan.objective.value, "intent": plan.intent, "next_steps": plan.next_steps, "requires_research": plan.requires_research, "approval_required": plan.approval_required, "confidence": plan.confidence, "notes": plan.notes, "safe_mode": True}
+
+    try:
+        return {"status": "ok", "mission": _worker.run_mission_once(mission_id, execute)}
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Mission not found") from exc
 
 
 @app.post("/chat")
@@ -156,25 +173,12 @@ def chat(request: ChatRequest) -> dict[str, str]:
 @app.post("/plan")
 def plan(request: PlanRequest) -> dict[str, Any]:
     result = build_plan(request.message, action=request.action)
-    return {
-        "objective": result.objective.value,
-        "intent": result.intent,
-        "next_steps": result.next_steps,
-        "requires_research": result.requires_research,
-        "approval_required": result.approval_required,
-        "confidence": result.confidence,
-        "notes": result.notes,
-    }
+    return {"objective": result.objective.value, "intent": result.intent, "next_steps": result.next_steps, "requires_research": result.requires_research, "approval_required": result.approval_required, "confidence": result.confidence, "notes": result.notes}
 
 
 @app.post("/actions/prepare")
 def prepare(request: ActionRequest) -> dict[str, Any]:
-    message = _orchestrator.prepare_high_impact_action(
-        request.session_id,
-        request.action,
-        request.description,
-        request.value,
-    )
+    message = _orchestrator.prepare_high_impact_action(request.session_id, request.action, request.description, request.value)
     _pending[(request.session_id, request.action)] = _orchestrator.sessions[request.session_id].pending_actions.get(request.action)
     return {"status": "ok", "message": message, "action": request.action, "value": request.value}
 
@@ -203,13 +207,8 @@ def dashboard_data() -> dict[str, Any]:
     for (session_id, action), item in _pending.items():
         approval = getattr(item, "approval", None)
         if approval is not None and not approval.approved:
-            pending.append({
-                "session_id": session_id,
-                "action": action,
-                "description": getattr(item, "description", ""),
-                "value": getattr(item, "value", None),
-            })
-    return {"pending_approvals": pending, "count": len(pending)}
+            pending.append({"session_id": session_id, "action": action, "description": getattr(item, "description", ""), "value": getattr(item, "value", None)})
+    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list())}
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -222,15 +221,9 @@ def dashboard() -> str:
 
 
 def run_telegram_bot() -> None:
-    """Compatibility hook; Telegram remains optional until its adapter is configured."""
     raise RuntimeError("Telegram adapter is not configured in this entrypoint. Use /chat or configure a dedicated adapter.")
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "app.main:app",
-        host=http_host(),
-        port=http_port(),
-        reload=False,
-    )
+    uvicorn.run("app.main:app", host=http_host(), port=http_port(), reload=False)
