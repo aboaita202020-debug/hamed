@@ -11,15 +11,15 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .agent_worker import HamedWorker
+from .agents.central_brain import CentralBrainProvider
 from .agents.commercial_brain import build_plan
 from .agents.orchestrator import HamedOrchestrator
-from .agents.provider import OpenAIProvider
 from .config import settings
 from .runtime import http_host, http_port
 
 
 class FallbackProvider:
-    """No-cost deterministic provider used when no OpenAI key is configured."""
+    """No-cost deterministic provider used when no AI credential is configured."""
 
     def generate_response(self, messages: list[dict[str, str]], *, system: str = "") -> str:
         text = messages[-1].get("content", "") if messages else ""
@@ -35,7 +35,7 @@ class FallbackProvider:
         return "أنا حامد. اكتب هدفك التجاري، وسأحوّله إلى بحث وتحليل وخطوات تنفيذ مناسبة."
 
     def web_research(self, query: str, *, system: str = "") -> str:
-        return "وضع التشغيل المجاني لا يحتوي على مزود بحث خارجي مفعّل. أضف OPENAI_API_KEY لتفعيل البحث المباشر عبر مزود الذكاء الاصطناعي."
+        return "لا يوجد مزود AI مفعّل حاليًا. فعّل OPENAI_API_KEY أو أحد مزودي المجلس لتشغيل الذكاء الخارجي."
 
 
 class ChatRequest(BaseModel):
@@ -61,8 +61,19 @@ class DecisionRequest(BaseModel):
     approved: bool
 
 
-app = FastAPI(title="Hamed AI", version="0.5.0", docs_url="/docs")
-_provider = OpenAIProvider(settings.openai_api_key, settings.openai_model) if settings.openai_api_key else FallbackProvider()
+app = FastAPI(title="Hamed AI", version="0.6.0", docs_url="/docs")
+
+if settings.openai_api_key:
+    _provider = CentralBrainProvider(settings.openai_api_key, settings.openai_model)
+else:
+    try:
+        _provider = CentralBrainProvider(None, settings.openai_model)
+    except Exception:
+        _provider = FallbackProvider()
+
+if isinstance(_provider, CentralBrainProvider) and _provider.mode == "fallback":
+    _provider = FallbackProvider()
+
 _orchestrator = HamedOrchestrator(_provider)
 _worker = HamedWorker(interval_seconds=int(os.getenv("HAMED_WORKER_INTERVAL", "900")))
 _pending: dict[tuple[str, str], Any] = {}
@@ -106,9 +117,16 @@ def root() -> dict[str, str]:
 
 @app.get("/health")
 def health() -> dict[str, Any]:
+    if isinstance(_provider, CentralBrainProvider):
+        ai_provider = _provider.mode
+        brains = _provider.available_brains()
+    else:
+        ai_provider = "fallback"
+        brains = []
     return {
         "status": "ok",
-        "ai_provider": "openai" if settings.openai_api_key else "fallback",
+        "ai_provider": ai_provider,
+        "brains": brains,
         "telegram": bool(settings.telegram_bot_token),
         "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")),
         "autonomous_mode": settings.autonomous_mode,
