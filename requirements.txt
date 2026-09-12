@@ -30,6 +30,9 @@ anthropic>=0.70,<1
 python-telegram-bot==20.7
 pyTelegramBotAPI>=4.29,<5
 
+# QR generation
+qrcode[pil]>=7.4,<9
+
 # Optional: Social Media APIs
 # tweepy==4.14.0
 
