@@ -62,8 +62,33 @@ class OpenAICompatibleProvider:
         return self.generate_response([{"role": "user", "content": query}], system=system)
 
 
+class OllamaProvider:
+    """Local, keyless brain. Requires an Ollama server on the user's machine."""
+
+    def __init__(self, model: str = "llama3.2:3b", base_url: str = "http://127.0.0.1:11434", timeout: int = 120) -> None:
+        self.model = model
+        self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
+
+    def generate_response(self, messages, *, system=""):
+        prompt_messages = list(messages)
+        if system:
+            prompt_messages.insert(0, {"role": "system", "content": system})
+        r = requests.post(
+            self.base_url + "/api/chat",
+            json={"model": self.model, "messages": prompt_messages, "stream": False},
+            timeout=self.timeout,
+        )
+        r.raise_for_status()
+        data = r.json()
+        return str(data.get("message", {}).get("content") or "").strip()
+
+    def web_research(self, query, *, system=""):
+        return self.generate_response([{"role": "user", "content": query}], system=system)
+
+
 class GeminiProvider:
-    """Native Gemini REST provider; avoids the previous OpenAI-compatibility 404."""
+    """Native Gemini REST provider; avoids OpenAI-compatibility 404s."""
 
     def __init__(self, api_key: str, model: str = "gemini-2.5-flash-lite", timeout: int = 60) -> None:
         if not api_key:
@@ -80,25 +105,14 @@ class GeminiProvider:
             text = str(message.get("content") or "")
             if not text:
                 continue
-            contents.append({
-                "role": "model" if role == "assistant" else "user",
-                "parts": [{"text": text}],
-            })
+            contents.append({"role": "model" if role == "assistant" else "user", "parts": [{"text": text}]})
         if not contents:
             contents = [{"role": "user", "parts": [{"text": "Hello"}]}]
-
         payload = {"contents": contents}
         if system:
             payload["systemInstruction"] = {"parts": [{"text": system}]}
-
         url = self.base_url + "/" + self.model + ":generateContent"
-        r = requests.post(
-            url,
-            params={"key": self.api_key},
-            headers={"Content-Type": "application/json"},
-            json=payload,
-            timeout=self.timeout,
-        )
+        r = requests.post(url, params={"key": self.api_key}, headers={"Content-Type": "application/json"}, json=payload, timeout=self.timeout)
         r.raise_for_status()
         data = r.json()
         parts = []
@@ -140,44 +154,45 @@ class BrainSelector:
         t = task.lower()
         available = list(available)
         if any(x in t for x in ("code", "python", "javascript", "برمج", "كود", "docker")):
-            preferred = ["gemini", "kimi", "deepseek", "claude", "openai"]
+            preferred = ["ollama", "gemini", "kimi", "deepseek", "claude", "openai"]
         elif any(x in t for x in ("research", "بحث", "مصادر", "سوق")):
-            preferred = ["gemini", "kimi", "claude", "openai", "deepseek"]
+            preferred = ["gemini", "ollama", "kimi", "claude", "openai", "deepseek"]
         elif any(x in t for x in ("sales", "بيع", "تسويق", "marketing", "عميل")):
-            preferred = ["gemini", "kimi", "claude", "openai", "deepseek"]
+            preferred = ["gemini", "ollama", "kimi", "claude", "openai", "deepseek"]
         else:
-            preferred = ["gemini", "kimi", "claude", "openai", "deepseek"]
-        if cost_sensitive:
-            preferred = ["gemini", "kimi"] + preferred
+            preferred = ["ollama", "gemini", "kimi", "claude", "openai", "deepseek"]
+        if cost_sensitive or os.getenv("HAMED_FREE_FIRST", "1").lower() not in {"0", "false", "no"}:
+            preferred = ["ollama", "gemini", "kimi"] + preferred
         return list(dict.fromkeys(x for x in preferred + available if x in available))
 
 
 class MultiBrainProvider:
-    """Multi-brain router; free-capable brains are preferred, configured brains remain available."""
+    """Multi-brain router. Claude is optional; Hamed can run without any paid subscription."""
 
     def __init__(self):
         self.providers = {}
         self._load()
         if not self.providers:
-            raise RuntimeError("At least one AI provider must be configured")
+            raise RuntimeError(
+                "No AI brain is available. Install/start Ollama for keyless local AI "
+                "or configure at least one supported provider API key."
+            )
 
     def _load(self):
-        # Load every provider for which a credential is configured. Routing remains
-        # free-first, so free brains are preferred without silently hiding configured brains.
+        # Local Ollama is enabled by default and requires no subscription or API key.
+        if os.getenv("HAMED_OLLAMA_ENABLED", "1").lower() not in {"0", "false", "no"}:
+            self.providers["ollama"] = OllamaProvider(
+                os.getenv("OLLAMA_MODEL", "llama3.2:3b"),
+                os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434"),
+            )
+
         key = os.getenv("GEMINI_API_KEY", "").strip()
         if key:
-            self.providers["gemini"] = GeminiProvider(
-                key, os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
-            )
+            self.providers["gemini"] = GeminiProvider(key, os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite"))
 
         key = os.getenv("KIMI_API_KEY", "").strip()
         if key:
-            self.providers["kimi"] = OpenAICompatibleProvider(
-                "kimi",
-                key,
-                os.getenv("KIMI_API_BASE_URL", "https://api.moonshot.ai/v1"),
-                os.getenv("KIMI_MODEL", "kimi-k2-0905-preview"),
-            )
+            self.providers["kimi"] = OpenAICompatibleProvider("kimi", key, os.getenv("KIMI_API_BASE_URL", "https://api.moonshot.ai/v1"), os.getenv("KIMI_MODEL", "kimi-k2-0905-preview"))
 
         compatible = [
             ("mistral", "MISTRAL_API_KEY", "https://api.mistral.ai/v1", "MISTRAL_MODEL", "mistral-small-latest"),
@@ -195,21 +210,16 @@ class MultiBrainProvider:
             if name == "llama" and not value:
                 value = os.getenv("GROQ_API_KEY", "").strip()
             if value:
-                self.providers[name] = OpenAICompatibleProvider(
-                    name, value, os.getenv(env + "_BASE_URL", url), os.getenv(model_env, default)
-                )
+                self.providers[name] = OpenAICompatibleProvider(name, value, os.getenv(env + "_BASE_URL", url), os.getenv(model_env, default))
 
         key = os.getenv("OPENAI_API_KEY", "").strip()
         if key:
             self.providers["openai"] = OpenAIProvider(key, os.getenv("OPENAI_MODEL", "gpt-5"))
 
+        # Claude is optional. It is never required for startup or normal operation.
         key = os.getenv("ANTHROPIC_API_KEY", "").strip()
         if key:
-            self.providers["claude"] = AnthropicProvider(
-                key,
-                os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-latest"),
-                os.getenv("ANTHROPIC_WORKSPACE_ID", "").strip(),
-            )
+            self.providers["claude"] = AnthropicProvider(key, os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-latest"), os.getenv("ANTHROPIC_WORKSPACE_ID", "").strip())
 
     def _order(self, task):
         return BrainSelector().rank(task, tuple(self.providers))
