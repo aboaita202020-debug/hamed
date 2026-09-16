@@ -64,7 +64,12 @@ class MissionRequest(BaseModel):
     tasks: list[str] | None = Field(default=None, max_length=30)
 
 
-app = FastAPI(title="Hamed AI", version="0.8.0", docs_url="/docs")
+class AutopilotRequest(BaseModel):
+    goal: str = Field(min_length=1, max_length=4000)
+    execute: bool = True
+
+
+app = FastAPI(title="Hamed AI", version="0.9.0", docs_url="/docs")
 
 if settings.openai_api_key:
     _provider = CentralBrainProvider(settings.openai_api_key, settings.openai_model)
@@ -168,6 +173,13 @@ def run_mission(mission_id: str) -> dict[str, Any]:
         raise HTTPException(status_code=404, detail="Mission not found") from exc
 
 
+@app.post("/autopilot/run")
+def autopilot_run(request: AutopilotRequest) -> dict[str, Any]:
+    """Run the unified commercial pipeline. Consequential actions remain gated."""
+    from .agents.autopilot import run_autopilot
+    return run_autopilot(_orchestrator, request.goal, execute=request.execute)
+
+
 @app.post("/chat")
 def chat(request: ChatRequest) -> dict[str, str]:
     try:
@@ -215,7 +227,7 @@ def dashboard_data() -> dict[str, Any]:
         approval = getattr(item, "approval", None)
         if approval is not None and not approval.approved:
             pending.append({"session_id": session_id, "action": action, "description": getattr(item, "description", ""), "value": getattr(item, "value", None)})
-    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list()), "smart_minds": len(list_smart_minds())}
+    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list()), "smart_minds": len(list_smart_minds()), "agents": len(_orchestrator.agents), "tools": len(_orchestrator.tools.list_tools())}
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
