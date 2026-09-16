@@ -8,13 +8,14 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
+import sys
 import threading
 import time
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.agents.learning import LearningCouncil
@@ -56,6 +57,34 @@ def save_state() -> None:
     tmp.replace(STATE_PATH)
 
 
+def ensure_local_brain() -> None:
+    """Start Ollama automatically when it is installed but not already running."""
+    if os.getenv("HAMED_OLLAMA_ENABLED", "1").lower() in {"0", "false", "no"}:
+        return
+    base_url = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
+    try:
+        import requests
+        requests.get(base_url + "/api/tags", timeout=2)
+        return
+    except Exception:
+        pass
+
+    if os.name != "nt":
+        return
+    try:
+        subprocess.Popen(
+            ["ollama", "serve"],
+            cwd=str(ROOT),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+        # Give Ollama a short startup window; the provider will retry on demand.
+        time.sleep(3)
+    except (FileNotFoundError, OSError):
+        pass
+
+
 def run_cycle(provider: MultiBrainProvider, learner: LearningCouncil, orchestrator: HamedOrchestrator, index: int) -> None:
     topic = TOPICS[index % len(TOPICS)]
     with _lock:
@@ -65,10 +94,8 @@ def run_cycle(provider: MultiBrainProvider, learner: LearningCouncil, orchestrat
         _state["last_error"] = None
         save_state()
 
-    # 1) Learn: evidence-oriented commercial lesson.
     item = learner.study(topic)
 
-    # 2) Work: turn the lesson into concrete, low-risk business opportunities and next steps.
     task = (
         "Act as Hamed's autonomous business operating council. Based on the learning report below, "
         "identify 5 concrete opportunities for Arab markets, with customer, problem, offer, acquisition "
@@ -78,7 +105,6 @@ def run_cycle(provider: MultiBrainProvider, learner: LearningCouncil, orchestrat
     )
     report = orchestrator.consult_brains(task, context=f"Current learning topic: {topic}")
 
-    # Persist a compact operational record so learning/work survives restarts.
     record = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "topic": topic,
@@ -99,6 +125,7 @@ def run_cycle(provider: MultiBrainProvider, learner: LearningCouncil, orchestrat
 
 
 def loop() -> None:
+    ensure_local_brain()
     provider = MultiBrainProvider()
     learner = LearningCouncil(provider)
     orchestrator = HamedOrchestrator(brain_provider=provider)
