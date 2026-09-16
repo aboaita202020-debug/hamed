@@ -124,7 +124,7 @@ if %AWAIT% GEQ 20 goto autonomous_timeout
 timeout /t 1 /nobreak >nul
 goto wait_autonomous
 
-autonomous_ready:
+:autonomous_ready
 echo [OK] Autonomous worker is ready. Hamed will learn and work continuously.
 
 REM ---- Hamed UI ------------------------------------------------
@@ -154,7 +154,7 @@ start "" "http://127.0.0.1:3000/"
 echo.
 echo ============================================================
 echo HAMED AI IS RUNNING AND WORKING
-necho Main UI:        http://127.0.0.1:3000/
+echo Main UI:        http://127.0.0.1:3000/
 echo Backend:        http://127.0.0.1:8000/health
 echo Smart Minds:    http://127.0.0.1:8000/smart-minds
 echo Autonomous:     http://127.0.0.1:8010/status
