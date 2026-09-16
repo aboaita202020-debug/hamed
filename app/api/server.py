@@ -12,6 +12,7 @@ RuntimeError instead of an ImportError deep in someone else's code.
 from __future__ import annotations
 
 from app.agents.orchestrator import HamedOrchestrator
+from app.agents.smart_minds import list_smart_minds
 from app.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -33,7 +34,7 @@ def create_app(orchestrator: HamedOrchestrator | None = None):
 
     @app.get("/health")
     async def health():
-        return {"status": "ok", "app": "Hamed AI"}
+        return {"status": "ok", "app": "Hamed AI", "smart_minds": len(list_smart_minds())}
 
     @app.get("/readiness")
     async def readiness():
@@ -46,6 +47,11 @@ def create_app(orchestrator: HamedOrchestrator | None = None):
     @app.get("/dashboard")
     async def dashboard():
         return orch.dashboard()
+
+    @app.get("/smart-minds")
+    async def smart_minds():
+        minds = list_smart_minds()
+        return {"status": "ok", "count": len(minds), "minds": minds}
 
     @app.get("/leads")
     async def leads(stage: str | None = None):
