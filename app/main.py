@@ -9,33 +9,29 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from .agent_worker import HamedWorker
-from .agents.central_brain import CentralBrainProvider
 from .agents.commercial_brain import build_plan
 from .agents.learning_engine import CommercialLearningEngine
 from .agents.mission_engine import build_mission, infer_domain
 from .agents.orchestrator import HamedOrchestrator
+from .agents.provider import MultiBrainProvider
 from .agents.smart_minds import list_smart_minds
 from .config import settings
-from .runtime import http_host, http_port
 
 
 class FallbackProvider:
-    """No-cost deterministic provider used when no AI credential is configured."""
     def generate_response(self, messages: list[dict[str, str]], *, system: str = "") -> str:
         text = messages[-1].get("content", "") if messages else ""
         lower = text.lower()
-        if any(k in lower for k in ("شراء", "اشتري", "مشتريات", "شراء منتج")):
+        if any(k in lower for k in ("شراء", "اشتري", "مشتريات")):
             return "أقدر أساعدك في تقييم الشراء وحساب التكلفة والربح والمخاطر، لكن تنفيذ الشراء نفسه يحتاج موافقة صريحة."
         if any(k in lower for k in ("موقع", "متجر", "website", "store")):
-            return "أقدر أراجع احتياج النشاط، أحدد المشاكل أو المتطلبات، وأجهز عرض موقع أو متجر مناسب بناءً على معلومات مؤكدة."
+            return "أقدر أراجع احتياج النشاط وأجهز خطة موقع أو متجر بناءً على معلومات مؤكدة."
         if any(k in lower for k in ("تسويق بالعمولة", "affiliate", "عمولة")):
-            return "أقدر أقيّم برامج التسويق بالعمولة حسب جودة المنتج، ملاءمة الجمهور، العمولة، التحويلات والمخاطر، ثم أبني خطة اختبار."
-        if any(k in lower for k in ("تفاوض", "السعر", "خصم")):
-            return "أقدر أبني استراتيجية تفاوض تحافظ على القيمة وتستخدم حدود السعر والخصم المسموح بها بدون اختلاق عروض أو معلومات."
-        return "أنا حامد. اكتب هدفك التجاري، وسأحوّله إلى بحث وتحليل وخطوات تنفيذ مناسبة."
+            return "أقدر أقيّم برامج التسويق بالعمولة وأبني خطة اختبار وقياس."
+        return "أنا حامد AGI. اكتب هدفك التجاري وسأحوّله إلى بحث وتحليل وخطوات تنفيذ مناسبة."
 
     def web_research(self, query: str, *, system: str = "") -> str:
-        return "لا يوجد مزود AI مفعّل حاليًا. فعّل مفتاح مزود مدعوم أو شغّل Ollama المحلي."
+        return "لا يوجد مزود AI مفعّل حاليًا. فعّل مزودًا مدعومًا أو شغّل Ollama المحلي."
 
 
 class ChatRequest(BaseModel):
@@ -72,31 +68,19 @@ class AutopilotRequest(BaseModel):
 
 
 app = FastAPI(title="Hamed AGI", version="1.0.0", docs_url="/docs")
-
-if settings.openai_api_key:
-    _provider = CentralBrainProvider(settings.openai_api_key, settings.openai_model)
-else:
-    try:
-        _provider = CentralBrainProvider(None, settings.openai_model)
-    except Exception:
-        _provider = FallbackProvider()
-
-if isinstance(_provider, CentralBrainProvider) and _provider.mode == "fallback":
+try:
+    _provider = MultiBrainProvider()
+except Exception:
     _provider = FallbackProvider()
 
-_orchestrator = HamedOrchestrator(_provider)
+_orchestrator = HamedOrchestrator(brain_provider=_provider)
 _worker = HamedWorker(interval_seconds=int(os.getenv("HAMED_WORKER_INTERVAL", "900")))
 _learning = CommercialLearningEngine(seed_curriculum=True)
 _pending: dict[tuple[str, str], Any] = {}
 
 
 def autonomous_scan() -> dict[str, Any]:
-    prompt = (
-        "حدد أولويات العمل التجاري الآمن لحامد الآن. ركّز بالترتيب على: "
-        "اكتشاف فرص خدمات مواقع ومتاجر، فرص تسويق بالعمولة عالية الملاءمة، "
-        "فرص شراء وإعادة بيع، ثم تحسين مهارات البيع والتفاوض. "
-        "أخرج 3 مهام عملية قابلة للبحث أو التحليل، بدون شراء أو دفع أو نشر أو تعاقد."
-    )
+    prompt = "حدد أولويات العمل التجاري الآمن لحامد الآن. أخرج 3 مهام عملية للبحث أو التحليل بدون شراء أو دفع أو نشر أو تعاقد."
     plan = build_plan(prompt)
     return {"status": "ok", "task_type": "commercial_scan", "objective": plan.objective.value, "next_steps": plan.next_steps, "requires_research": plan.requires_research, "approval_required": plan.approval_required, "safe_mode": True}
 
@@ -114,18 +98,17 @@ async def stop_worker() -> None:
 
 @app.get("/")
 def root() -> dict[str, str]:
-    return {"name": "Hamed AGI", "status": "running", "mode": settings.app_env}
+    return {"name": "Hamed AGI", "status": "running", "mode": settings.environment}
 
 
 @app.get("/health")
 def health() -> dict[str, Any]:
-    if isinstance(_provider, CentralBrainProvider):
-        ai_provider = _provider.mode
-        brains = _provider.available_brains()
+    if isinstance(_provider, MultiBrainProvider):
+        brains = list(_provider.available_brains())
+        ai_provider = brains[0] if brains else "none"
     else:
-        ai_provider = "fallback"
-        brains = []
-    return {"status": "ok", "app": "Hamed AGI", "ai_provider": ai_provider, "brains": brains, "smart_minds": len(list_smart_minds()), "telegram": bool(settings.telegram_bot_token), "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")), "autonomous_mode": settings.autonomous_mode, "worker": _worker.status()}
+        brains, ai_provider = [], "fallback"
+    return {"status": "ok", "app": "Hamed AGI", "ai_provider": ai_provider, "brains": brains, "smart_minds": len(list_smart_minds()), "telegram": bool(settings.telegram_bot_token), "voice": bool(settings.twilio_account_sid and settings.twilio_auth_token), "autonomous_mode": os.getenv("HAMED_AUTONOMOUS_MODE", "true").lower() == "true", "worker": _worker.status()}
 
 
 @app.get("/smart-minds")
@@ -136,7 +119,6 @@ def smart_minds() -> dict[str, Any]:
 
 @app.get("/capabilities")
 def capabilities() -> dict[str, Any]:
-    """Expose the complete business capability map used by mission planning."""
     return {"status": "ok", "domains": {d: [a for _, a in build_mission("", d)] for d in ("general", "commerce", "affiliate", "service", "website", "marketing", "b2b")}}
 
 
@@ -182,7 +164,6 @@ def run_mission(mission_id: str) -> dict[str, Any]:
     def execute(description: str) -> dict[str, Any]:
         plan = build_plan(description)
         return {"objective": plan.objective.value, "intent": plan.intent, "next_steps": plan.next_steps, "requires_research": plan.requires_research, "approval_required": plan.approval_required, "confidence": plan.confidence, "notes": plan.notes, "safe_mode": True}
-
     try:
         return {"status": "ok", "mission": _worker.run_mission_once(mission_id, execute)}
     except KeyError as exc:
@@ -191,7 +172,6 @@ def run_mission(mission_id: str) -> dict[str, Any]:
 
 @app.post("/autopilot/run")
 def autopilot_run(request: AutopilotRequest) -> dict[str, Any]:
-    """Run the unified commercial pipeline. Consequential actions remain gated."""
     from .agents.autopilot import run_autopilot
     return run_autopilot(_orchestrator, request.goal, execute=request.execute)
 
@@ -201,7 +181,7 @@ def chat(request: ChatRequest) -> dict[str, str]:
     try:
         reply = _orchestrator.respond(request.session_id, request.message)
         return {"session_id": request.session_id, "reply": reply}
-    except Exception as exc:  # pragma: no cover
+    except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
