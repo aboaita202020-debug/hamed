@@ -12,6 +12,7 @@ from .agent_worker import HamedWorker
 from .agents.central_brain import CentralBrainProvider
 from .agents.commercial_brain import build_plan
 from .agents.orchestrator import HamedOrchestrator
+from .agents.smart_minds import list_smart_minds
 from .config import settings
 from .runtime import http_host, http_port
 
@@ -32,7 +33,7 @@ class FallbackProvider:
         return "أنا حامد. اكتب هدفك التجاري، وسأحوّله إلى بحث وتحليل وخطوات تنفيذ مناسبة."
 
     def web_research(self, query: str, *, system: str = "") -> str:
-        return "لا يوجد مزود AI مفعّل حاليًا. فعّل OPENAI_API_KEY أو أحد مزودي المجلس لتشغيل الذكاء الخارجي."
+        return "لا يوجد مزود AI مفعّل حاليًا. فعّل مفتاح مزود مدعوم أو شغّل Ollama المحلي."
 
 
 class ChatRequest(BaseModel):
@@ -63,7 +64,7 @@ class MissionRequest(BaseModel):
     tasks: list[str] | None = Field(default=None, max_length=30)
 
 
-app = FastAPI(title="Hamed AI", version="0.7.0", docs_url="/docs")
+app = FastAPI(title="Hamed AI", version="0.8.0", docs_url="/docs")
 
 if settings.openai_api_key:
     _provider = CentralBrainProvider(settings.openai_api_key, settings.openai_model)
@@ -116,7 +117,13 @@ def health() -> dict[str, Any]:
     else:
         ai_provider = "fallback"
         brains = []
-    return {"status": "ok", "ai_provider": ai_provider, "brains": brains, "telegram": bool(settings.telegram_bot_token), "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")), "autonomous_mode": settings.autonomous_mode, "worker": _worker.status()}
+    return {"status": "ok", "app": "Hamed AI", "ai_provider": ai_provider, "brains": brains, "smart_minds": len(list_smart_minds()), "telegram": bool(settings.telegram_bot_token), "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")), "autonomous_mode": settings.autonomous_mode, "worker": _worker.status()}
+
+
+@app.get("/smart-minds")
+def smart_minds() -> dict[str, Any]:
+    minds = list_smart_minds()
+    return {"status": "ok", "count": len(minds), "minds": minds}
 
 
 @app.get("/worker/status")
@@ -208,7 +215,7 @@ def dashboard_data() -> dict[str, Any]:
         approval = getattr(item, "approval", None)
         if approval is not None and not approval.approved:
             pending.append({"session_id": session_id, "action": action, "description": getattr(item, "description", ""), "value": getattr(item, "value", None)})
-    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list())}
+    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list()), "smart_minds": len(list_smart_minds())}
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
