@@ -1,6 +1,3 @@
-"""
-FastAPI Dashboard/Health/Webhook/Chat adapter.
-"""
 from __future__ import annotations
 
 from app.agents.orchestrator import HamedOrchestrator
@@ -21,7 +18,6 @@ except ImportError:  # pragma: no cover
 def create_app(orchestrator: HamedOrchestrator | None = None):
     if not _FASTAPI_AVAILABLE:
         raise RuntimeError("fastapi/uvicorn not installed. Run: pip install fastapi uvicorn")
-
     orch = orchestrator or HamedOrchestrator(brain_provider=MultiBrainProvider())
     app = FastAPI(title="Hamed AI", version="0.1.0")
 
@@ -45,6 +41,11 @@ def create_app(orchestrator: HamedOrchestrator | None = None):
     async def smart_minds():
         minds = list_smart_minds()
         return {"status": "ok", "count": len(minds), "minds": minds}
+
+    @app.get("/agent-runs")
+    async def agent_runs(limit: int = 25):
+        limit = max(1, min(limit, 100))
+        return orch.repo.list_agent_runs(limit=limit)
 
     @app.post("/chat")
     async def chat(request: Request):
@@ -83,13 +84,7 @@ def create_app(orchestrator: HamedOrchestrator | None = None):
     async def dispatch(agent_name: str, request: Request):
         payload = await request.json()
         outcome = orch.dispatch(agent_name, payload)
-        return {
-            "agent": outcome.agent,
-            "attempts": outcome.attempts,
-            "success": outcome.result.success,
-            "error": outcome.result.error,
-            "data": _jsonable(outcome.result.data),
-        }
+        return {"agent": outcome.agent, "attempts": outcome.attempts, "success": outcome.result.success, "error": outcome.result.error, "data": _jsonable(outcome.result.data)}
 
     @app.post("/webhook/telegram")
     async def telegram_webhook(request: Request):
