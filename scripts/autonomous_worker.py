@@ -1,8 +1,8 @@
-"""Always-on Hamed work + learning loop.
+"""Always-on Hamed learning-first autonomous loop.
 
-Runs a first cycle immediately, then continues in the background. Learning and
-planning are autonomous; purchases, payments, contracts and other irreversible
-or high-impact actions remain behind the existing permission/approval layer.
+Hamed completes a broad internet-learning phase before generating business opportunities.
+Learning is autonomous; purchases, payments, contracts and irreversible/high-impact actions
+remain behind the existing permission/approval layer.
 """
 from __future__ import annotations
 
@@ -26,15 +26,29 @@ ROOT = Path(__file__).resolve().parent.parent
 STATE_PATH = ROOT / "data" / "autonomous_state.json"
 PORT = int(os.getenv("HAMED_AUTONOMOUS_PORT", "8010"))
 INTERVAL = int(os.getenv("HAMED_AUTONOMOUS_INTERVAL", "1800"))
-TOPICS = [
-    "sales and customer discovery",
-    "B2B brokerage and supplier buyer opportunities",
-    "affiliate marketing and product demand",
-    "e-commerce growth and store optimization",
-    "negotiation and pricing",
-    "customer psychology and objections",
-    "service business opportunities",
-    "marketing campaigns and lead generation",
+
+# Phase 1: build the knowledge base first. Each cycle researches one topic from the public web.
+LEARNING_TOPICS = [
+    "sales fundamentals, consultative selling, customer discovery and buyer signals",
+    "B2B sales, brokerage, supplier discovery and buyer discovery",
+    "negotiation, pricing, objections, value framing and deal structures",
+    "customer psychology, behavioral economics and ethical persuasion",
+    "marketing strategy, positioning, segmentation and go-to-market",
+    "digital marketing, SEO, content marketing and conversion optimization",
+    "lead generation, outbound sales, prospecting and CRM workflows",
+    "e-commerce growth, marketplaces, product pages, CRO and retention",
+    "affiliate marketing, product research, demand signals and attribution",
+    "service businesses, freelancing, productized services and recurring revenue",
+    "competitive intelligence, market research and industry analysis",
+    "economic intelligence, pricing signals, supply chains and import opportunities",
+    "customer service, retention, loyalty, reviews and complaint handling",
+    "business analytics, unit economics, margins, CAC, LTV and ROI",
+    "startup strategy, business models, validation and opportunity discovery",
+    "Arabic markets, Arab consumer behavior and cross-border commerce",
+    "website building, online stores, landing pages and digital conversion",
+    "sales automation, AI agents, workflow automation and responsible autonomy",
+    "successful entrepreneurs, business case studies and lessons from failures",
+    "books, academic research, courses, interviews, podcasts and educational videos for business",
 ]
 
 _state = {
@@ -42,6 +56,9 @@ _state = {
     "started_at": None,
     "last_cycle_at": None,
     "last_topic": None,
+    "phase": "internet_learning",
+    "learning_topics_total": len(LEARNING_TOPICS),
+    "learning_topics_completed": 0,
     "cycles": 0,
     "lessons": 0,
     "opportunity_reports": 0,
@@ -58,7 +75,6 @@ def save_state() -> None:
 
 
 def ensure_local_brain() -> None:
-    """Start Ollama automatically when it is installed but not already running."""
     if os.getenv("HAMED_OLLAMA_ENABLED", "1").lower() in {"0", "false", "no"}:
         return
     base_url = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
@@ -68,54 +84,72 @@ def ensure_local_brain() -> None:
         return
     except Exception:
         pass
-
     if os.name != "nt":
         return
     try:
-        subprocess.Popen(
-            ["ollama", "serve"],
-            cwd=str(ROOT),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-        )
-        # Give Ollama a short startup window; the provider will retry on demand.
+        subprocess.Popen(["ollama", "serve"], cwd=str(ROOT), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         time.sleep(3)
     except (FileNotFoundError, OSError):
         pass
 
 
-def run_cycle(provider: MultiBrainProvider, learner: LearningCouncil, orchestrator: HamedOrchestrator, index: int) -> None:
-    topic = TOPICS[index % len(TOPICS)]
+def log_learning(topic: str, item, phase: str) -> None:
+    record = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "phase": phase,
+        "topic": topic,
+        "learning": item.evidence[:20000],
+    }
+    log_path = ROOT / "data" / "autonomous_learning.jsonl"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with log_path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def run_learning_cycle(learner: LearningCouncil, index: int) -> bool:
+    topic = LEARNING_TOPICS[index]
     with _lock:
-        _state["status"] = "learning_and_working"
+        _state["status"] = "internet_learning"
+        _state["phase"] = "internet_learning"
         _state["last_topic"] = topic
         _state["last_cycle_at"] = datetime.now(timezone.utc).isoformat()
         _state["last_error"] = None
         save_state()
 
     item = learner.study(topic)
+    log_learning(topic, item, "internet_learning")
+    with _lock:
+        _state["learning_topics_completed"] += 1
+        _state["cycles"] += 1
+        _state["lessons"] += 1
+        save_state()
+    return True
 
+
+def run_opportunity_cycle(provider: MultiBrainProvider, learner: LearningCouncil, orchestrator: HamedOrchestrator, index: int) -> None:
+    topic = LEARNING_TOPICS[index % len(LEARNING_TOPICS)]
+    with _lock:
+        _state["status"] = "learning_and_working"
+        _state["phase"] = "continuous_learning_and_work"
+        _state["last_topic"] = topic
+        _state["last_cycle_at"] = datetime.now(timezone.utc).isoformat()
+        _state["last_error"] = None
+        save_state()
+
+    item = learner.study(topic)
     task = (
-        "Act as Hamed's autonomous business operating council. Based on the learning report below, "
-        "identify 5 concrete opportunities for Arab markets, with customer, problem, offer, acquisition "
-        "channel, estimated effort, risks, verification steps and first action. Do not invent companies, "
-        "prices or facts. Separate assumptions from evidence. Do not recommend purchases or irreversible "
-        "actions without authorization.\n\nLEARNING REPORT:\n" + item.evidence
+        "Act as Hamed's autonomous business operating council. Use the current evidence-backed learning report "
+        "to identify 5 concrete opportunities for Arab markets. Include customer, problem, offer, acquisition "
+        "channel, estimated effort, risks, verification steps and first action. Do not invent companies, prices "
+        "or facts. Separate evidence from assumptions. Never recommend purchases or irreversible actions without authorization.\n\n"
+        "LEARNING REPORT:\n" + item.evidence
     )
     report = orchestrator.consult_brains(task, context=f"Current learning topic: {topic}")
-
-    record = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "topic": topic,
-        "learning": item.evidence[:12000],
-        "opportunities": report,
-    }
+    record = {"timestamp": datetime.now(timezone.utc).isoformat(), "topic": topic, "learning": item.evidence[:12000], "opportunities": report}
     log_path = ROOT / "data" / "autonomous_activity.jsonl"
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(record, ensure_ascii=False) + "\n")
-
     with _lock:
         _state["cycles"] += 1
         _state["lessons"] += 1
@@ -130,10 +164,29 @@ def loop() -> None:
     learner = LearningCouncil(provider)
     orchestrator = HamedOrchestrator(brain_provider=provider)
     index = 0
+
+    # Do not generate opportunities until the initial learning curriculum is complete.
+    while index < len(LEARNING_TOPICS):
+        try:
+            run_learning_cycle(learner, index)
+            index += 1
+        except Exception as exc:
+            with _lock:
+                _state["status"] = "learning_retry"
+                _state["last_error"] = f"{type(exc).__name__}: {exc}"
+                save_state()
+            time.sleep(min(max(60, INTERVAL), 300))
+
+    with _lock:
+        _state["phase"] = "continuous_learning_and_work"
+        _state["status"] = "learning_complete_starting_work"
+        save_state()
+
+    work_index = 0
     while True:
         try:
-            run_cycle(provider, learner, orchestrator, index)
-            index += 1
+            run_opportunity_cycle(provider, learner, orchestrator, work_index)
+            work_index += 1
         except Exception as exc:
             with _lock:
                 _state["status"] = "error_waiting_to_retry"
