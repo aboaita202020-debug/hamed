@@ -87,7 +87,7 @@ echo [START] Checking Hamed backend on http://127.0.0.1:8000
 curl -s http://127.0.0.1:8000/health >nul 2>nul
 if errorlevel 1 (
     echo [START] Launching Hamed backend...
-    start "Hamed Backend" cmd /k "cd /d "%~dp0" ^&^& .venv\Scripts\python.exe scripts\run_server.py"
+    start "Hamed Backend" /D "%~dp0" cmd /k ".venv\Scripts\python.exe scripts\run_server.py"
 ) else (
     echo [OK] Hamed backend is already running.
 )
@@ -111,7 +111,7 @@ REM Keep it on port 3000 so the familiar Hamed UI opens directly.
 echo [START] Checking Hamed UI on http://127.0.0.1:3000
 curl -s http://127.0.0.1:3000 >nul 2>nul
 if errorlevel 1 (
-    start "Hamed UI" cmd /k "cd /d "%~dp0" ^&^& npm run dev -- --host 127.0.0.1 --port 3000"
+    start "Hamed UI" /D "%~dp0" cmd /k "npm run dev -- --host 127.0.0.1 --port 3000"
 ) else (
     echo [OK] Hamed UI is already running.
 )
@@ -132,11 +132,11 @@ start "" "http://127.0.0.1:3000/"
 echo.
 echo ============================================================
 echo HAMED AI IS RUNNING
- echo Main UI:   http://127.0.0.1:3000/
- echo Backend:   http://127.0.0.1:8000/health
- echo Chat API:  http://127.0.0.1:8000/chat
- echo Smart Minds: http://127.0.0.1:8000/smart-minds
- echo ============================================================
+echo Main UI:   http://127.0.0.1:3000/
+echo Backend:   http://127.0.0.1:8000/health
+echo Chat API:  http://127.0.0.1:8000/chat
+echo Smart Minds: http://127.0.0.1:8000/smart-minds
+echo ============================================================
 echo.
 echo The existing Hamed Business Operating System UI is the main interface.
 echo ============================================================
