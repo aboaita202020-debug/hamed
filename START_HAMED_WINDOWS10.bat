@@ -105,6 +105,28 @@ goto wait_backend
 :backend_ready
 echo [OK] Backend is ready.
 
+REM ---- Autonomous work + learning ------------------------------
+echo [START] Checking Hamed autonomous worker on http://127.0.0.1:8010
+curl -s http://127.0.0.1:8010/health >nul 2>nul
+if errorlevel 1 (
+    echo [START] Launching autonomous work and learning loop...
+    start "Hamed Autonomous Worker" /D "%~dp0" cmd /k ".venv\Scripts\python.exe scripts\autonomous_worker.py"
+) else (
+    echo [OK] Autonomous worker is already running.
+)
+
+set /a AWAIT=0
+:wait_autonomous
+curl -s http://127.0.0.1:8010/health >nul 2>nul
+if not errorlevel 1 goto autonomous_ready
+set /a AWAIT+=1
+if %AWAIT% GEQ 20 goto autonomous_timeout
+timeout /t 1 /nobreak >nul
+goto wait_autonomous
+
+autonomous_ready:
+echo [OK] Autonomous worker is ready. Hamed will learn and work continuously.
+
 REM ---- Hamed UI ------------------------------------------------
 REM The main Hamed interface is the existing root index.html served by Vite.
 REM Keep it on port 3000 so the familiar Hamed UI opens directly.
@@ -131,20 +153,27 @@ start "" "http://127.0.0.1:3000/"
 
 echo.
 echo ============================================================
-echo HAMED AI IS RUNNING
-echo Main UI:   http://127.0.0.1:3000/
-echo Backend:   http://127.0.0.1:8000/health
-echo Chat API:  http://127.0.0.1:8000/chat
-echo Smart Minds: http://127.0.0.1:8000/smart-minds
+echo HAMED AI IS RUNNING AND WORKING
+necho Main UI:        http://127.0.0.1:3000/
+echo Backend:        http://127.0.0.1:8000/health
+echo Smart Minds:    http://127.0.0.1:8000/smart-minds
+echo Autonomous:     http://127.0.0.1:8010/status
+echo Activity log:   data\autonomous_activity.jsonl
 echo ============================================================
-echo.
-echo The existing Hamed Business Operating System UI is the main interface.
+echo Hamed starts learning immediately, generates business opportunities,
+echo records the work, then repeats automatically every 30 minutes.
 echo ============================================================
 exit /b 0
 
 :ui_timeout
 echo [ERROR] Hamed UI did not become ready on port 3000.
 echo Check the Hamed UI window for the startup error.
+pause
+exit /b 1
+
+:autonomous_timeout
+echo [ERROR] Autonomous worker did not become ready on port 8010.
+echo Check the Hamed Autonomous Worker window for the startup error.
 pause
 exit /b 1
 
