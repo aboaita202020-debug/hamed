@@ -1,17 +1,10 @@
 """
-FastAPI Dashboard/Health/Webhook adapter — spec sections 19, 21, 25.
-
-Reproduces the endpoints already seen in the original project
-(section 22): /health and /dashboard, plus /webhook/telegram for a
-production webhook deployment (vs. polling in scripts/run_telegram.py).
-
-Optional on purpose: requires `fastapi` + `uvicorn` (see
-requirements.txt). If they are missing, `create_app()` raises a clear
-RuntimeError instead of an ImportError deep in someone else's code.
+FastAPI Dashboard/Health/Webhook/Chat adapter.
 """
 from __future__ import annotations
 
 from app.agents.orchestrator import HamedOrchestrator
+from app.agents.provider import MultiBrainProvider
 from app.agents.smart_minds import list_smart_minds
 from app.logging_config import get_logger
 
@@ -29,7 +22,7 @@ def create_app(orchestrator: HamedOrchestrator | None = None):
     if not _FASTAPI_AVAILABLE:
         raise RuntimeError("fastapi/uvicorn not installed. Run: pip install fastapi uvicorn")
 
-    orch = orchestrator or HamedOrchestrator()
+    orch = orchestrator or HamedOrchestrator(brain_provider=MultiBrainProvider())
     app = FastAPI(title="Hamed AI", version="0.1.0")
 
     @app.get("/health")
@@ -52,6 +45,25 @@ def create_app(orchestrator: HamedOrchestrator | None = None):
     async def smart_minds():
         minds = list_smart_minds()
         return {"status": "ok", "count": len(minds), "minds": minds}
+
+    @app.post("/chat")
+    async def chat(request: Request):
+        payload = await request.json()
+        message = str(payload.get("message", "")).strip()
+        if not message:
+            return JSONResponse(status_code=400, content={"status": "error", "error": "message_required"})
+        if orch.brain_council is None:
+            return JSONResponse(status_code=503, content={"status": "error", "error": "brain_provider_not_configured"})
+        context = str(payload.get("context", ""))
+        roles = payload.get("roles")
+        if roles is not None and not isinstance(roles, list):
+            return JSONResponse(status_code=400, content={"status": "error", "error": "roles_must_be_list"})
+        try:
+            result = orch.consult_brains(message, context=context, roles=roles)
+            return {"status": "ok", "message": message, **result}
+        except Exception as exc:
+            logger.exception("Chat request failed")
+            return JSONResponse(status_code=502, content={"status": "error", "error": str(exc)})
 
     @app.get("/leads")
     async def leads(stage: str | None = None):
@@ -81,9 +93,6 @@ def create_app(orchestrator: HamedOrchestrator | None = None):
 
     @app.post("/webhook/telegram")
     async def telegram_webhook(request: Request):
-        # Intentionally minimal: production Telegram webhook wiring is a
-        # thin translation layer (see app/channels/telegram_adapter.py for
-        # the polling variant used in development).
         payload = await request.json()
         logger.info("Received Telegram webhook update: %s", str(payload)[:200])
         return {"ok": True}
