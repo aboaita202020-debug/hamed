@@ -7,7 +7,7 @@ color 0A
 
 echo ============================================================
 echo                 HAMED AI - WINDOWS 10
- echo ============================================================
+echo ============================================================
 echo.
 
 REM ---- Python -------------------------------------------------
@@ -105,30 +105,48 @@ goto wait_backend
 :backend_ready
 echo [OK] Backend is ready.
 
-REM ---- Frontend ------------------------------------------------
-echo [START] Checking Hamed dashboard on http://127.0.0.1:5173
-curl -s http://127.0.0.1:5173 >nul 2>nul
+REM ---- Hamed UI ------------------------------------------------
+REM The main Hamed interface is the existing root index.html served by Vite.
+REM Keep it on port 3000 so the familiar Hamed UI opens directly.
+echo [START] Checking Hamed UI on http://127.0.0.1:3000
+curl -s http://127.0.0.1:3000 >nul 2>nul
 if errorlevel 1 (
-    start "Hamed Dashboard" cmd /k "cd /d "%~dp0" ^&^& npm run dev -- --host 127.0.0.1"
+    start "Hamed UI" cmd /k "cd /d "%~dp0" ^&^& npm run dev -- --host 127.0.0.1 --port 3000"
 ) else (
-    echo [OK] Dashboard is already running.
+    echo [OK] Hamed UI is already running.
 )
 
-timeout /t 5 /nobreak >nul
-start "" "http://127.0.0.1:5173"
+REM Wait briefly for Vite, then open the main interface.
+set /a UIWAIT=0
+:wait_ui
+curl -s http://127.0.0.1:3000 >nul 2>nul
+if not errorlevel 1 goto ui_ready
+set /a UIWAIT+=1
+if %UIWAIT% GEQ 20 goto ui_timeout
+timeout /t 1 /nobreak >nul
+goto wait_ui
+
+:ui_ready
+start "" "http://127.0.0.1:3000/"
 
 echo.
 echo ============================================================
 echo HAMED AI IS RUNNING
- echo Dashboard: http://127.0.0.1:5173
+ echo Main UI:   http://127.0.0.1:3000/
  echo Backend:   http://127.0.0.1:8000/health
  echo Chat API:  http://127.0.0.1:8000/chat
+ echo Smart Minds: http://127.0.0.1:8000/smart-minds
  echo ============================================================
 echo.
-echo This launcher starts backend and dashboard in separate windows.
+echo The existing Hamed Business Operating System UI is the main interface.
 echo ============================================================
-pause
 exit /b 0
+
+:ui_timeout
+echo [ERROR] Hamed UI did not become ready on port 3000.
+echo Check the Hamed UI window for the startup error.
+pause
+exit /b 1
 
 :backend_timeout
 echo [ERROR] Backend did not become ready on port 8000.
