@@ -59,6 +59,7 @@ def _clear_brain_env(monkeypatch: pytest.MonkeyPatch):
 
 
 def test_multibrain_loads_only_configured_fake_providers(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("HAMED_OLLAMA_ENABLED", "0")
     _clear_brain_env(monkeypatch)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test-placeholder")
     monkeypatch.setenv("DEEPSEEK_API_KEY", "fake-deepseek")
@@ -69,6 +70,7 @@ def test_multibrain_loads_only_configured_fake_providers(monkeypatch: pytest.Mon
 
 
 def test_multibrain_loads_all_ten_brains_with_fake_credentials(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("HAMED_OLLAMA_ENABLED", "0")
     _clear_brain_env(monkeypatch)
     fake_keys = {
         "OPENAI_API_KEY": "fake-openai",

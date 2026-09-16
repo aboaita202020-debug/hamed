@@ -11,6 +11,7 @@ def test_brain_selector_ranks_only_available_brains():
 
 
 def test_ten_brain_configuration_with_fake_credentials(monkeypatch):
+    monkeypatch.setenv("HAMED_OLLAMA_ENABLED", "0")
     keys = {
         "OPENAI_API_KEY":"fake-openai", "ANTHROPIC_API_KEY":"fake-anthropic", "DEEPSEEK_API_KEY":"fake-deepseek",
         "KIMI_API_KEY":"fake-kimi", "GEMINI_API_KEY":"fake-gemini", "MISTRAL_API_KEY":"fake-mistral",
