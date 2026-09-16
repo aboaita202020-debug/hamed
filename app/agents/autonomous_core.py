@@ -1,9 +1,9 @@
 """24/7 autonomous Hamed core.
 
 Runs independently of Telegram. It continuously learns, hunts evidence-backed
-commercial opportunities and prioritizes reversible revenue work. External
-purchases, payments, contracts, publishing, account changes and irreversible
-actions remain bounded by server-side authorization rules.
+commercial opportunities, reflects on outcomes, and prioritizes reversible
+revenue work. External purchases, payments, contracts, publishing, account
+changes and irreversible actions remain bounded by server-side authorization.
 """
 from __future__ import annotations
 
@@ -14,6 +14,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Optional
 
+from .self_improvement import SelfImprovementEngine
+
 
 class AutonomousCore:
     def __init__(self, orchestrator, notify: Optional[Callable[[str], None]] = None) -> None:
@@ -21,12 +23,14 @@ class AutonomousCore:
         self.notify = notify
         self.enabled = os.getenv("HAMED_AUTONOMOUS_MODE", "true").lower() == "true"
         self.opportunity_enabled = os.getenv("HAMED_OPPORTUNITY_HUNTER", "true").lower() == "true"
+        self.self_improvement_enabled = os.getenv("HAMED_SELF_IMPROVEMENT", "true").lower() == "true"
         self.interval = max(300, int(os.getenv("HAMED_OPPORTUNITY_INTERVAL", os.getenv("HAMED_AUTONOMOUS_INTERVAL", "1800"))))
         self.daily_target = max(0.0, float(os.getenv("HAMED_DAILY_REVENUE_TARGET", "0")))
         self.state_path = Path(os.getenv("HAMED_AUTONOMOUS_STATE", "hamed_autonomous_state.json"))
         self._stop = threading.Event()
         self._thread = None
         self.state = self._load_state()
+        self.self_improvement = SelfImprovementEngine(orchestrator) if self.self_improvement_enabled else None
 
     def _load_state(self) -> dict:
         try:
@@ -36,9 +40,10 @@ class AutonomousCore:
             state.setdefault("opportunities", [])
             state.setdefault("revenue_focus", None)
             state.setdefault("last_run", None)
+            state.setdefault("self_improvement_cycles", 0)
             return state
         except Exception:
-            return {"cycles": 0, "lessons": [], "opportunities": [], "revenue_focus": None, "last_run": None}
+            return {"cycles": 0, "lessons": [], "opportunities": [], "revenue_focus": None, "last_run": None, "self_improvement_cycles": 0}
 
     def _save_state(self) -> None:
         try:
@@ -79,6 +84,9 @@ class AutonomousCore:
             "unused capacity, dead stock, bundles, churn, referral networks, revenue experiments and profit leaks",
             "sales, negotiation and customer psychology: discovery, buyer signals, objections and conversion",
             "sales training videos and public transcripts about consultative selling and objection handling",
+            "website audits, e-commerce conversion, SEO, landing pages and digital growth services",
+            "customer service, retention, reviews, complaint handling and trust-building",
+            "business analytics, unit economics, CAC, LTV, ROI, margins and cash requirements",
         ]
         topic = topics[self.state.get("cycles", 0) % len(topics)]
 
@@ -100,10 +108,9 @@ class AutonomousCore:
                 "dead stock, bundle optimization, churn prevention, referral networks, measurable revenue experiments, profit leaks "
                 "and opportunity portfolios. For each opportunity extract product/service, customer need, location, quantity when present, "
                 "supplier/research targets, evidence, estimated value only when supported, effort, risk and next reversible step. "
-                "Rank opportunities by evidence, customer fit, value, effort and risk. Never invent facts, prices, suppliers, "
-                "demand, commissions or results. Never spam, deceive, bypass platform rules, scrape behind access controls, "
-                "or exploit vulnerabilities. External purchases, payments, contracts, publishing and irreversible actions "
-                "must stay behind authorized execution controls. Psychology is for understanding needs, never manipulation."
+                "Never invent facts, prices, suppliers, demand, commissions or results. Never spam, deceive, bypass platform rules, "
+                "scrape behind access controls, or exploit vulnerabilities. External purchases, payments, contracts, publishing and "
+                "irreversible actions must stay behind authorized execution controls. Psychology is for understanding needs, never manipulation."
             ),
         )
         item = {"time": now, "topic": topic, "summary": summary[:6000], "evidence": evidence[:6000]}
@@ -123,8 +130,6 @@ class AutonomousCore:
             except Exception as exc:
                 item["hunter_error"] = type(exc).__name__
 
-        # Revenue Brain: choose the best observed opportunity instead of blindly
-        # repeating one monetization method. Missing economics remain unknown.
         try:
             candidates = []
             for opportunity in self.state.get("opportunities", [])[-20:]:
@@ -143,9 +148,17 @@ class AutonomousCore:
         except Exception as exc:
             item["revenue_brain_error"] = type(exc).__name__
 
+        if self.self_improvement:
+            try:
+                plan = self.self_improvement.reflect(topic, evidence, summary)
+                item["self_improvement"] = plan
+                self.state["self_improvement_cycles"] = int(self.state.get("self_improvement_cycles", 0)) + 1
+            except Exception as exc:
+                item["self_improvement_error"] = type(exc).__name__
+
         self._save_state()
         if self.notify:
             focus_text = ""
             if self.state.get("revenue_focus", {}).get("focus"):
                 focus_text = "\n\n🎯 Revenue Brain: " + str(self.state["revenue_focus"]["focus"].get("title", "next opportunity"))
-            self.notify("🧠 Hamed Revenue Radar completed a new learning/opportunity cycle." + focus_text + "\n\n" + summary[:3500])
+            self.notify("🧠 Hamed autonomous cycle completed: learning → opportunity → reflection." + focus_text + "\n\n" + summary[:3500])
