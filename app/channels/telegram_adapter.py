@@ -8,9 +8,7 @@ rules — those all live in app/agents/*.
 
 Requires `python-telegram-bot>=20` (see requirements.txt) and
 TELEGRAM_BOT_TOKEN. Both are optional: if the package isn't
-installed, importing this module raises a clear, contained error
-telling the operator exactly what to install — it does NOT crash the
-rest of the app (see scripts/run_telegram.py for the guarded entrypoint).
+installed, importing this module raises a clear, contained error.
 """
 from __future__ import annotations
 
@@ -22,16 +20,14 @@ logger = get_logger(__name__)
 
 try:
     from telegram import Update
-    from telegram.ext import Application, CommandHandler, ContextTypes
+    from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
     _TELEGRAM_AVAILABLE = True
-except ImportError:  # pragma: no cover - exercised only when dependency missing
+except ImportError:  # pragma: no cover
     _TELEGRAM_AVAILABLE = False
 
 
 def build_telegram_app(orchestrator: HamedOrchestrator):
-    """Build (but do not run) the Telegram Application. Raises a clear
-    RuntimeError if the dependency or the token is missing, instead of
-    a confusing stack trace deep inside python-telegram-bot."""
+    """Build the Telegram Application and connect normal messages to Hamed."""
     if not _TELEGRAM_AVAILABLE:
         raise RuntimeError(
             "python-telegram-bot is not installed. Run: "
@@ -48,6 +44,7 @@ def build_telegram_app(orchestrator: HamedOrchestrator):
             "/dashboard - ملخص الأداء\n"
             "/leads - آخر العملاء المحتملين\n"
             "/opportunities - أفضل الفرص\n"
+            "\nأرسل لي أي رسالة عادية وسأتعامل معها."
         )
 
     async def dashboard(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -58,8 +55,7 @@ def build_telegram_app(orchestrator: HamedOrchestrator):
             f"Opportunities: {snapshot.get('opportunities', 0)}\n"
             f"Agent errors: {snapshot.get('agent_errors', 0)}\n"
             f"Open deals: {pipeline.get('total_deals', 0)}\n"
-            f"Won: {pipeline.get('won_deals', 0)} "
-            f"({pipeline.get('close_rate_pct', 0)}%)\n"
+            f"Won: {pipeline.get('won_deals', 0)} ({pipeline.get('close_rate_pct', 0)}%)\n"
             f"Expected revenue: {pipeline.get('expected_revenue', 0)}\n"
             f"Actual revenue: {pipeline.get('actual_revenue', 0)}\n"
         )
@@ -84,9 +80,34 @@ def build_telegram_app(orchestrator: HamedOrchestrator):
         )
         await update.message.reply_text(text)
 
+    async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if not update.message or not update.message.text:
+            return
+        text = update.message.text.strip()
+        if not text:
+            return
+        await update.message.chat.send_action("typing")
+        try:
+            result = orchestrator.consult_brains(text)
+            if result.get("success"):
+                response = result.get("final_answer") or result.get("answer") or result.get("decision")
+                if not response:
+                    response = str(result)
+            else:
+                # Keep the bot useful even when the optional AI council is unavailable.
+                outcome = orchestrator.dispatch("customer_conversation_agent", {"message": text})
+                response = outcome.result.data or outcome.result.error or "لم أتمكن من معالجة الرسالة الآن."
+            if isinstance(response, dict):
+                response = response.get("message") or response.get("text") or str(response)
+            await update.message.reply_text(str(response)[:4000])
+        except Exception as exc:
+            logger.exception("Telegram message handling failed")
+            await update.message.reply_text(f"حدث خطأ أثناء معالجة الرسالة: {exc}")
+
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("dashboard", dashboard))
     app.add_handler(CommandHandler("leads", leads))
     app.add_handler(CommandHandler("opportunities", opportunities))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 
     return app
