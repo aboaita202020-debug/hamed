@@ -35,8 +35,24 @@ class LearningCouncil:
             "Use psychology to understand observable behavior, not to diagnose, manipulate or exploit. "
             "Return a concise evidence report with source titles/URLs when available. Do not invent facts or citations."
         )
-        evidence = self.provider.web_research(topic, system=prompt)
-        return KnowledgeItem(topic=topic, evidence=evidence, confidence="review")
+        try:
+            evidence = self.provider.web_research(topic, system=prompt)
+            return KnowledgeItem(topic=topic, evidence=evidence, confidence="review")
+        except Exception as exc:
+            # A provider outage must not stop Hamed's autonomous work loop.
+            # Fall back to the verified built-in curriculum and clearly label it
+            # as offline guidance rather than pretending it is fresh web research.
+            skill = self.multimedia._skill_for_topic(topic)
+            lessons = self.commercial.recommend(skill, limit=8)
+            evidence = (
+                "OFFLINE LEARNING FALLBACK — live web research was unavailable. "
+                f"Provider error: {type(exc).__name__}. No live sources are claimed.\n"
+                f"Topic: {topic}\n"
+                "Verified built-in commercial guidance:\n- "
+                + "\n- ".join(lessons)
+                + "\nNext live-research step: retry when an AI/web research provider is available."
+            )
+            return KnowledgeItem(topic=topic, evidence=evidence, confidence="offline_fallback")
 
     def study(self, topic: str = "sales, marketing and customer psychology") -> KnowledgeItem:
         """Run a broad multimedia learning pass and store the evidence as a lesson."""
@@ -49,9 +65,13 @@ class LearningCouncil:
                 "Use evidence-backed customer discovery and sales strategy learned from a broad "
                 "multimedia research pass; adapt to the customer's explicit need and verify current facts."
             ),
-            source="continuous_multimedia_web_research",
+            source=(
+                "continuous_multimedia_web_research"
+                if item.confidence == "review"
+                else "built_in_curriculum_offline_fallback"
+            ),
             evidence=item.evidence,
-            confidence=0.65,
+            confidence=0.65 if item.confidence == "review" else 0.5,
         ))
         return item
 
