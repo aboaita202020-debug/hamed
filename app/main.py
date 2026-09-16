@@ -1,4 +1,4 @@
-"""Unified Hamed AI application entrypoint."""
+"""Unified Hamed AGI application entrypoint."""
 from __future__ import annotations
 
 import os
@@ -11,6 +11,8 @@ from pydantic import BaseModel, Field
 from .agent_worker import HamedWorker
 from .agents.central_brain import CentralBrainProvider
 from .agents.commercial_brain import build_plan
+from .agents.learning_engine import CommercialLearningEngine
+from .agents.mission_engine import build_mission, infer_domain
 from .agents.orchestrator import HamedOrchestrator
 from .agents.smart_minds import list_smart_minds
 from .config import settings
@@ -69,7 +71,7 @@ class AutopilotRequest(BaseModel):
     execute: bool = True
 
 
-app = FastAPI(title="Hamed AI", version="0.9.0", docs_url="/docs")
+app = FastAPI(title="Hamed AGI", version="1.0.0", docs_url="/docs")
 
 if settings.openai_api_key:
     _provider = CentralBrainProvider(settings.openai_api_key, settings.openai_model)
@@ -84,6 +86,7 @@ if isinstance(_provider, CentralBrainProvider) and _provider.mode == "fallback":
 
 _orchestrator = HamedOrchestrator(_provider)
 _worker = HamedWorker(interval_seconds=int(os.getenv("HAMED_WORKER_INTERVAL", "900")))
+_learning = CommercialLearningEngine(seed_curriculum=True)
 _pending: dict[tuple[str, str], Any] = {}
 
 
@@ -111,7 +114,7 @@ async def stop_worker() -> None:
 
 @app.get("/")
 def root() -> dict[str, str]:
-    return {"name": "Hamed AI", "status": "running", "mode": settings.app_env}
+    return {"name": "Hamed AGI", "status": "running", "mode": settings.app_env}
 
 
 @app.get("/health")
@@ -122,13 +125,24 @@ def health() -> dict[str, Any]:
     else:
         ai_provider = "fallback"
         brains = []
-    return {"status": "ok", "app": "Hamed AI", "ai_provider": ai_provider, "brains": brains, "smart_minds": len(list_smart_minds()), "telegram": bool(settings.telegram_bot_token), "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")), "autonomous_mode": settings.autonomous_mode, "worker": _worker.status()}
+    return {"status": "ok", "app": "Hamed AGI", "ai_provider": ai_provider, "brains": brains, "smart_minds": len(list_smart_minds()), "telegram": bool(settings.telegram_bot_token), "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")), "autonomous_mode": settings.autonomous_mode, "worker": _worker.status()}
 
 
 @app.get("/smart-minds")
 def smart_minds() -> dict[str, Any]:
     minds = list_smart_minds()
     return {"status": "ok", "count": len(minds), "minds": minds}
+
+
+@app.get("/capabilities")
+def capabilities() -> dict[str, Any]:
+    """Expose the complete business capability map used by mission planning."""
+    return {"status": "ok", "domains": {d: [a for _, a in build_mission("", d)] for d in ("general", "commerce", "affiliate", "service", "website", "marketing", "b2b")}}
+
+
+@app.get("/learning")
+def learning() -> dict[str, Any]:
+    return {"status": "ok", "summary": _learning.summarize(), "curriculum": _learning.curriculum()}
 
 
 @app.get("/worker/status")
@@ -144,6 +158,8 @@ def worker_run() -> dict[str, Any]:
 @app.post("/missions")
 def create_mission(request: MissionRequest) -> dict[str, Any]:
     mission = _worker.submit_mission(request.goal, request.tasks)
+    mission["domain"] = infer_domain(request.goal)
+    mission["execution_plan"] = build_mission(request.goal, mission["domain"])
     return {"status": "ok", "mission": mission, "safe_mode": True}
 
 
@@ -227,7 +243,7 @@ def dashboard_data() -> dict[str, Any]:
         approval = getattr(item, "approval", None)
         if approval is not None and not approval.approved:
             pending.append({"session_id": session_id, "action": action, "description": getattr(item, "description", ""), "value": getattr(item, "value", None)})
-    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list()), "smart_minds": len(list_smart_minds()), "agents": len(_orchestrator.agents), "tools": len(_orchestrator.tools.list_tools())}
+    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list()), "smart_minds": len(list_smart_minds()), "agents": len(_orchestrator.agents), "tools": len(_orchestrator.tools.list_tools()), "learning": _learning.summarize()}
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -236,13 +252,4 @@ def dashboard() -> str:
     if os.path.exists(ui_path):
         with open(ui_path, "r", encoding="utf-8") as fh:
             return fh.read()
-    return "<h1>Hamed AI</h1><p>واجهة التحكم غير متاحة حاليًا.</p>"
-
-
-def run_telegram_bot() -> None:
-    raise RuntimeError("Telegram adapter is not configured in this entrypoint. Use /chat or configure a dedicated adapter.")
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app.main:app", host=http_host(), port=http_port(), reload=False)
+    return "<h1>Hamed AGI</h1><p>واجهة التحكم غير متاحة حاليًا.</p>"
