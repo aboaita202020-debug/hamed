@@ -18,6 +18,8 @@ from .agents.provider import MultiBrainProvider
 from .agents.smart_minds import list_smart_minds
 from .config import settings
 from .channels.whatsapp_web import build_whatsapp_web_url, open_whatsapp_web
+from .instagram_routes import router as instagram_router
+from .instagram_webhooks import router as instagram_webhook_router
 
 
 class FallbackProvider:
@@ -79,6 +81,8 @@ class WhatsAppWebPrepareRequest(BaseModel):
 
 
 app = FastAPI(title="Hamed AGI", version="1.0.0", docs_url="/docs")
+app.include_router(instagram_router)
+app.include_router(instagram_webhook_router)
 try:
     _provider = MultiBrainProvider()
 except Exception:
