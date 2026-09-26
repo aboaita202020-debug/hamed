@@ -2,7 +2,10 @@
   "username": "mlovenoor",
   "profile_url": "https://www.instagram.com/mlovenoor/",
   "enabled": true,
-  "purpose": "lead_discovery_and_outreach",
+  "purpose": ["lead_discovery", "permitted_outreach", "content_publishing"],
   "authenticated": false,
-  "requires_meta_credentials": true
+  "meta_api_required": true,
+  "auto_publish": false,
+  "auto_outreach": false,
+  "note": "Enable API actions only after valid Meta/Instagram authorization; do not store secrets in repo."
 }
