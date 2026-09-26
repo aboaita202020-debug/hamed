@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from .agent_worker import HamedWorker
 from .agents.commercial_brain import build_plan
 from .agents.learning_engine import CommercialLearningEngine
+from .agents.money_engine import scan_revenue_opportunities
 from .agents.mission_engine import build_mission, infer_domain
 from .agents.orchestrator import HamedOrchestrator
 from .agents.provider import MultiBrainProvider
@@ -120,6 +121,12 @@ def smart_minds() -> dict[str, Any]:
 @app.get("/capabilities")
 def capabilities() -> dict[str, Any]:
     return {"status": "ok", "domains": {d: [a for _, a in build_mission("", d)] for d in ("general", "commerce", "affiliate", "service", "website", "marketing", "b2b")}}
+
+
+@app.get("/money/opportunity-scan")
+def money_opportunity_scan() -> dict[str, Any]:
+    """Find evidence-backed monetization opportunities without contacting or paying anyone."""
+    return scan_revenue_opportunities()
 
 
 @app.get("/learning")
