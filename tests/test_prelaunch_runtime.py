@@ -24,6 +24,7 @@ def run_bot(env: dict[str, str]):
         "PAYMOB_API_KEY",
     ):
         clean.pop(key, None)
+    clean["PYTHON_DOTENV_DISABLED"] = "1"
     clean.update(env)
     return subprocess.run(
         [sys.executable, "bot.py"],
