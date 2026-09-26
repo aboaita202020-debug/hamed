@@ -78,6 +78,7 @@ _orchestrator = HamedOrchestrator(brain_provider=_provider)
 _worker = HamedWorker(interval_seconds=int(os.getenv("HAMED_WORKER_INTERVAL", "900")))
 _learning = CommercialLearningEngine(seed_curriculum=True)
 _pending: dict[tuple[str, str], Any] = {}
+_revenue_results: dict[str, Any] = {"status": "empty", "records": [], "updated_at": None}
 
 
 def autonomous_scan() -> dict[str, Any]:
@@ -125,8 +126,18 @@ def capabilities() -> dict[str, Any]:
 
 @app.get("/money/opportunity-scan")
 def money_opportunity_scan() -> dict[str, Any]:
-    """Find evidence-backed monetization opportunities without contacting or paying anyone."""
-    return scan_revenue_opportunities()
+    """Find evidence-backed monetization opportunities and publish them to the dashboard feed."""
+    from datetime import datetime, timezone
+    global _revenue_results
+    result = scan_revenue_opportunities()
+    _revenue_results = {**result, "updated_at": datetime.now(timezone.utc).isoformat()}
+    return _revenue_results
+
+
+@app.get("/dashboard/revenue")
+def dashboard_revenue() -> dict[str, Any]:
+    """Return the latest revenue-search results for the live dashboard."""
+    return _revenue_results
 
 
 @app.get("/learning")
@@ -230,7 +241,7 @@ def dashboard_data() -> dict[str, Any]:
         approval = getattr(item, "approval", None)
         if approval is not None and not approval.approved:
             pending.append({"session_id": session_id, "action": action, "description": getattr(item, "description", ""), "value": getattr(item, "value", None)})
-    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list()), "smart_minds": len(list_smart_minds()), "agents": len(_orchestrator.agents), "tools": len(_orchestrator.tools.list_tools()), "learning": _learning.summarize()}
+    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list()), "smart_minds": len(list_smart_minds()), "agents": len(_orchestrator.agents), "tools": len(_orchestrator.tools.list_tools()), "learning": _learning.summarize(), "revenue": _revenue_results}
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
