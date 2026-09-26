@@ -17,6 +17,7 @@ from .agents.orchestrator import HamedOrchestrator
 from .agents.provider import MultiBrainProvider
 from .agents.smart_minds import list_smart_minds
 from .config import settings
+from .channels.whatsapp_web import build_whatsapp_web_url, open_whatsapp_web
 
 
 class FallbackProvider:
@@ -66,6 +67,15 @@ class MissionRequest(BaseModel):
 class AutopilotRequest(BaseModel):
     goal: str = Field(min_length=1, max_length=4000)
     execute: bool = True
+
+
+class WhatsAppWebPrepareRequest(BaseModel):
+    session_id: str = Field(default="default", min_length=1, max_length=120)
+    to: str = Field(min_length=8, max_length=30)
+    customer_name: str = ""
+    business_name: str = ""
+    message: str = Field(min_length=1, max_length=4000)
+    permitted_contact: bool = False
 
 
 app = FastAPI(title="Hamed AGI", version="1.0.0", docs_url="/docs")
@@ -138,6 +148,40 @@ def money_opportunity_scan() -> dict[str, Any]:
 def dashboard_revenue() -> dict[str, Any]:
     """Return the latest revenue-search results for the live dashboard."""
     return _revenue_results
+
+
+@app.post("/outreach/whatsapp-web/prepare")
+def prepare_whatsapp_web(request: WhatsAppWebPrepareRequest) -> dict[str, Any]:
+    if not request.permitted_contact:
+        raise HTTPException(status_code=403, detail="A permitted/approved contact is required before opening an outbound message.")
+    url = build_whatsapp_web_url(request.to, request.message)
+    return {
+        "status": "prepared",
+        "session_id": request.session_id,
+        "customer_name": request.customer_name,
+        "business_name": request.business_name,
+        "channel": "whatsapp_web",
+        "url": url,
+        "sent": False,
+        "next_step": "Open the URL and press Send in WhatsApp Web.",
+    }
+
+
+@app.post("/outreach/whatsapp-web/open")
+def open_prepared_whatsapp_web(request: WhatsAppWebPrepareRequest) -> dict[str, Any]:
+    if not request.permitted_contact:
+        raise HTTPException(status_code=403, detail="A permitted/approved contact is required before opening an outbound message.")
+    url = open_whatsapp_web(request.to, request.message)
+    return {
+        "status": "opened",
+        "session_id": request.session_id,
+        "customer_name": request.customer_name,
+        "business_name": request.business_name,
+        "channel": "whatsapp_web",
+        "url": url,
+        "sent": False,
+        "next_step": "Press Send in WhatsApp Web.",
+    }
 
 
 @app.get("/learning")
