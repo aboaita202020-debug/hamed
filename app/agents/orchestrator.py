@@ -44,7 +44,7 @@ from .fact_check_agent import FactCheckAgent
 from .brain_council import BrainCouncil, BRAIN_ROLES
 from .workflow import PendingAction, prepare_action
 from .swarm_agents import SwarmAgent, build_swarm_specs
-from app.agent_bus import agent_bus
+from .swarm_bus import swarm_bus
 logger = get_logger(__name__)
 
 @dataclass
@@ -149,7 +149,7 @@ class HamedOrchestrator:
             results.append(item)
             if outcome.result.success:
                 peer_findings[name] = outcome.result.data
-                agent_bus.publish(name, "swarm_finding", outcome.result.data)
+                swarm_bus.publish(name, "swarm_finding", outcome.result.data)
         return {
             "objective": objective,
             "agents_requested": len(names),
