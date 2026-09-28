@@ -43,6 +43,8 @@ from .reporting_agent import ReportingAgent
 from .fact_check_agent import FactCheckAgent
 from .brain_council import BrainCouncil, BRAIN_ROLES
 from .workflow import PendingAction, prepare_action
+from .swarm_agents import SwarmAgent, build_swarm_specs
+from app.agent_bus import agent_bus
 logger = get_logger(__name__)
 
 @dataclass
@@ -67,6 +69,12 @@ class HamedOrchestrator:
         self.sessions: dict[str, SessionState] = {}
         for agent_cls in (OpportunityHunterAgent, OpportunityMachineAgent, CustomerRelationshipAgent, CustomerPsychologyAgent, CustomerAcquisitionAgent, CustomerConversationAgent, OfferCompilerAgent, RevenueCompilerAgent, MarketingCampaignAgent, FreelanceRevenueAgent, VideoCommerceAgent, VideoProductionAgent, ServiceCompilerAgent, RevenueOpportunitySuiteAgent, RevenueExpansionSuiteAgent, BusinessOpportunityFactoryAgent, RevenueInfrastructureSuiteAgent, UniversalCustomerExecutionAgent, UniversalHumanOpportunityAgent, WebsiteEcommerceIntelligenceAgent, MillionIdeaAgent, RevenuePathAgent, IncomeIdeasAgent, BusinessAssetNetworkAgent, EconomicIntelligenceAgent, SalesAgent, NegotiationAgent, RevenueAgent, ReportingAgent, FactCheckAgent):
             self.register_agent(agent_cls(self.tools, self.repo))
+        # Keep the original specialist agents and add a large logical swarm.
+        # The swarm agents are executable workers backed by the same model router;
+        # they are not fake names or separate OS processes.
+        existing = set(self.agents)
+        for spec in build_swarm_specs(existing, target=2020):
+            self.register_agent(SwarmAgent(self.tools, self.repo, spec, brain_provider=self.brain_provider))
 
     def register_agent(self, agent: BaseAgent) -> None: self.agents[agent.name] = agent
     def session(self, session_id: str) -> SessionState: return self.sessions.setdefault(session_id, SessionState())
@@ -104,6 +112,51 @@ class HamedOrchestrator:
                 logger.exception("Agent '%s' raised an unhandled exception", agent_name); self.repo.finish_agent_run(run_id, "FAILED", error=str(exc)); last_result = AgentResult(success=False, error=str(exc))
             if attempts < self.max_retries: time.sleep(0.05)
         return OrchestratorResult(agent_name, last_result, attempts)
+
+    def swarm_status(self) -> dict:
+        departments = {}
+        for agent in self.agents.values():
+            department = getattr(agent, "spec", None)
+            department = getattr(department, "department", "core")
+            departments[department] = departments.get(department, 0) + 1
+        return {
+            "total_agents": len(self.agents),
+            "target_agents": 2020,
+            "target_reached": len(self.agents) == 2020,
+            "departments": departments,
+            "provider_available": self.brain_provider is not None,
+            "communication_bus": "shared agent context + persisted agent runs",
+        }
+
+    def run_swarm(self, objective: str, agent_names: Optional[list[str]] = None, limit: int | None = None) -> dict:
+        names = agent_names or list(self.agents)
+        if limit is not None:
+            names = names[:max(0, int(limit))]
+        peer_findings = {}
+        results = []
+        for name in names:
+            outcome = self.dispatch(name, {
+                "objective": objective,
+                "context": {"swarm_size": len(self.agents), "cooperation": True},
+                "peer_findings": peer_findings,
+            })
+            item = {
+                "agent": outcome.agent,
+                "success": outcome.result.success,
+                "data": outcome.result.data,
+                "error": outcome.result.error,
+            }
+            results.append(item)
+            if outcome.result.success:
+                peer_findings[name] = outcome.result.data
+                agent_bus.publish(name, "swarm_finding", outcome.result.data)
+        return {
+            "objective": objective,
+            "agents_requested": len(names),
+            "agents_completed": sum(1 for item in results if item["success"]),
+            "results": results,
+            "peer_findings": len(peer_findings),
+        }
 
     def brain_roster(self) -> list[dict[str, str]]: return [{"name": role.name, "specialty": role.specialty} for role in BRAIN_ROLES]
     def consult_brains(self, task: str, context: str = "", roles: Optional[list[str]] = None) -> dict:
