@@ -127,6 +127,23 @@ def health() -> dict[str, Any]:
     return {"status": "ok", "app": "Hamed AGI", "ai_provider": ai_provider, "brains": brains, "smart_minds": len(list_smart_minds()), "telegram": bool(settings.telegram_bot_token), "voice": bool(settings.twilio_account_sid and settings.twilio_auth_token), "autonomous_mode": os.getenv("HAMED_AUTONOMOUS_MODE", "true").lower() == "true", "worker": _worker.status()}
 
 
+@app.get("/swarm/status")
+def swarm_status() -> dict[str, Any]:
+    from .agents.swarm_bus import swarm_bus
+    return {"status": "ok", **_orchestrator.swarm_status(), "bus": swarm_bus.status()}
+
+
+@app.get("/swarm/messages")
+def swarm_messages(limit: int = 100) -> dict[str, Any]:
+    from .agents.swarm_bus import swarm_bus
+    return {"status": "ok", "messages": swarm_bus.recent(limit)}
+
+
+@app.post("/swarm/run")
+def swarm_run(request: MissionRequest) -> dict[str, Any]:
+    return {"status": "ok", **_orchestrator.run_swarm(request.goal, limit=None)}
+
+
 @app.get("/smart-minds")
 def smart_minds() -> dict[str, Any]:
     minds = list_smart_minds()
