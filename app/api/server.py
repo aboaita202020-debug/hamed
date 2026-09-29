@@ -4,6 +4,7 @@ from app.agents.orchestrator import HamedOrchestrator
 from app.agents.provider import MultiBrainProvider
 from app.agents.smart_minds import list_smart_minds
 from app.logging_config import get_logger
+from app.ai_universal_hub import catalog as ai_hub_catalog, status as ai_hub_status, find_tools as ai_hub_find, route as ai_hub_route, health as ai_hub_health
 
 logger = get_logger(__name__)
 
@@ -36,6 +37,23 @@ def create_app(orchestrator: HamedOrchestrator | None = None):
     @app.get("/dashboard")
     async def dashboard():
         return orch.dashboard()
+
+    @app.get("/ai-hub")
+    async def ai_hub():
+        return {"status": "ok", "hub": ai_hub_status(), "tools": ai_hub_catalog()}
+
+    @app.get("/ai-hub/health")
+    async def ai_hub_health_route():
+        return ai_hub_health()
+
+    @app.get("/ai-hub/search")
+    async def ai_hub_search(capability: str, category: str | None = None):
+        return {"status": "ok", "results": ai_hub_find(capability, category)}
+
+    @app.get("/ai-hub/route")
+    async def ai_hub_route_endpoint(capability: str, preferred: str | None = None):
+        prefs = [x.strip() for x in preferred.split(",") if x.strip()] if preferred else []
+        return ai_hub_route(capability, prefs)
 
     @app.get("/smart-minds")
     async def smart_minds():
