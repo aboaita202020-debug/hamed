@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, asdict
 import os
 from app.free_tools.specialist_registry import FREE_SPECIALIST_TOOLS
+from app.free_tools.extended_registry import TOOLS as EXTENDED_TOOLS
 @dataclass(frozen=True)
 class AITool:
     id:str; name:str; category:str; capabilities:tuple[str,...]; integration:str="api"; env_key:str|None=None
@@ -23,7 +24,8 @@ _GROUPS={
 _CAPS={"reasoning":("chat","reasoning","vision"),"image":("image","image-editing"),"video":("video","image-to-video"),"voice":("text-to-speech","speech-to-text"),"coding":("coding","code-completion"),"documents":("ocr","document-analysis"),"research":("web-search","research"),"data":("retrieval","vector-search"),"automation":("automation","workflows"),"agents":("multi-agent","orchestration"),"local-models":("local-llm","embeddings")}
 _BASE_TOOLS=tuple(AITool(i,n,cat,_CAPS[cat],"local" if i in {"comfyui","tesseract","ollama","lm-studio"} else ("sdk" if cat=="agents" else "api"),k) for cat,rows in _GROUPS.items() for i,n,k in rows)
 _FREE_TOOLS=tuple(AITool(x["id"],x["name"],x["category"],tuple(x["capabilities"]),x["integration"],None) for x in FREE_SPECIALIST_TOOLS)
-TOOLS=_BASE_TOOLS+_FREE_TOOLS
+_EXTENDED_TOOLS=tuple(AITool(x["id"],x["name"],x["category"],tuple(x["capabilities"]),x["integration"],None) for x in EXTENDED_TOOLS)
+TOOLS=_BASE_TOOLS+_FREE_TOOLS+_EXTENDED_TOOLS
 TOOL_REGISTRY={t.id:t for t in TOOLS}
 def catalog(): return [asdict(t)|{"enabled":t.enabled} for t in TOOLS]
 def status():
