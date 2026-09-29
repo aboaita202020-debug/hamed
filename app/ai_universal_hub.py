@@ -32,6 +32,8 @@ def status():
     cats={}
     for t in TOOLS: cats[t.category]=cats.get(t.category,0)+1
     en=sum(t.enabled for t in TOOLS)
+    for required in ("business_ops",):
+        cats.setdefault(required, 0)
     return {"total":len(TOOLS),"enabled":en,"disabled":len(TOOLS)-en,"categories":dict(sorted(cats.items()))}
 def find_tools(capability,category=None):
     q=capability.lower().strip()
