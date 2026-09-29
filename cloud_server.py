@@ -1,1 +1,18 @@
-"""Cloud entrypoint for Hamed AGI.\n\nExpose the full application so cloud deployments do not accidentally run a\nminimal health-only shell. Secrets remain environment-only.\n"""\nfrom app.main import app\n\n__all__ = ["app"]\n\nif __name__ == "__main__":\n    import os\n    import uvicorn\n\n    uvicorn.run(\n        app,\n        host=os.getenv("HAMED_HOST", "0.0.0.0"),\n        port=int(os.getenv("HAMED_PORT", "8000")),\n    )\n
+"""Cloud entrypoint for Hamed AGI.
+
+Expose the full application so cloud deployments do not accidentally run a
+minimal health-only shell. Secrets remain environment-only.
+"""
+from app.main import app
+
+__all__ = ["app"]
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+
+    uvicorn.run(
+        app,
+        host=os.getenv("HAMED_HOST", "0.0.0.0"),
+        port=int(os.getenv("HAMED_PORT", "8000")),
+    )
