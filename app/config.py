@@ -15,6 +15,10 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 
+from app.env_loader import load_env
+
+load_env()
+
 
 def _env_bool(name: str, default: bool = False) -> bool:
     val = os.getenv(name)
