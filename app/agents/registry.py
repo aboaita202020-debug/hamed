@@ -25,6 +25,7 @@ AGENTS = [
     ("investment", "Investment Research", "finance", "research investment opportunities"),
     ("market", "Market Research Agent", "research", "research markets and demand"),
     ("competitor", "Competitor Analysis Agent", "research", "compare competitors"),
+    ("competitive-intelligence", "Competitive Intelligence Agent", "research", "continuously analyze lawful public competitor signals, identify gaps and map them to relevant Hamed services"),
     ("business-model", "Business Model Agent", "business", "design viable business models"),
     ("operations", "Operations Agent", "operations", "improve operating workflows"),
     ("procurement", "Procurement Agent", "operations", "research purchasing and suppliers"),
