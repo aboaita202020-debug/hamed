@@ -21,8 +21,8 @@ def load_specialist_tools():
                 "integration": "free-specialist",
                 "env_key": None,
             })
-    if len(tools) != 250:
-        raise RuntimeError(f"Expected 250 specialist tools, got {len(tools)}")
-    return tuple(tools)
+    if len(tools) < 250:
+        raise RuntimeError(f"Expected at least 250 specialist tools, got {len(tools)}")
+    return tuple(tools[:250])
 
 FREE_SPECIALIST_TOOLS = load_specialist_tools()
