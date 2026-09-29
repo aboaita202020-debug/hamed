@@ -1,11 +1,12 @@
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 import os
+from app.free_tools.specialist_registry import FREE_SPECIALIST_TOOLS
 @dataclass(frozen=True)
 class AITool:
     id:str; name:str; category:str; capabilities:tuple[str,...]; integration:str="api"; env_key:str|None=None
     @property
-    def enabled(self): return self.integration in {"local","sdk","self-hosted"} or bool(self.env_key and os.getenv(self.env_key))
+    def enabled(self): return self.integration in {"local","sdk","self-hosted","free-specialist"} or bool(self.env_key and os.getenv(self.env_key))
 _GROUPS={
 "reasoning":[("openai","OpenAI","OPENAI_API_KEY"),("anthropic","Anthropic Claude","ANTHROPIC_API_KEY"),("google-gemini","Google Gemini","GEMINI_API_KEY"),("deepseek","DeepSeek","DEEPSEEK_API_KEY"),("moonshot-kimi","Moonshot Kimi","KIMI_API_KEY"),("mistral","Mistral AI","MISTRAL_API_KEY"),("cohere","Cohere","COHERE_API_KEY"),("xai-grok","xAI Grok","XAI_API_KEY"),("perplexity","Perplexity","PERPLEXITY_API_KEY"),("groq","Groq","GROQ_API_KEY"),("together-ai","Together AI","TOGETHER_API_KEY"),("fireworks-ai","Fireworks AI","FIREWORKS_API_KEY")],
 "image":[("stability-ai","Stability AI","STABILITY_API_KEY"),("ideogram","Ideogram","IDEOGRAM_API_KEY"),("midjourney","Midjourney","MIDJOURNEY_API_KEY"),("leonardo","Leonardo AI","LEONARDO_API_KEY"),("black-forest-labs","Black Forest Labs","BFL_API_KEY"),("replicate","Replicate","REPLICATE_API_TOKEN"),("comfyui","ComfyUI",None)],
@@ -20,7 +21,9 @@ _GROUPS={
 "local-models":[("ollama","Ollama","OLLAMA_HOST"),("lm-studio","LM Studio","LMSTUDIO_BASE_URL"),("huggingface","Hugging Face","HF_TOKEN")]
 }
 _CAPS={"reasoning":("chat","reasoning","vision"),"image":("image","image-editing"),"video":("video","image-to-video"),"voice":("text-to-speech","speech-to-text"),"coding":("coding","code-completion"),"documents":("ocr","document-analysis"),"research":("web-search","research"),"data":("retrieval","vector-search"),"automation":("automation","workflows"),"agents":("multi-agent","orchestration"),"local-models":("local-llm","embeddings")}
-TOOLS=tuple(AITool(i,n,cat,_CAPS[cat],"local" if i in {"comfyui","tesseract","ollama","lm-studio"} else ("sdk" if cat=="agents" else "api"),k) for cat,rows in _GROUPS.items() for i,n,k in rows)
+_BASE_TOOLS=tuple(AITool(i,n,cat,_CAPS[cat],"local" if i in {"comfyui","tesseract","ollama","lm-studio"} else ("sdk" if cat=="agents" else "api"),k) for cat,rows in _GROUPS.items() for i,n,k in rows)
+_FREE_TOOLS=tuple(AITool(x["id"],x["name"],x["category"],tuple(x["capabilities"]),x["integration"],None) for x in FREE_SPECIALIST_TOOLS)
+TOOLS=_BASE_TOOLS+_FREE_TOOLS
 TOOL_REGISTRY={t.id:t for t in TOOLS}
 def catalog(): return [asdict(t)|{"enabled":t.enabled} for t in TOOLS]
 def status():
@@ -37,4 +40,4 @@ def route(capability,preferred=None):
     cs += [t for t in TOOLS if t not in cs and capability in t.capabilities]
     cs.sort(key=lambda t:not t.enabled)
     return {"status":"ok","capability":capability,"selected":(asdict(cs[0])|{"enabled":cs[0].enabled}) if cs else None,"fallbacks":[asdict(t)|{"enabled":t.enabled} for t in cs[1:8]]}
-def health(): return {"status":"ok","registry_size":len(TOOLS),"configured":[t.id for t in TOOLS if t.enabled]}
+def health(): return {"status":"ok","registry_size":len(TOOLS),"specialist_free_tools":len(FREE_SPECIALIST_TOOLS),"configured":[t.id for t in TOOLS if t.enabled]}
