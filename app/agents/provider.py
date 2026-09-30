@@ -320,7 +320,8 @@ class MultiBrainProvider:
             raise RuntimeError("No AI brain is available. Install/start Ollama or configure a supported provider API key.")
 
     def _load(self):
-        ollama_default = "0" if os.getenv("PYTHONANYWHERE_SITE") or os.getenv("PYTHONANYWHERE_DOMAIN") else "1"\n        if os.getenv("HAMED_OLLAMA_ENABLED", ollama_default).lower() not in {"0", "false", "no"}:
+        ollama_default = "0" if os.getenv("PYTHONANYWHERE_SITE") or os.getenv("PYTHONANYWHERE_DOMAIN") else "1"
+        if os.getenv("HAMED_OLLAMA_ENABLED", ollama_default).lower() not in {"0", "false", "no"}:
             self.providers["ollama"] = OllamaProvider(os.getenv("OLLAMA_MODEL", "llama3.2:3b"), os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434"))
         key = os.getenv("GEMINI_API_KEY", "").strip()
         if key:

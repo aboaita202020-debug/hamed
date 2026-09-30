@@ -18,6 +18,7 @@ from .agents.provider import MultiBrainProvider
 from .agents.smart_minds import list_smart_minds
 from .config import settings
 from .channels.whatsapp_web import build_whatsapp_web_url, open_whatsapp_web
+from .channels.content_channels import channel_plan, channel_status
 from .instagram_routes import router as instagram_router
 from .instagram_webhooks import router as instagram_webhook_router
 
@@ -203,6 +204,19 @@ def open_prepared_whatsapp_web(request: WhatsAppWebPrepareRequest) -> dict[str, 
         "sent": False,
         "next_step": "Press Send in WhatsApp Web.",
     }
+
+
+@app.get("/channels")
+def channels() -> dict[str, Any]:
+    return channel_status()
+
+
+@app.get("/channels/{channel_key}")
+def channel(channel_key: str) -> dict[str, Any]:
+    try:
+        return {"status": "ok", "channel": channel_plan(channel_key)}
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Channel not found") from exc
 
 
 @app.get("/learning")
