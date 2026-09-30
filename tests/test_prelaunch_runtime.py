@@ -25,6 +25,9 @@ def run_bot(env: dict[str, str]):
     ):
         clean.pop(key, None)
     clean["PYTHON_DOTENV_DISABLED"] = "1"
+    # Keep an explicit empty OpenAI variable so any host-level dotenv/configuration
+    # cannot mask the missing-key startup check.
+    clean["OPENAI_API_KEY"] = ""
     clean.update(env)
     return subprocess.run(
         [sys.executable, "bot.py"],
