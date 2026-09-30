@@ -16,7 +16,9 @@ from app.agents.autonomous_core import AutonomousCore
 from app.runtime import http_host, http_port
 from app.voice.telegram_tts import TelegramTTS
 
-load_dotenv()
+if os.getenv("PYTHON_DOTENV_DISABLED", "").strip() != "1":
+    load_dotenv()
+
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 HAMED_NAME = os.getenv("HAMED_NAME", "Hamed AI")
