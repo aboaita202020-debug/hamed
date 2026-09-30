@@ -192,7 +192,7 @@ def public_web_research(query: str, max_results: int = 12) -> str:
 
 
 class OpenAIProvider:
-    def __init__(self, api_key: str, model: str = "gpt-5") -> None:
+    def __init__(self, api_key: str, model: str = "gpt-5-mini") -> None:
         if not api_key:
             raise ValueError("OPENAI_API_KEY is required")
         from openai import OpenAI
@@ -320,7 +320,7 @@ class MultiBrainProvider:
             raise RuntimeError("No AI brain is available. Install/start Ollama or configure a supported provider API key.")
 
     def _load(self):
-        if os.getenv("HAMED_OLLAMA_ENABLED", "1").lower() not in {"0", "false", "no"}:
+        ollama_default = "0" if os.getenv("PYTHONANYWHERE_SITE") or os.getenv("PYTHONANYWHERE_DOMAIN") else "1"\n        if os.getenv("HAMED_OLLAMA_ENABLED", ollama_default).lower() not in {"0", "false", "no"}:
             self.providers["ollama"] = OllamaProvider(os.getenv("OLLAMA_MODEL", "llama3.2:3b"), os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434"))
         key = os.getenv("GEMINI_API_KEY", "").strip()
         if key:
@@ -347,7 +347,7 @@ class MultiBrainProvider:
                 self.providers[name] = OpenAICompatibleProvider(name, value, os.getenv(env + "_BASE_URL", url), os.getenv(model_env, default))
         key = os.getenv("OPENAI_API_KEY", "").strip()
         if key:
-            self.providers["openai"] = OpenAIProvider(key, os.getenv("OPENAI_MODEL", "gpt-5"))
+            self.providers["openai"] = OpenAIProvider(key, os.getenv("OPENAI_MODEL", "gpt-5-mini"))
         key = os.getenv("ANTHROPIC_API_KEY", "").strip()
         if key:
             self.providers["claude"] = AnthropicProvider(key, os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-latest"), os.getenv("ANTHROPIC_WORKSPACE_ID", "").strip())
