@@ -7,6 +7,20 @@ import threading
 import time
 
 from dotenv import load_dotenv
+
+if os.getenv("PYTHON_DOTENV_DISABLED", "").strip() != "1":
+    load_dotenv()
+
+# Validate the raw startup environment before importing modules that may load
+# additional configuration. This keeps missing-secret failures deterministic
+# in CI/test/PaaS environments and prevents accidental runtime startup.
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+if not TELEGRAM_BOT_TOKEN:
+    raise RuntimeError("Missing required environment variable(s): TELEGRAM_BOT_TOKEN")
+if not OPENAI_API_KEY:
+    raise RuntimeError("Missing required environment variable(s): OPENAI_API_KEY")
+
 import telebot
 import uvicorn
 
@@ -16,11 +30,6 @@ from app.agents.autonomous_core import AutonomousCore
 from app.runtime import http_host, http_port
 from app.voice.telegram_tts import TelegramTTS
 
-if os.getenv("PYTHON_DOTENV_DISABLED", "").strip() != "1":
-    load_dotenv()
-
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 HAMED_NAME = os.getenv("HAMED_NAME", "Hamed AI")
 # PaaS manifests in this repository expose HAMED_HOST/HAMED_PORT, while
 # container platforms commonly inject PORT. Prefer the explicit Hamed settings
@@ -30,15 +39,6 @@ PORT = http_port()
 TELEGRAM_POLLING_ENABLED = os.getenv("HAMED_TELEGRAM_POLLING", "true").lower() == "true"
 AUTONOMOUS_NOTIFY_CHAT_ID = os.getenv("HAMED_AUTONOMOUS_NOTIFY_CHAT_ID", "").strip()
 
-
-def validate_required_secrets() -> None:
-    if not TELEGRAM_BOT_TOKEN:
-        raise RuntimeError("Missing required environment variable(s): TELEGRAM_BOT_TOKEN")
-    if not OPENAI_API_KEY:
-        raise RuntimeError("Missing required environment variable(s): OPENAI_API_KEY")
-
-
-validate_required_secrets()
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN, parse_mode=None)
 hamed = HamedOrchestrator(MultiBrainProvider())
 voice_tts = TelegramTTS()
