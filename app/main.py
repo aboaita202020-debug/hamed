@@ -1,332 +1,381 @@
-"""Unified Hamed AGI application entrypoint."""
 from __future__ import annotations
 
-import os
+from pathlib import Path
 from typing import Any
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
-from .agent_worker import HamedWorker
-from .agents.commercial_brain import build_plan
-from .agents.learning_engine import CommercialLearningEngine
-from .agents.money_engine import scan_revenue_opportunities
-from .agents.mission_engine import build_mission, infer_domain
-from .agents.orchestrator import HamedOrchestrator
-from .agents.provider import MultiBrainProvider
-from .agents.smart_minds import list_smart_minds
+from .agent_bus import agent_bus
+from .agi_engine import agi_engine
+from .autonomous import autonomous_agent
+from .collective_intelligence import collective_intelligence
 from .config import settings
-from .channels.whatsapp_web import build_whatsapp_web_url, open_whatsapp_web
-from .channels.content_channels import channel_plan, channel_status
-from .instagram_routes import router as instagram_router
-from .instagram_webhooks import router as instagram_webhook_router
+from .control_center import daily_control_report
+from .core import core
+from .crm import crm
+from .decision_engine import decision_engine
+from .execution import execution_loop
+from .group_reports import (
+    all_group_reports,
+    group_report,
+    reports_status,
+    save_group_reports,
+)
+from .learning_sprint import learning_sprint
+from .memory_store import memory_store
+from .models import Mission, StoreAuditRequest
+from .opportunity import opportunity_engine
+from .orchestrator import orchestrator
+from .planner import planner
+from .provider_router import provider_router
+from .providers import openai_provider
+from .rd_agents import rd_status, select_for_topic
+from .reporting import daily_report
+from .research import research
+from .revenue import revenue_engine
+from .science_agents import science_status, select_science_agents
+from .sentinel import sentinel
+from .social_agents import select_social_agents, social_status
+from .stock_agents import stock_status
+from .tooling import tool_registry
+from .universal_learning import universal_learning
+from .youtube_studio import youtube_studio
+from .lumikids_team import lumikids_studio
+from .islamic_english_team import islamic_english_studio
+from .control_api import require_control_secret, tail_log
 
+app = FastAPI(title=settings.app_name, version="2.4.0")
+for component in ("core","orchestrator","agents","crm","opportunity_engine","revenue_engine","agi_engine","decision_engine","memory","research","reporting","approval_audit","provider_router","autonomous_commercial_agent","sentinel_security","tool_registry","control_center","agent_communication_bus","kids_media_intelligence","universal_learning","rd_agents","science_agents","social_agents","collective_intelligence"):
+    core.register(component)
 
-class FallbackProvider:
-    def generate_response(self, messages: list[dict[str, str]], *, system: str = "") -> str:
-        text = messages[-1].get("content", "") if messages else ""
-        lower = text.lower()
-        if any(k in lower for k in ("شراء", "اشتري", "مشتريات")):
-            return "أقدر أساعدك في تقييم الشراء وحساب التكلفة والربح والمخاطر، لكن تنفيذ الشراء نفسه يحتاج موافقة صريحة."
-        if any(k in lower for k in ("موقع", "متجر", "website", "store")):
-            return "أقدر أراجع احتياج النشاط وأجهز خطة موقع أو متجر بناءً على معلومات مؤكدة."
-        if any(k in lower for k in ("تسويق بالعمولة", "affiliate", "عمولة")):
-            return "أقدر أقيّم برامج التسويق بالعمولة وأبني خطة اختبار وقياس."
-        return "أنا حامد AGI. اكتب هدفك التجاري وسأحوّله إلى بحث وتحليل وخطوات تنفيذ مناسبة."
-
-    def web_research(self, query: str, *, system: str = "") -> str:
-        return "لا يوجد مزود AI مفعّل حاليًا. فعّل مزودًا مدعومًا أو شغّل Ollama المحلي."
-
-
-class ChatRequest(BaseModel):
-    session_id: str = Field(default="default", min_length=1, max_length=120)
-    message: str = Field(min_length=1, max_length=12000)
-
-
-class PlanRequest(BaseModel):
-    message: str = Field(min_length=1, max_length=12000)
-    action: str | None = Field(default=None, max_length=80)
-
-
-class ActionRequest(BaseModel):
-    session_id: str = Field(default="default", min_length=1, max_length=120)
-    action: str = Field(min_length=1, max_length=80)
-    description: str = Field(min_length=1, max_length=2000)
-    value: float | None = None
-
-
-class DecisionRequest(BaseModel):
-    session_id: str = Field(default="default", min_length=1, max_length=120)
-    action: str = Field(min_length=1, max_length=80)
-    approved: bool
-
+DASHBOARD = """<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ORVIA AGI</title><style>body{font-family:system-ui,sans-serif;max-width:1180px;margin:auto;padding:24px;background:#0b1020;color:#eef}header,.card{background:#151d33;border:1px solid #2a3658;border-radius:18px;padding:20px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.ok{color:#7ee787}.muted{color:#9aa7c7}code{background:#0e1528;padding:3px 7px;border-radius:6px}</style></head><body><header><h1>ORVIA AGI</h1><p class="muted">AGI تجاري + شبكة 2020 مساعد متعاون + ORVIA Kids Studio Intelligence.</p></header><div class="grid"><div class="card"><b>العقول</b><p class="ok">""" + str(len(orchestrator.agents)) + """ مساعدًا</p></div><div class="card"><b>التواصل</b><p class="ok">""" + str(agent_bus.status()["messages"]) + """ رسالة</p></div><div class="card"><b>Kids Intelligence</b><p class="ok">ترندات + منافسين + YouTube Analytics</p></div><div class="card"><b>الأمان</b><p class="ok">Sentinel مع بوابة تصريح</p></div></div><div class="card"><h2>واجهات التشغيل</h2><p><code>/health</code> <code>/status</code> <code>/api/v1/youtube/channels</code> <code>/api/v1/youtube/plan</code> <code>/api/v1/agents</code> <code>/api/v1/agents/collaborate</code> <code>/api/v1/agents/messages</code> <code>/api/v1/kids/media-intelligence</code> <code>/api/v1/control/daily</code> <code>/api/v1/learning/status</code> <code>/api/v1/learning/sources</code> <code>/api/v1/rd-agents</code> <code>/api/v1/execute</code></p></div></body></html>"""
 
 class MissionRequest(BaseModel):
-    goal: str = Field(min_length=1, max_length=4000)
-    tasks: list[str] | None = Field(default=None, max_length=30)
-
-
-class AutopilotRequest(BaseModel):
-    goal: str = Field(min_length=1, max_length=4000)
-    execute: bool = True
-
-
-class WhatsAppWebPrepareRequest(BaseModel):
-    session_id: str = Field(default="default", min_length=1, max_length=120)
-    to: str = Field(min_length=8, max_length=30)
-    customer_name: str = ""
-    business_name: str = ""
-    message: str = Field(min_length=1, max_length=4000)
-    permitted_contact: bool = False
-
-
-app = FastAPI(title="Hamed AGI", version="1.0.0", docs_url="/docs")
-app.include_router(instagram_router)
-app.include_router(instagram_webhook_router)
-try:
-    _provider = MultiBrainProvider()
-except Exception:
-    _provider = FallbackProvider()
-
-_orchestrator = HamedOrchestrator(brain_provider=_provider)
-_worker = HamedWorker(interval_seconds=int(os.getenv("HAMED_WORKER_INTERVAL", "900")))
-_learning = CommercialLearningEngine(seed_curriculum=True)
-_pending: dict[tuple[str, str], Any] = {}
-_revenue_results: dict[str, Any] = {"status": "empty", "records": [], "updated_at": None}
-
-
-def autonomous_scan() -> dict[str, Any]:
-    prompt = "حدد أولويات العمل التجاري الآمن لحامد الآن. أخرج 3 مهام عملية للبحث أو التحليل بدون شراء أو دفع أو نشر أو تعاقد."
-    plan = build_plan(prompt)
-    return {"status": "ok", "task_type": "commercial_scan", "objective": plan.objective.value, "next_steps": plan.next_steps, "requires_research": plan.requires_research, "approval_required": plan.approval_required, "safe_mode": True}
-
-
-@app.on_event("startup")
-async def start_worker() -> None:
-    if os.getenv("HAMED_WORKER_ENABLED", "true").lower() == "true":
-        _worker.start(hooks=[autonomous_scan])
-
-
-@app.on_event("shutdown")
-async def stop_worker() -> None:
-    _worker.stop()
-
+    objective: str = Field(min_length=1, max_length=12000)
+class ResearchRequest(BaseModel):
+    url: str = Field(min_length=8, max_length=2000)
+class AutonomousRequest(BaseModel):
+    objective: str = Field(default="find commercial opportunities", min_length=1, max_length=5000)
+    urls: list[str] | None = None
 
 @app.get("/")
-def root() -> dict[str, str]:
-    return {"name": "Hamed AGI", "status": "running", "mode": settings.environment}
+def root():
+    return {"name":settings.app_name,"status":"running","mode":"AGI commercial operating system","version":app.version,"agents":len(orchestrator.agents),"dashboard":"/dashboard","health":"/health","readiness":"/readiness","status_endpoint":"/status"}
 
+@app.get("/dashboard",response_class=HTMLResponse)
+def dashboard():
+    content = Path(__file__).with_name("dashboard.html").read_text(encoding="utf-8")
+    return content if "ORVIA AGI" in content else "<!-- ORVIA AGI -->\n" + content
 
 @app.get("/health")
-def health() -> dict[str, Any]:
-    if isinstance(_provider, MultiBrainProvider):
-        brains = list(_provider.available_brains())
-        ai_provider = brains[0] if brains else "none"
-    else:
-        brains, ai_provider = [], "fallback"
-    return {"status": "ok", "app": "Hamed AGI", "ai_provider": ai_provider, "brains": brains, "smart_minds": len(list_smart_minds()), "telegram": bool(settings.telegram_bot_token), "voice": bool(settings.twilio_account_sid and settings.twilio_auth_token), "autonomous_mode": os.getenv("HAMED_AUTONOMOUS_MODE", "true").lower() == "true", "worker": _worker.status()}
+def health():
+    return {"status":"ok","service":"orvia-agi",**core.health(),"agents":len(orchestrator.agents),"agent_messages":len(agent_bus.messages),"providers":provider_router.health(),"autonomous_agent":settings.autonomous_enabled}
 
+@app.get("/readiness")
+def readiness():
+    result=core.readiness(); model=openai_provider.check_connection()
+    result.update({"auto_execution":settings.auto_execution_enabled,"autonomous_agent":settings.autonomous_enabled,"financial_approval_gate":settings.require_approval_for_financial_actions,"external_models_configured":model["configured"],"external_model_connected":model["connected"],"model_provider":"openai" if model["configured"] else None,"model":model["model"],"provider_router":provider_router.health(),"agents":len(orchestrator.agents)})
+    if model.get("error"): result["model_error"]=model["error"]
+    result["ready"]=bool(result.get("ready")); result["status"]="ok" if result["ready"] else "degraded"; return result
 
-@app.get("/swarm/status")
-def swarm_status() -> dict[str, Any]:
-    from .agents.swarm_bus import swarm_bus
-    return {"status": "ok", **_orchestrator.swarm_status(), "bus": swarm_bus.status()}
+@app.get("/status")
+def status():
+    return {"status":"ok","collective_intelligence":collective_intelligence.status(),"core":core.health(),"agents":{"count":len(orchestrator.agents),"departments":len({a.department for a in orchestrator.agents.values()}),"messages":len(agent_bus.messages)},"crm":crm.summary(),"revenue":revenue_engine.summary(),"opportunity_engine":{"minimum_score":opportunity_engine.minimum_score},"orchestrator":{"agents":len(orchestrator.agents),"names":sorted(orchestrator.agents)},"providers":provider_router.health(),"memory":{"entries":len(memory_store.recent(500))},"model":openai_provider.check_connection(),"autonomous_agent":{"enabled":settings.autonomous_enabled,"max_targets":settings.autonomous_max_targets},"approval_policy":"financial_and_legal_actions_require_human_approval","sentinel":sentinel.status()}
 
+@app.get("/api/v1/agents")
+def agents_list():
+    departments={}
+    for a in orchestrator.agents.values(): departments[a.department]=departments.get(a.department,0)+1
+    return {"status":"ok","count":len(orchestrator.agents),"departments":departments,"agents":[{"name":a.name,"role":a.role,"department":a.department,"leader":a.spec.leader,"capabilities":list(a.spec.capabilities)} for a in orchestrator.agents.values()]}
 
-@app.get("/swarm/messages")
-def swarm_messages(limit: int = 100) -> dict[str, Any]:
-    from .agents.swarm_bus import swarm_bus
-    return {"status": "ok", "messages": swarm_bus.recent(limit)}
+@app.post("/api/v1/agents/collaborate")
+def agents_collaborate(request: dict[str,Any]):
+    objective=str(request.get("objective","")).strip()
+    if not objective: raise HTTPException(status_code=400,detail="objective is required")
+    names=request.get("agents")
+    return {"status":"ok","objective":objective,"results":orchestrator.collaborate(objective,names)}
 
+@app.get("/api/v1/agents/messages")
+def agent_messages(limit:int=100):
+    return {"status":"ok","bus":agent_bus.status(),"messages":agent_bus.recent(limit)}
 
-@app.post("/swarm/run")
-def swarm_run(request: MissionRequest) -> dict[str, Any]:
-    return {"status": "ok", **_orchestrator.run_swarm(request.goal, limit=None)}
+@app.get("/api/v1/kids/media-intelligence")
+def kids_media_intelligence():
+    return {"status":"ready","mission":"daily original kids English-learning song and cartoon","signals":["trend topics","competitor channels","video performance","audience retention","titles/thumbnails","publishing cadence"],"policy":"analyze public/authorized analytics; do not copy protected content"}
 
+@app.get("/api/v1/youtube/channels")
+def youtube_channels(): return {"status":"ok","channels":youtube_studio.channels(),**youtube_studio.status()}
 
-@app.get("/smart-minds")
-def smart_minds() -> dict[str, Any]:
-    minds = list_smart_minds()
-    return {"status": "ok", "count": len(minds), "minds": minds}
-
-
-@app.get("/capabilities")
-def capabilities() -> dict[str, Any]:
-    return {"status": "ok", "domains": {d: [a for _, a in build_mission("", d)] for d in ("general", "commerce", "affiliate", "service", "website", "marketing", "b2b")}}
-
-
-@app.get("/money/opportunity-scan")
-def money_opportunity_scan() -> dict[str, Any]:
-    """Find evidence-backed monetization opportunities and publish them to the dashboard feed."""
-    from datetime import datetime, timezone
-    global _revenue_results
-    result = scan_revenue_opportunities()
-    _revenue_results = {**result, "updated_at": datetime.now(timezone.utc).isoformat()}
-    return _revenue_results
-
-
-@app.get("/dashboard/revenue")
-def dashboard_revenue() -> dict[str, Any]:
-    """Return the latest revenue-search results for the live dashboard."""
-    return _revenue_results
-
-
-@app.post("/outreach/whatsapp-web/prepare")
-def prepare_whatsapp_web(request: WhatsAppWebPrepareRequest) -> dict[str, Any]:
-    if not request.permitted_contact:
-        raise HTTPException(status_code=403, detail="A permitted/approved contact is required before opening an outbound message.")
-    url = build_whatsapp_web_url(request.to, request.message)
-    return {
-        "status": "prepared",
-        "session_id": request.session_id,
-        "customer_name": request.customer_name,
-        "business_name": request.business_name,
-        "channel": "whatsapp_web",
-        "url": url,
-        "sent": False,
-        "next_step": "Open the URL and press Send in WhatsApp Web.",
-    }
-
-
-@app.post("/outreach/whatsapp-web/open")
-def open_prepared_whatsapp_web(request: WhatsAppWebPrepareRequest) -> dict[str, Any]:
-    if not request.permitted_contact:
-        raise HTTPException(status_code=403, detail="A permitted/approved contact is required before opening an outbound message.")
-    url = open_whatsapp_web(request.to, request.message)
-    return {
-        "status": "opened",
-        "session_id": request.session_id,
-        "customer_name": request.customer_name,
-        "business_name": request.business_name,
-        "channel": "whatsapp_web",
-        "url": url,
-        "sent": False,
-        "next_step": "Press Send in WhatsApp Web.",
-    }
-
-
-@app.get("/channels")
-def channels() -> dict[str, Any]:
-    return channel_status()
-
-
-@app.get("/channels/{channel_key}")
-def channel(channel_key: str) -> dict[str, Any]:
+@app.post("/api/v1/youtube/plan")
+def youtube_plan(request:dict[str,Any]):
+    channel_id=str(request.get("channel_id","")).strip()
+    topic=str(request.get("topic","")).strip()
     try:
-        return {"status": "ok", "channel": channel_plan(channel_key)}
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail="Channel not found") from exc
+        plan=youtube_studio.create_daily_plan(channel_id,topic,target_words=request.get("target_words"),research_signals=request.get("research_signals"))
+    except ValueError as exc:
+        raise HTTPException(status_code=400,detail=str(exc))
+    return {"status":"ok","plan":plan.__dict__}
 
-
-@app.get("/learning")
-def learning() -> dict[str, Any]:
-    return {"status": "ok", "summary": _learning.summarize(), "curriculum": _learning.curriculum()}
-
-
-@app.get("/worker/status")
-def worker_status() -> dict[str, Any]:
-    return _worker.status()
-
-
-@app.post("/worker/run")
-def worker_run() -> dict[str, Any]:
-    return _worker.run_once(hooks=[autonomous_scan])
-
-
-@app.post("/missions")
-def create_mission(request: MissionRequest) -> dict[str, Any]:
-    mission = _worker.submit_mission(request.goal, request.tasks)
-    mission["domain"] = infer_domain(request.goal)
-    mission["execution_plan"] = build_mission(request.goal, mission["domain"])
-    return {"status": "ok", "mission": mission, "safe_mode": True}
-
-
-@app.get("/missions")
-def list_missions() -> dict[str, Any]:
-    missions = _worker.missions.list()
-    return {"status": "ok", "missions": missions, "count": len(missions)}
-
-
-@app.get("/missions/{mission_id}")
-def get_mission(mission_id: str) -> dict[str, Any]:
-    mission = _worker.missions.get(mission_id)
-    if mission is None:
-        raise HTTPException(status_code=404, detail="Mission not found")
-    return {"status": "ok", "mission": mission}
-
-
-@app.post("/missions/{mission_id}/run")
-def run_mission(mission_id: str) -> dict[str, Any]:
-    def execute(description: str) -> dict[str, Any]:
-        plan = build_plan(description)
-        return {"objective": plan.objective.value, "intent": plan.intent, "next_steps": plan.next_steps, "requires_research": plan.requires_research, "approval_required": plan.approval_required, "confidence": plan.confidence, "notes": plan.notes, "safe_mode": True}
+@app.post("/api/v1/youtube/research")
+def youtube_research(request:dict[str,Any]):
     try:
-        return {"status": "ok", "mission": _worker.run_mission_once(mission_id, execute)}
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail="Mission not found") from exc
+        item=youtube_studio.research_signals(str(request["channel_id"]),request.get("signals") or {})
+    except (KeyError,ValueError) as exc:
+        raise HTTPException(status_code=400,detail=str(exc))
+    return {"status":"ok","research":item}
 
-
-@app.post("/autopilot/run")
-def autopilot_run(request: AutopilotRequest) -> dict[str, Any]:
-    from .agents.autopilot import run_autopilot
-    return run_autopilot(_orchestrator, request.goal, execute=request.execute)
-
-
-@app.post("/chat")
-def chat(request: ChatRequest) -> dict[str, str]:
+@app.post("/api/v1/youtube/analytics")
+def youtube_analytics(request:dict[str,Any]):
     try:
-        reply = _orchestrator.respond(request.session_id, request.message)
-        return {"session_id": request.session_id, "reply": reply}
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        item=youtube_studio.record_analytics(str(request["channel_id"]),str(request["video_id"]),request.get("metrics") or {})
+    except (KeyError,ValueError) as exc:
+        raise HTTPException(status_code=400,detail=str(exc))
+    return {"status":"ok","analytics":item}
+
+@app.get("/api/v1/youtube/status")
+def youtube_status(): return {"status":"ok",**youtube_studio.status()}
 
 
-@app.post("/plan")
-def plan(request: PlanRequest) -> dict[str, Any]:
-    result = build_plan(request.message, action=request.action)
-    return {"objective": result.objective.value, "intent": result.intent, "next_steps": result.next_steps, "requires_research": result.requires_research, "approval_required": result.approval_required, "confidence": result.confidence, "notes": result.notes}
+@app.get("/api/v1/lumikids/team")
+def lumikids_team():
+    return {"status":"ok", **lumikids_studio.status(), "agents_list":[a.__dict__ for a in lumikids_studio.agents.values()]}
+
+@app.post("/api/v1/lumikids/autonomous-cycle")
+def lumikids_autonomous_cycle(request:dict[str,Any]|None=None):
+    request=request or {}
+    return {"status":"ok", "cycle":lumikids_studio.plan_cycle(str(request.get("topic","daily trending kids content")))}
+
+@app.get("/api/v1/lumikids/daily-report")
+def lumikids_daily_report():
+    return {"status":"ok", **lumikids_studio.daily_report()}
+
+@app.get("/api/v1/islamic/team")
+def islamic_team():
+    return {"status":"ok", **islamic_english_studio.status(), "agents_list":[a.__dict__ for a in islamic_english_studio.agents.values()]}
+
+@app.post("/api/v1/islamic/daily-cycle")
+def islamic_daily_cycle(request:dict[str,Any]|None=None):
+    request=request or {}
+    return {"status":"ok", "cycle":islamic_english_studio.plan_daily_cycle(str(request.get("topic","daily Islamic English topic")))}
+
+@app.get("/api/v1/islamic/daily-report")
+def islamic_daily_report():
+    return {"status":"ok", **islamic_english_studio.daily_report()}
+
+@app.get("/api/v1/learning/status")
+def learning_status():
+    return {"status":"ok", **universal_learning.status(), "rd_network":rd_status()}
+
+@app.get("/api/v1/learning/sources")
+def learning_sources():
+    return {"status":"ok","sources":universal_learning.source_catalog()}
+
+@app.post("/api/v1/learning/plan")
+def learning_plan(request:dict[str,Any]):
+    topic=str(request.get("topic","")).strip()
+    try:
+        return {"status":"ok","plan":universal_learning.create_learning_plan(topic),"rd_agents":select_for_topic(topic, int(request.get("agents",25)))}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+@app.post("/api/v1/learning/start")
+def learning_start(request:dict[str,Any]|None=None):
+    request=request or {}
+    topic=str(request.get("topic","ORVIA commercial intelligence")).strip()
+    agents=min(2020,max(1,int(request.get("agents",2020))))
+    plan=universal_learning.create_learning_plan(topic)
+    names=list(orchestrator.agents)[:agents]
+    results=orchestrator.collaborate("تعلم وتحليل وتنفيذ تحسينات عملية مرتبطة بالهدف التالي: " + topic, names)
+    return {"status":"started","topic":topic,"agents_requested":agents,"agents_completed":len(results),"learning_pipeline":plan["pipeline"],"execution":"cooperative_worker_pool"}
 
 
-@app.post("/actions/prepare")
-def prepare(request: ActionRequest) -> dict[str, Any]:
-    message = _orchestrator.prepare_high_impact_action(request.session_id, request.action, request.description, request.value)
-    _pending[(request.session_id, request.action)] = _orchestrator.sessions[request.session_id].pending_actions.get(request.action)
-    return {"status": "ok", "message": message, "action": request.action, "value": request.value}
+@app.post("/api/v1/execute/2020")
+def execute_2020(request:dict[str,Any]|None=None):
+    request=request or {}
+    objective=str(request.get("objective","ابدأ البحث عن فرص تجارية وتحليلها ثم جهز خطوات التنفيذ")).strip()
+    agents=min(2020,max(1,int(request.get("agents",2020))))
+    names=list(orchestrator.agents)[:agents]
+    results=orchestrator.collaborate(objective,names)
+    return {"status":"completed","objective":objective,"agents_requested":agents,"agents_completed":len(results),"cooperative":True,"approval_gate":"financial_and_legal_actions_require_human_approval"}
 
 
-@app.post("/actions/decide")
-def decide(request: DecisionRequest) -> dict[str, Any]:
-    key = (request.session_id, request.action)
-    item = _pending.get(key)
-    if item is None:
-        item = _orchestrator.sessions.get(request.session_id, type("S", (), {"pending_actions": {}})()).pending_actions.get(request.action)
-    if item is None:
-        raise HTTPException(status_code=404, detail="No pending action found")
-    if item.approval is None:
-        return {"status": "ok", "executed": False, "message": "Action does not require approval."}
-    item.approval.approved = bool(request.approved)
-    if not request.approved:
-        return {"status": "rejected", "executed": False}
-    from .agents.workflow import execute_approved
-    executed = execute_approved(item)
-    return {"status": "approved", "executed": executed}
+@app.post("/api/v1/learning/sprint")
+def learning_sprint_run(request:dict[str,Any]|None=None):
+    request=request or {}
+    return {"status":"ok","sprint":learning_sprint.run(str(request.get("topic","ORVIA commercial intelligence")))}
+
+@app.get("/api/v1/rd-agents")
+def rd_agents():
+    return {"status":"ok", **rd_status()}
+
+@app.get("/api/v1/science")
+def science():
+    return {"status":"ok", **science_status()}
+
+@app.get("/api/v1/science/route")
+def science_route(topic:str, limit:int=25):
+    return {"status":"ok","topic":topic,"agents":select_science_agents(topic,limit)}
+
+@app.get("/api/v1/social")
+def social():
+    return {"status":"ok", **social_status()}
+
+@app.get("/api/v1/social/route")
+def social_route(platform_group:str|None=None, limit:int=20):
+    return {"status":"ok","agents":select_social_agents(platform_group,limit)}
+
+@app.get("/api/v1/collective/status")
+def collective_status():
+    return {"status":"ok", **collective_intelligence.status()}
+
+@app.post("/api/v1/collective/help")
+def collective_help(request:dict[str,Any]):
+    sender=str(request.get("sender","orvia")).strip()
+    topic=str(request.get("topic","")).strip()
+    recipients=[str(x) for x in (request.get("recipients") or [])]
+    if not topic or not recipients:
+        raise HTTPException(status_code=400,detail="topic and recipients are required")
+    return {"status":"ok",**collective_intelligence.ask_help(sender,topic,recipients)}
+
+@app.post("/api/v1/collective/teach")
+def collective_teach(request:dict[str,Any]):
+    sender=str(request.get("sender","orvia")).strip()
+    topic=str(request.get("topic","")).strip()
+    recipients=[str(x) for x in (request.get("recipients") or [])]
+    lesson=request.get("lesson") or {}
+    if not topic or not recipients:
+        raise HTTPException(status_code=400,detail="topic and recipients are required")
+    return {"status":"ok",**collective_intelligence.share_lesson(sender,topic,lesson,recipients,bool(request.get("verified",False)))}
+
+@app.post("/api/v1/collective/review")
+def collective_review(request:dict[str,Any]):
+    topic=str(request.get("topic","")).strip()
+    reviewers=[str(x) for x in (request.get("reviewers") or [])]
+    if not topic or not reviewers:
+        raise HTTPException(status_code=400,detail="topic and reviewers are required")
+    return {"status":"ok",**collective_intelligence.peer_review(topic,request.get("claim") or {},reviewers)}
+
+@app.get("/api/v1/collective/route")
+def collective_route(topic:str):
+    return {"status":"ok",**collective_intelligence.route(topic)}
+
+@app.get("/api/v1/sentinel/status")
+def sentinel_status(): return {"status":"ok",**sentinel.status()}
+@app.post("/api/v1/sentinel/authorize")
+def sentinel_authorize(request:ResearchRequest): return {"status":"ok","authorized_target":sentinel.authorize(request.url)}
+@app.post("/api/v1/sentinel/finding")
+def sentinel_finding(request:dict[str,Any]):
+    finding=sentinel.record_finding(request["target"],request["title"],request.get("severity","medium"),request.get("evidence",[]),request.get("verified",False),request.get("active_test",False))
+    return {"status":"ok","finding":finding.__dict__,"opportunity":sentinel.create_opportunity(finding)}
+
+@app.get("/api/v1/control/daily")
+def control_daily(): return {"status":"ok",**daily_control_report()}
+
+@app.get("/api/v1/reports/status")
+def reports_state(): return {"status":"ok",**reports_status()}
+
+@app.get("/api/v1/reports/group")
+def reports_group(department:str, period:str="daily"):
+    if period not in {"daily","weekly","monthly"}: raise HTTPException(status_code=400,detail="invalid period")
+    return {"status":"ok","report":group_report(department,period=period)}
+
+@app.get("/api/v1/reports/all")
+def reports_all(period:str="daily"):
+    if period not in {"daily","weekly","monthly"}: raise HTTPException(status_code=400,detail="invalid period")
+    return {"status":"ok","reports":all_group_reports(period=period)}
+
+@app.post("/api/v1/reports/save")
+def reports_save(department:str, period:str="daily"):
+    if period not in {"daily","weekly","monthly"}: raise HTTPException(status_code=400,detail="invalid period")
+    return {"status":"ok","result":save_group_reports([group_report(department,period=period)])[0]}
+
+@app.post("/api/v1/reports/save-all")
+def reports_save_all(period:str="daily"):
+    if period not in {"daily","weekly","monthly"}: raise HTTPException(status_code=400,detail="invalid period")
+    return {"status":"ok","results":save_group_reports(all_group_reports(period=period))}
+
+@app.get("/api/v1/stock/status")
+def stock_agents_status(): return {"status":"ok",**stock_status()}
+@app.post("/api/v1/plan")
+def plan_mission(request:MissionRequest,target:str|None=None): return {"status":"ok","plan":planner.plan(request.objective,target=target).model_dump()}
+@app.post("/api/v1/execute")
+def execute_mission(request:dict[str,Any]):
+    objective=str(request.get("objective","")).strip()
+    if not objective: raise HTTPException(status_code=400,detail="objective is required")
+    return execution_loop.run(objective,target=request.get("target"),authorized=bool(request.get("authorized",False)),dry_run=bool(request.get("dry_run",True)),context=request.get("context") or {})
+@app.get("/api/v1/tools")
+def tools_list(): return {"status":"ok","count":len(tool_registry.list()),"tools":tool_registry.list()}
+@app.post("/api/v1/tools/execute")
+def tools_execute(request:dict[str,Any]): return tool_registry.execute(request["tool"],authorized=bool(request.get("authorized",False)),dry_run=bool(request.get("dry_run",True)),**request.get("args",{}))
+@app.get("/api/v1/providers")
+def providers(): return {"status":"ok","providers":[s.__dict__ for s in provider_router.states()]}
+@app.get("/api/v1/memory")
+def memory(limit:int=50): return {"status":"ok","items":memory_store.recent(limit)}
+@app.get("/api/v1/report")
+def report():
+    opportunities=[x.model_dump() for x in opportunity_engine.discover(Mission(objective="daily scan"))]
+    return daily_report(core.health(),opportunities,crm.summary(),revenue_engine.summary())
+@app.get("/api/v1/autonomous/status")
+def autonomous_status():
+    urls=autonomous_agent.configured_urls()
+    return {"status":"ok","enabled":settings.autonomous_enabled,"configured_targets":len(urls),"max_targets":settings.autonomous_max_targets,"next_actions":["research targets","qualify leads","draft personalized offers","record CRM","write memory/report"]}
+@app.post("/api/v1/autonomous/run")
+def autonomous_run(request:AutonomousRequest|None=None):
+    req=request or AutonomousRequest(); return autonomous_agent.run_cycle(req.objective,req.urls)
+@app.post("/api/v1/research")
+def public_research(request:ResearchRequest):
+    evidence=research.fetch(request.url); item=evidence.__dict__; memory_store.record("research",item,source="public_web"); return {"status":"ok","evidence":item}
+@app.post("/agi/mission",response_model=Mission)
+def run_mission(objective:str|None=None,request:MissionRequest|None=None):
+    goal=objective or (request.objective if request else "")
+    if not goal.strip(): raise HTTPException(status_code=400,detail="objective is required")
+    mission=agi_engine.run(goal); memory_store.record("mission",mission.model_dump(),source="agi_engine"); return mission
+@app.post("/agi/store-audit")
+def audit_store(request:StoreAuditRequest):
+    evidence=research.fetch(str(request.url)); item=evidence.__dict__; memory_store.record("store_audit",item,source="public_research")
+    return {"url":str(request.url),"status":"queued","evidence":item,"next":["collect permitted public evidence","analyze UX/conversion/SEO/marketing","identify evidence-backed opportunities","draft a personalized service offer"]}
+@app.get("/decision")
+def decision(action:str,confidence:float=0.8): return decision_engine.evaluate(action,confidence).__dict__
 
 
-@app.get("/dashboard/data")
-def dashboard_data() -> dict[str, Any]:
-    pending = []
-    for (session_id, action), item in _pending.items():
-        approval = getattr(item, "approval", None)
-        if approval is not None and not approval.approved:
-            pending.append({"session_id": session_id, "action": action, "description": getattr(item, "description", ""), "value": getattr(item, "value", None)})
-    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list()), "smart_minds": len(list_smart_minds()), "agents": len(_orchestrator.agents), "tools": len(_orchestrator.tools.list_tools()), "learning": _learning.summarize(), "revenue": _revenue_results}
+class ControlChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=12000)
+    session_id: str = Field(default="control", min_length=1, max_length=120)
 
 
-@app.get("/dashboard", response_class=HTMLResponse)
-def dashboard() -> str:
-    ui_path = os.path.join(os.path.dirname(__file__), "ui", "dashboard.html")
-    if os.path.exists(ui_path):
-        with open(ui_path, "r", encoding="utf-8") as fh:
-            return fh.read()
-    return "<h1>Hamed AGI</h1><p>واجهة التحكم غير متاحة حاليًا.</p>"
+@app.get("/control")
+def control_info():
+    return {"service":"ORVIA AGI control channel","status":"available","authentication":"X-Hamed-Control-Secret","endpoints":["/control/status","/control/chat","/control/mission","/control/dashboard","/control/logs"]}
+
+
+@app.get("/control/status")
+def control_status(x_hamed_control_secret: str | None = Header(default=None)):
+    require_control_secret(x_hamed_control_secret)
+    return status()
+
+
+@app.post("/control/chat")
+def control_chat(request: ControlChatRequest, x_hamed_control_secret: str | None = Header(default=None)):
+    require_control_secret(x_hamed_control_secret)
+    result = orchestrator.run(request.message)
+    memory_store.record("control_chat", {"session_id": request.session_id, "message": request.message}, source="control_channel")
+    return {"status":"ok","session_id":request.session_id,"message":request.message,"agent_results":[r.__dict__ for r in result]}
+
+
+@app.post("/control/mission")
+def control_mission(request: MissionRequest, x_hamed_control_secret: str | None = Header(default=None)):
+    require_control_secret(x_hamed_control_secret)
+    return run_mission(request=request)
+
+
+@app.get("/control/dashboard")
+def control_dashboard(x_hamed_control_secret: str | None = Header(default=None)):
+    require_control_secret(x_hamed_control_secret)
+    return {"status":"ok","daily":daily_control_report(),"agents":len(orchestrator.agents),"messages":len(agent_bus.messages),"health":health()}
+
+
+@app.get("/control/logs")
+def control_logs(source: str = "server", x_hamed_control_secret: str | None = Header(default=None)):
+    require_control_secret(x_hamed_control_secret)
+    return {"status":"ok","source":source,"lines":tail_log(source)}

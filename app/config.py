@@ -1,117 +1,39 @@
-"""
-Central configuration for Hamed AI.
+from pathlib import Path
 
-Every setting is read from environment variables (see .env.example).
-Nothing here requires a third-party package. Secrets are NEVER
-hard-coded and NEVER logged (see AuditLog.redact()).
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-Design rule from the spec (section 23/33):
-    Database, Telegram, OpenAI, Twilio, Paymob are all OPTIONAL for
-    Core to boot. A missing var simply disables the related feature
-    instead of crashing the process.
-"""
-from __future__ import annotations
-
-import os
-from dataclasses import dataclass, field
-
-from app.env_loader import load_env
-
-load_env()
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
-def _env_bool(name: str, default: bool = False) -> bool:
-    val = os.getenv(name)
-    if val is None:
-        return default
-    return val.strip().lower() in ("1", "true", "yes", "on")
-
-
-def _env_float(name: str, default: float) -> float:
-    val = os.getenv(name)
-    try:
-        return float(val) if val is not None else default
-    except ValueError:
-        return default
-
-
-@dataclass
-class ApprovalLimits:
-    """Thresholds above which an action requires human Approval.
-    Owner-configurable via env vars (spec section 13)."""
-
-    max_auto_payment_egp: float = field(
-        default_factory=lambda: _env_float("HAMED_MAX_AUTO_PAYMENT_EGP", 0.0)
-    )
-    max_auto_purchase_egp: float = field(
-        default_factory=lambda: _env_float("HAMED_MAX_AUTO_PURCHASE_EGP", 0.0)
-    )
-    max_auto_discount_pct: float = field(
-        default_factory=lambda: _env_float("HAMED_MAX_AUTO_DISCOUNT_PCT", 10.0)
-    )
-    max_negotiation_concession_pct: float = field(
-        default_factory=lambda: _env_float("HAMED_MAX_NEGOTIATION_CONCESSION_PCT", 15.0)
-    )
-    require_approval_for_contracts: bool = field(
-        default_factory=lambda: _env_bool("HAMED_REQUIRE_APPROVAL_CONTRACTS", True)
-    )
-
-
-@dataclass
-class Settings:
-    # --- Core ---
-    app_name: str = "Hamed AI"
-    environment: str = field(default_factory=lambda: os.getenv("HAMED_ENV", "development"))
-    debug: bool = field(default_factory=lambda: _env_bool("HAMED_DEBUG", False))
-
-    # --- Database (optional; falls back to local SQLite file, stdlib only) ---
-    database_url: str = field(
-        default_factory=lambda: os.getenv("DATABASE_URL", "sqlite:///./data/hamed.db")
-    )
-
-    # --- Telegram (optional) ---
-    telegram_bot_token: str | None = field(
-        default_factory=lambda: os.getenv("TELEGRAM_BOT_TOKEN")
-    )
-
-    # --- AI Providers (optional, at least one recommended) ---
-    openai_api_key: str | None = field(default_factory=lambda: os.getenv("OPENAI_API_KEY"))
-    anthropic_api_key: str | None = field(default_factory=lambda: os.getenv("ANTHROPIC_API_KEY"))
-    deepseek_api_key: str | None = field(default_factory=lambda: os.getenv("DEEPSEEK_API_KEY"))
-    mistral_api_key: str | None = field(default_factory=lambda: os.getenv("MISTRAL_API_KEY"))
-    default_ai_provider: str = field(
-        default_factory=lambda: os.getenv("HAMED_DEFAULT_AI_PROVIDER", "openai")
-    )
-
-    # --- Payments / Voice (optional) ---
-    twilio_account_sid: str | None = field(default_factory=lambda: os.getenv("TWILIO_ACCOUNT_SID"))
-    twilio_auth_token: str | None = field(default_factory=lambda: os.getenv("TWILIO_AUTH_TOKEN"))
-    paymob_api_key: str | None = field(default_factory=lambda: os.getenv("PAYMOB_API_KEY"))
-
-    # --- Web server (optional dashboard adapter) ---
-    host: str = field(default_factory=lambda: os.getenv("HAMED_HOST", "0.0.0.0"))
-    port: int = field(default_factory=lambda: int(os.getenv("PORT", os.getenv("HAMED_PORT", "8000"))))
-
-    approval_limits: ApprovalLimits = field(default_factory=ApprovalLimits)
-
-    def sqlite_path(self) -> str:
-        """Extract a plain filesystem path out of a sqlite:/// URL."""
-        if self.database_url.startswith("sqlite:///"):
-            return self.database_url[len("sqlite:///"):]
-        # Fallback: treat the whole string as a path
-        return self.database_url
-
-    def configured_ai_providers(self) -> list[str]:
-        providers = []
-        if self.openai_api_key:
-            providers.append("openai")
-        if self.anthropic_api_key:
-            providers.append("claude")
-        if self.deepseek_api_key:
-            providers.append("deepseek")
-        if self.mistral_api_key:
-            providers.append("mistral")
-        return providers
+class Settings(BaseSettings):
+    app_name: str = "ORVIA AGI"
+    environment: str = "development"
+    host: str = "0.0.0.0"
+    port: int = 8000
+    auto_execution_enabled: bool = True
+    autonomous_enabled: bool = True
+    autonomous_max_targets: int = 10
+    require_approval_for_financial_actions: bool = True
+    min_opportunity_score: float = 0.60
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-5-mini"
+    anthropic_api_key: str | None = None
+    anthropic_model: str = "claude"
+    gemini_api_key: str | None = None
+    gemini_model: str = "gemini"
+    deepseek_api_key: str | None = None
+    deepseek_model: str = "deepseek-chat"
+    kimi_api_key: str | None = None
+    kimi_model: str = "kimi"
+    youtube_enabled: bool = False
+    youtube_client_id: str | None = None
+    youtube_client_secret: str | None = None
+    youtube_kids_channel_id: str | None = None
+    youtube_islamic_channel_id: str | None = None
+    telegram_bot_token: str | None = None
+    whatsapp_access_token: str | None = None
+    whatsapp_phone_number_id: str | None = None
+    model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")
 
 
 settings = Settings()

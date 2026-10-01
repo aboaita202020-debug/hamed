@@ -1,0 +1,15 @@
+# Freelance Automation System - Requirements
+# Note: Core system uses Python stdlib only (no external dependencies)
+
+# Optional: For actual AI API integration (uncomment when needed)
+# anthropic>=0.39.0
+# openai>=1.50.0
+# google-generativeai>=0.8.0
+
+# Optional: For platform API integration (uncomment when needed)
+# requests>=2.31.0
+# python-dotenv>=1.0.0
+
+# Optional: For dashboard (uncomment when needed)
+# flask>=3.0.0
+# flask-cors>=4.0.0

@@ -1,0 +1,332 @@
+"""Unified Hamed AGI application entrypoint."""
+from __future__ import annotations
+
+import os
+from typing import Any
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel, Field
+
+from .agent_worker import HamedWorker
+from .agents.commercial_brain import build_plan
+from .agents.learning_engine import CommercialLearningEngine
+from .agents.money_engine import scan_revenue_opportunities
+from .agents.mission_engine import build_mission, infer_domain
+from .agents.orchestrator import HamedOrchestrator
+from .agents.provider import MultiBrainProvider
+from .agents.smart_minds import list_smart_minds
+from .config import settings
+from .channels.whatsapp_web import build_whatsapp_web_url, open_whatsapp_web
+from .channels.content_channels import channel_plan, channel_status
+from .instagram_routes import router as instagram_router
+from .instagram_webhooks import router as instagram_webhook_router
+
+
+class FallbackProvider:
+    def generate_response(self, messages: list[dict[str, str]], *, system: str = "") -> str:
+        text = messages[-1].get("content", "") if messages else ""
+        lower = text.lower()
+        if any(k in lower for k in ("شراء", "اشتري", "مشتريات")):
+            return "أقدر أساعدك في تقييم الشراء وحساب التكلفة والربح والمخاطر، لكن تنفيذ الشراء نفسه يحتاج موافقة صريحة."
+        if any(k in lower for k in ("موقع", "متجر", "website", "store")):
+            return "أقدر أراجع احتياج النشاط وأجهز خطة موقع أو متجر بناءً على معلومات مؤكدة."
+        if any(k in lower for k in ("تسويق بالعمولة", "affiliate", "عمولة")):
+            return "أقدر أقيّم برامج التسويق بالعمولة وأبني خطة اختبار وقياس."
+        return "أنا حامد AGI. اكتب هدفك التجاري وسأحوّله إلى بحث وتحليل وخطوات تنفيذ مناسبة."
+
+    def web_research(self, query: str, *, system: str = "") -> str:
+        return "لا يوجد مزود AI مفعّل حاليًا. فعّل مزودًا مدعومًا أو شغّل Ollama المحلي."
+
+
+class ChatRequest(BaseModel):
+    session_id: str = Field(default="default", min_length=1, max_length=120)
+    message: str = Field(min_length=1, max_length=12000)
+
+
+class PlanRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=12000)
+    action: str | None = Field(default=None, max_length=80)
+
+
+class ActionRequest(BaseModel):
+    session_id: str = Field(default="default", min_length=1, max_length=120)
+    action: str = Field(min_length=1, max_length=80)
+    description: str = Field(min_length=1, max_length=2000)
+    value: float | None = None
+
+
+class DecisionRequest(BaseModel):
+    session_id: str = Field(default="default", min_length=1, max_length=120)
+    action: str = Field(min_length=1, max_length=80)
+    approved: bool
+
+
+class MissionRequest(BaseModel):
+    goal: str = Field(min_length=1, max_length=4000)
+    tasks: list[str] | None = Field(default=None, max_length=30)
+
+
+class AutopilotRequest(BaseModel):
+    goal: str = Field(min_length=1, max_length=4000)
+    execute: bool = True
+
+
+class WhatsAppWebPrepareRequest(BaseModel):
+    session_id: str = Field(default="default", min_length=1, max_length=120)
+    to: str = Field(min_length=8, max_length=30)
+    customer_name: str = ""
+    business_name: str = ""
+    message: str = Field(min_length=1, max_length=4000)
+    permitted_contact: bool = False
+
+
+app = FastAPI(title="Hamed AGI", version="1.0.0", docs_url="/docs")
+app.include_router(instagram_router)
+app.include_router(instagram_webhook_router)
+try:
+    _provider = MultiBrainProvider()
+except Exception:
+    _provider = FallbackProvider()
+
+_orchestrator = HamedOrchestrator(brain_provider=_provider)
+_worker = HamedWorker(interval_seconds=int(os.getenv("HAMED_WORKER_INTERVAL", "900")))
+_learning = CommercialLearningEngine(seed_curriculum=True)
+_pending: dict[tuple[str, str], Any] = {}
+_revenue_results: dict[str, Any] = {"status": "empty", "records": [], "updated_at": None}
+
+
+def autonomous_scan() -> dict[str, Any]:
+    prompt = "حدد أولويات العمل التجاري الآمن لحامد الآن. أخرج 3 مهام عملية للبحث أو التحليل بدون شراء أو دفع أو نشر أو تعاقد."
+    plan = build_plan(prompt)
+    return {"status": "ok", "task_type": "commercial_scan", "objective": plan.objective.value, "next_steps": plan.next_steps, "requires_research": plan.requires_research, "approval_required": plan.approval_required, "safe_mode": True}
+
+
+@app.on_event("startup")
+async def start_worker() -> None:
+    if os.getenv("HAMED_WORKER_ENABLED", "true").lower() == "true":
+        _worker.start(hooks=[autonomous_scan])
+
+
+@app.on_event("shutdown")
+async def stop_worker() -> None:
+    _worker.stop()
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {"name": "Hamed AGI", "status": "running", "mode": settings.environment}
+
+
+@app.get("/health")
+def health() -> dict[str, Any]:
+    if isinstance(_provider, MultiBrainProvider):
+        brains = list(_provider.available_brains())
+        ai_provider = brains[0] if brains else "none"
+    else:
+        brains, ai_provider = [], "fallback"
+    return {"status": "ok", "app": "Hamed AGI", "ai_provider": ai_provider, "brains": brains, "smart_minds": len(list_smart_minds()), "telegram": bool(settings.telegram_bot_token), "voice": bool(settings.twilio_account_sid and settings.twilio_auth_token), "autonomous_mode": os.getenv("HAMED_AUTONOMOUS_MODE", "true").lower() == "true", "worker": _worker.status()}
+
+
+@app.get("/swarm/status")
+def swarm_status() -> dict[str, Any]:
+    from .agents.swarm_bus import swarm_bus
+    return {"status": "ok", **_orchestrator.swarm_status(), "bus": swarm_bus.status()}
+
+
+@app.get("/swarm/messages")
+def swarm_messages(limit: int = 100) -> dict[str, Any]:
+    from .agents.swarm_bus import swarm_bus
+    return {"status": "ok", "messages": swarm_bus.recent(limit)}
+
+
+@app.post("/swarm/run")
+def swarm_run(request: MissionRequest) -> dict[str, Any]:
+    return {"status": "ok", **_orchestrator.run_swarm(request.goal, limit=None)}
+
+
+@app.get("/smart-minds")
+def smart_minds() -> dict[str, Any]:
+    minds = list_smart_minds()
+    return {"status": "ok", "count": len(minds), "minds": minds}
+
+
+@app.get("/capabilities")
+def capabilities() -> dict[str, Any]:
+    return {"status": "ok", "domains": {d: [a for _, a in build_mission("", d)] for d in ("general", "commerce", "affiliate", "service", "website", "marketing", "b2b")}}
+
+
+@app.get("/money/opportunity-scan")
+def money_opportunity_scan() -> dict[str, Any]:
+    """Find evidence-backed monetization opportunities and publish them to the dashboard feed."""
+    from datetime import datetime, timezone
+    global _revenue_results
+    result = scan_revenue_opportunities()
+    _revenue_results = {**result, "updated_at": datetime.now(timezone.utc).isoformat()}
+    return _revenue_results
+
+
+@app.get("/dashboard/revenue")
+def dashboard_revenue() -> dict[str, Any]:
+    """Return the latest revenue-search results for the live dashboard."""
+    return _revenue_results
+
+
+@app.post("/outreach/whatsapp-web/prepare")
+def prepare_whatsapp_web(request: WhatsAppWebPrepareRequest) -> dict[str, Any]:
+    if not request.permitted_contact:
+        raise HTTPException(status_code=403, detail="A permitted/approved contact is required before opening an outbound message.")
+    url = build_whatsapp_web_url(request.to, request.message)
+    return {
+        "status": "prepared",
+        "session_id": request.session_id,
+        "customer_name": request.customer_name,
+        "business_name": request.business_name,
+        "channel": "whatsapp_web",
+        "url": url,
+        "sent": False,
+        "next_step": "Open the URL and press Send in WhatsApp Web.",
+    }
+
+
+@app.post("/outreach/whatsapp-web/open")
+def open_prepared_whatsapp_web(request: WhatsAppWebPrepareRequest) -> dict[str, Any]:
+    if not request.permitted_contact:
+        raise HTTPException(status_code=403, detail="A permitted/approved contact is required before opening an outbound message.")
+    url = open_whatsapp_web(request.to, request.message)
+    return {
+        "status": "opened",
+        "session_id": request.session_id,
+        "customer_name": request.customer_name,
+        "business_name": request.business_name,
+        "channel": "whatsapp_web",
+        "url": url,
+        "sent": False,
+        "next_step": "Press Send in WhatsApp Web.",
+    }
+
+
+@app.get("/channels")
+def channels() -> dict[str, Any]:
+    return channel_status()
+
+
+@app.get("/channels/{channel_key}")
+def channel(channel_key: str) -> dict[str, Any]:
+    try:
+        return {"status": "ok", "channel": channel_plan(channel_key)}
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Channel not found") from exc
+
+
+@app.get("/learning")
+def learning() -> dict[str, Any]:
+    return {"status": "ok", "summary": _learning.summarize(), "curriculum": _learning.curriculum()}
+
+
+@app.get("/worker/status")
+def worker_status() -> dict[str, Any]:
+    return _worker.status()
+
+
+@app.post("/worker/run")
+def worker_run() -> dict[str, Any]:
+    return _worker.run_once(hooks=[autonomous_scan])
+
+
+@app.post("/missions")
+def create_mission(request: MissionRequest) -> dict[str, Any]:
+    mission = _worker.submit_mission(request.goal, request.tasks)
+    mission["domain"] = infer_domain(request.goal)
+    mission["execution_plan"] = build_mission(request.goal, mission["domain"])
+    return {"status": "ok", "mission": mission, "safe_mode": True}
+
+
+@app.get("/missions")
+def list_missions() -> dict[str, Any]:
+    missions = _worker.missions.list()
+    return {"status": "ok", "missions": missions, "count": len(missions)}
+
+
+@app.get("/missions/{mission_id}")
+def get_mission(mission_id: str) -> dict[str, Any]:
+    mission = _worker.missions.get(mission_id)
+    if mission is None:
+        raise HTTPException(status_code=404, detail="Mission not found")
+    return {"status": "ok", "mission": mission}
+
+
+@app.post("/missions/{mission_id}/run")
+def run_mission(mission_id: str) -> dict[str, Any]:
+    def execute(description: str) -> dict[str, Any]:
+        plan = build_plan(description)
+        return {"objective": plan.objective.value, "intent": plan.intent, "next_steps": plan.next_steps, "requires_research": plan.requires_research, "approval_required": plan.approval_required, "confidence": plan.confidence, "notes": plan.notes, "safe_mode": True}
+    try:
+        return {"status": "ok", "mission": _worker.run_mission_once(mission_id, execute)}
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Mission not found") from exc
+
+
+@app.post("/autopilot/run")
+def autopilot_run(request: AutopilotRequest) -> dict[str, Any]:
+    from .agents.autopilot import run_autopilot
+    return run_autopilot(_orchestrator, request.goal, execute=request.execute)
+
+
+@app.post("/chat")
+def chat(request: ChatRequest) -> dict[str, str]:
+    try:
+        reply = _orchestrator.respond(request.session_id, request.message)
+        return {"session_id": request.session_id, "reply": reply}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/plan")
+def plan(request: PlanRequest) -> dict[str, Any]:
+    result = build_plan(request.message, action=request.action)
+    return {"objective": result.objective.value, "intent": result.intent, "next_steps": result.next_steps, "requires_research": result.requires_research, "approval_required": result.approval_required, "confidence": result.confidence, "notes": result.notes}
+
+
+@app.post("/actions/prepare")
+def prepare(request: ActionRequest) -> dict[str, Any]:
+    message = _orchestrator.prepare_high_impact_action(request.session_id, request.action, request.description, request.value)
+    _pending[(request.session_id, request.action)] = _orchestrator.sessions[request.session_id].pending_actions.get(request.action)
+    return {"status": "ok", "message": message, "action": request.action, "value": request.value}
+
+
+@app.post("/actions/decide")
+def decide(request: DecisionRequest) -> dict[str, Any]:
+    key = (request.session_id, request.action)
+    item = _pending.get(key)
+    if item is None:
+        item = _orchestrator.sessions.get(request.session_id, type("S", (), {"pending_actions": {}})()).pending_actions.get(request.action)
+    if item is None:
+        raise HTTPException(status_code=404, detail="No pending action found")
+    if item.approval is None:
+        return {"status": "ok", "executed": False, "message": "Action does not require approval."}
+    item.approval.approved = bool(request.approved)
+    if not request.approved:
+        return {"status": "rejected", "executed": False}
+    from .agents.workflow import execute_approved
+    executed = execute_approved(item)
+    return {"status": "approved", "executed": executed}
+
+
+@app.get("/dashboard/data")
+def dashboard_data() -> dict[str, Any]:
+    pending = []
+    for (session_id, action), item in _pending.items():
+        approval = getattr(item, "approval", None)
+        if approval is not None and not approval.approved:
+            pending.append({"session_id": session_id, "action": action, "description": getattr(item, "description", ""), "value": getattr(item, "value", None)})
+    return {"pending_approvals": pending, "count": len(pending), "missions": len(_worker.missions.list()), "smart_minds": len(list_smart_minds()), "agents": len(_orchestrator.agents), "tools": len(_orchestrator.tools.list_tools()), "learning": _learning.summarize(), "revenue": _revenue_results}
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def dashboard() -> str:
+    ui_path = os.path.join(os.path.dirname(__file__), "ui", "dashboard.html")
+    if os.path.exists(ui_path):
+        with open(ui_path, "r", encoding="utf-8") as fh:
+            return fh.read()
+    return "<h1>Hamed AGI</h1><p>واجهة التحكم غير متاحة حاليًا.</p>"
