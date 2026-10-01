@@ -1,0 +1,18 @@
+﻿ORVIA × HAMED — UPDATED PROJECT NOTE
+
+Last update: 2026-10-01
+
+Current HAMED AGI updates:
+- Autonomous YouTube channel structure added.
+- LumiKids: 100 dedicated assistants.
+- English learning channel: 100 dedicated assistants.
+- Each channel: 1 main video daily + 1 accompanying Short/Reel.
+- Publishing strategy: learn from channel analytics.
+- Channel workflow: trend research → competitor analysis → opportunity selection → original creation → quality/policy review → publishing → analytics → learning.
+- New channel API routes were added locally: /channels, /channels/lumilkids, /channels/english_songs.
+- Local commit: fa2b920.
+- Full local test suite was run and showed no failures in the current output.
+- Existing local data files were preserved.
+
+ORVIA relationship:
+This file is the updated handoff/reference note connecting ORVIA with HAMED AGI. It does not replace or delete the original project files.

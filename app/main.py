@@ -68,6 +68,10 @@ def dashboard():
     content = Path(__file__).with_name("dashboard.html").read_text(encoding="utf-8")
     return content if "ORVIA AGI" in content else "<!-- ORVIA AGI -->\n" + content
 
+@app.get("/orvia",response_class=HTMLResponse)
+def orvia_dashboard():
+    return Path(__file__).with_name("orvia_dashboard.html").read_text(encoding="utf-8")
+
 @app.get("/health")
 def health():
     return {"status":"ok","service":"orvia-agi",**core.health(),"agents":len(orchestrator.agents),"agent_messages":len(agent_bus.messages),"providers":provider_router.health(),"autonomous_agent":settings.autonomous_enabled}
