@@ -1,0 +1,1776 @@
+2026-10-01 02:58:53 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 02:58:53 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 02:58:53 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 02:58:53 | INFO     | telegram.ext.Application | Application started
+2026-10-01 02:58:58 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 02:58:58 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:58:58 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:04 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 02:59:04 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:04 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:11 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 02:59:11 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:11 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:19 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 02:59:19 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:19 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:28 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 02:59:28 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:28 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[Thu 10/01/2026  2:59:33.24] Starting Hamed Telegram bot 
+2026-10-01 02:59:35 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 02:59:35 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 02:59:35 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 02:59:35 | INFO     | telegram.ext.Application | Application started
+2026-10-01 02:59:41 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 02:59:41 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:41 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:48 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 02:59:48 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:48 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[Thu 10/01/2026  2:59:50.07] Bot stopped. Restarting in 3 seconds... 
+[Thu 10/01/2026  2:59:50.11] Starting Hamed Telegram bot 
+2026-10-01 02:59:51 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 02:59:52 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 02:59:52 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 02:59:52 | INFO     | telegram.ext.Application | Application started
+2026-10-01 02:59:56 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 02:59:56 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 02:59:56 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:03 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:00:03 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:03 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:09 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:00:09 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:09 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:17 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:00:17 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:17 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:25 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:00:25 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:25 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:34 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:00:34 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:34 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:48 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:00:48 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:00:48 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:01:05 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:01:05 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:01:05 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:01:28 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:01:28 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:01:28 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:02:00 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:02:00 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:02:00 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:02:35 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:02:35 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:02:35 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[Thu 10/01/2026  3:02:39.51] Starting Hamed Telegram bot 
+2026-10-01 03:02:42 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 03:02:42 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 03:02:42 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 03:02:42 | INFO     | telegram.ext.Application | Application started
+[Thu 10/01/2026  3:02:46.89] Bot stopped. Restarting in 3 seconds... 
+[Thu 10/01/2026  3:02:46.97] Starting Hamed Telegram bot 
+2026-10-01 03:02:48 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 03:02:49 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 03:02:49 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 03:02:49 | INFO     | telegram.ext.Application | Application started
+2026-10-01 03:02:55 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:02:55 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:02:55 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:01 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:03:01 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:01 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[Thu 10/01/2026  3:03:06.56] Bot stopped. Restarting in 3 seconds... 
+[Thu 10/01/2026  3:03:06.64] Starting Hamed Telegram bot 
+2026-10-01 03:03:08 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 03:03:08 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 03:03:09 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 03:03:09 | INFO     | telegram.ext.Application | Application started
+2026-10-01 03:03:14 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:03:14 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:14 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:21 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:03:21 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:21 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:28 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:03:28 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:28 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:36 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:03:36 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:36 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:45 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:03:45 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:45 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:56 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:03:56 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:03:56 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:04:10 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:04:10 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:04:10 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:04:26 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:04:26 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:04:26 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[Thu 10/01/2026  3:04:39.69] Bot stopped. Restarting in 3 seconds... 
+[Thu 10/01/2026  3:04:39.77] Starting Hamed Telegram bot 
+2026-10-01 03:04:41 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 03:04:42 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 03:04:42 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 03:04:42 | INFO     | telegram.ext.Application | Application started
+2026-10-01 03:04:48 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:04:48 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:04:48 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:04:54 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:04:54 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:04:54 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:01 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:05:01 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:01 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:09 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:05:09 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:09 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:18 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:05:18 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:18 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[Thu 10/01/2026  3:05:20.51] Bot stopped. Restarting in 3 seconds... 
+[Thu 10/01/2026  3:05:20.60] Starting Hamed Telegram bot 
+2026-10-01 03:05:22 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 03:05:23 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 03:05:23 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 03:05:23 | INFO     | telegram.ext.Application | Application started
+2026-10-01 03:05:29 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:05:29 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:29 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:35 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:05:35 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:35 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:43 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:05:43 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:43 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:51 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:05:51 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:05:51 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:06:00 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:06:00 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:06:00 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:06:11 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:06:11 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:06:11 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:06:24 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:06:24 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:06:24 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:06:41 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:06:41 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:06:41 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[Thu 10/01/2026  3:08:32.62] Starting Hamed Telegram bot 
+2026-10-01 03:08:34 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 03:08:34 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 03:08:35 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 03:08:35 | INFO     | telegram.ext.Application | Application started
+2026-10-01 03:08:40 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:08:40 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:08:40 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:08:47 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:08:47 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:08:47 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:08:54 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:08:54 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:08:54 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:09:02 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:09:02 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:09:02 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[Thu 10/01/2026  3:09:05.23] Bot stopped. Restarting in 3 seconds... 
+[Thu 10/01/2026  3:09:11.77] Starting Hamed Telegram bot 
+2026-10-01 03:09:13 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 03:09:14 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 03:09:14 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 03:09:14 | INFO     | telegram.ext.Application | Application started
+2026-10-01 03:09:20 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:09:20 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:09:20 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:09:26 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:09:26 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:09:26 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:09:33 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:09:33 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:09:33 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:09:41 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getUpdates "HTTP/1.1 409 Conflict"
+2026-10-01 03:09:41 | ERROR    | telegram.ext.Updater | Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-10-01 03:09:41 | ERROR    | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\hamed agi\hamed-main\hamed-main\.venv\Lib\site-packages\telegram\request\_baserequest.py", line 381, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+[Thu 10/01/2026  3:09:46.26] Starting Hamed Telegram bot 
+2026-10-01 03:09:48 | INFO     | run_telegram | Hamed AI Telegram bot starting (polling mode)...
+2026-10-01 03:09:49 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/getMe "HTTP/1.1 200 OK"
+2026-10-01 03:09:49 | INFO     | httpx | HTTP Request: POST https://api.telegram.org/bot8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU/deleteWebhook "HTTP/1.1 200 OK"
+2026-10-01 03:09:49 | INFO     | telegram.ext.Application | Application started
+[Thu 10/01/2026  3:09:53.10] Bot stopped. Restarting in 3 seconds... 

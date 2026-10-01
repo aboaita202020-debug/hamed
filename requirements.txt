@@ -1,47 +1,54 @@
-﻿
-# AI providers
-# Database
-# Date/Time Utilities
-# Development
-# Environment Variables
-# flask-debugtoolbar==0.14.1
 # Hamed AI - Python Dependencies
-# HTTP Requests (for API integrations)
 # Install with: pip install -r requirements.txt
-# json is built-in, no additional packages needed
-# JSON Processing
-# Optional: Email
-# Optional: Payment Processing
-# Optional: SMS
-# Optional: Social Media APIs
-# paypalrestsdk==1.13.0
-# QR generation
-# sendgrid==6.10.0
-# SQLite is built-in, no additional packages needed
-# stripe==7.0.0
-# Telegram Bot integrations
-# Testing
-# tweepy==4.14.0
-# twilio==8.10.0
+
 # Web Framework
-anthropic>=0.70,<1
-fastapi>=0.115,<1
 Flask==3.0.0
 Flask-CORS==4.0.0
-google-auth>=2.30,<3
-gspread>=6,<7
-httpx>=0.27,<1
-openai>=1.100,<3
-pydantic>=2.8,<3
-pydantic-settings>=2.4,<3
-pyTelegramBotAPI>=4.29,<5
-pytest==7.4.3
-pytest>=8,<9
-pytest-cov==4.1.0
-python-dateutil==2.8.2
-python-dotenv==1.0.0
-python-telegram-bot==20.7
-qrcode[pil]>=7.4,<9
-requests==2.31.0
-uvicorn[standard]>=0.30,<1
+fastapi>=0.115,<1
 uvicorn>=0.34,<1
+
+# Database
+# SQLite is built-in, no additional packages needed
+
+# HTTP Requests (for API integrations)
+requests==2.31.0
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Date/Time Utilities
+python-dateutil==2.8.2
+
+# JSON Processing
+# json is built-in, no additional packages needed
+
+# AI providers
+openai>=1.100,<3
+anthropic>=0.70,<1
+
+# Telegram Bot integrations
+python-telegram-bot==20.7
+pyTelegramBotAPI>=4.29,<5
+
+# QR generation
+qrcode[pil]>=7.4,<9
+
+# Optional: Social Media APIs
+# tweepy==4.14.0
+
+# Optional: Payment Processing
+# stripe==7.0.0
+# paypalrestsdk==1.13.0
+
+# Optional: Email
+# sendgrid==6.10.0
+
+# Optional: SMS
+# twilio==8.10.0
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
+
+# Development
+# flask-debugtoolbar==0.14.1

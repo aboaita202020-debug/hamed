@@ -1,0 +1,6 @@
+
+> dev
+> vite --host 127.0.0.1 --port 3000
+
+'vite' is not recognized as an internal or external command,
+operable program or batch file.

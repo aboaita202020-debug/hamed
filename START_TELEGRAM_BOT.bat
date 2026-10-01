@@ -67,8 +67,15 @@ echo.
 echo ═══════════════════════════════════════════════════════════
 echo.
 
-:: Start the bot
-cd freelance_automation
-python bots/telegram_bot.py
+:: Load Telegram token from the protected desktop API file
+for /f "tokens=1,* delims==" %%A in ('findstr /b "TELEGRAM_BOT_TOKEN=" "C:\Users\2hamed\Desktop\API.txt"') do set "TELEGRAM_BOT_TOKEN=%%B"
+if not defined TELEGRAM_BOT_TOKEN (
+    echo ❌ TELEGRAM_BOT_TOKEN not found in API.txt
+    pause
+    exit /b 1
+)
+
+:: Start the current Hamed Telegram runner
+python scripts\run_telegram.py
 
 pause
