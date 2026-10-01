@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORVIA AGI — مركز التحكم</title>
+<style>
+:root{--bg:#06101d;--panel:#0d1a2d;--panel2:#12243d;--line:#203653;--text:#edf6ff;--muted:#8ea4bf;--accent:#63d8ff;--good:#46d58a;--warn:#ffd166;--bad:#ff6b7a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#12355a 0,#06101d 45%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.app{display:grid;grid-template-columns:270px 1fr;min-height:100vh}.sidebar{border-left:1px solid var(--line);background:rgba(5,13,24,.94);padding:22px 15px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-size:25px;font-weight:900;margin:3px 8px}.brand span{color:var(--accent)}.muted{color:var(--muted)}.nav-title{font-size:11px;color:#637b98;margin:24px 10px 7px;text-transform:uppercase}
+.nav button{width:100%;border:0;background:transparent;color:var(--muted);padding:11px 12px;border-radius:11px;text-align:right;font-size:14px;cursor:pointer;margin:2px 0}.nav button:hover,.nav button.active{background:var(--panel2);color:var(--text)}
+.agent-menu{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#091526}.agent-menu button{display:flex;justify-content:space-between;width:100%;border:0;background:transparent;color:var(--text);padding:9px 6px;cursor:pointer;border-radius:9px}.agent-menu button:hover{background:#10243c}
+.main{padding:25px;max-width:1600px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}.status{display:flex;align-items:center;gap:8px;color:var(--good);font-weight:800}.dot{width:9px;height:9px;border-radius:50%;background:var(--good);box-shadow:0 0 14px var(--good)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.card{background:rgba(13,26,45,.9);border:1px solid var(--line);border-radius:17px;padding:17px;box-shadow:0 14px 38px rgba(0,0,0,.16)}.metric{font-size:27px;font-weight:900;margin-top:6px}.label{font-size:12px;color:var(--muted)}
+.section{margin-top:16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.section-head h2{margin:0;font-size:19px}.btn{border:1px solid var(--line);background:#10223a;color:var(--text);border-radius:10px;padding:9px 13px;cursor:pointer}.btn.primary{background:var(--accent);color:#04111c;border:0;font-weight:900}
+.groups{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.group{cursor:pointer;transition:.15s}.group:hover{transform:translateY(-2px);border-color:#3d6d9c}.group .row{display:flex;justify-content:space-between;gap:8px;align-items:center}.badge{background:#163455;border:1px solid #28527e;padding:4px 8px;border-radius:999px;font-size:11px}.ok{color:var(--good)}
+.report-layout{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:11px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}.table th{color:var(--muted);font-weight:600}.agent-list{display:grid;gap:8px;max-height:540px;overflow:auto}.agent{padding:11px;border:1px solid var(--line);border-radius:11px;background:#091627;cursor:pointer}.agent:hover{background:#10233a}.agent small{display:block;color:var(--muted);margin-top:4px}.detail{display:grid;gap:10px}.detail-item{padding:11px;border:1px solid var(--line);border-radius:11px;background:#091627}.empty{padding:25px;text-align:center;color:var(--muted)}
+@media(max-width:1100px){.groups{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.report-layout{grid-template-columns:1fr}}
+@media(max-width:850px){.app{display:block}.sidebar{position:relative;height:auto;border-left:0;border-bottom:1px solid var(--line)}.main{padding:14px}.groups{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><span>∞</span> ORVIA</div>
+  <div class="muted" style="margin:0 8px">AI Agents Operating System</div>
+  <div class="nav-title">التنقل</div>
+  <nav class="nav">
+    <button class="active" onclick="showHome()">🏠 الرئيسية</button>
+    <button onclick="showAgents()">🤖 الوكلاء</button>
+    <button onclick="showReports()">📊 التقارير</button>
+    <button onclick="showSection('🧩 الفرص')">🎯 الفرص</button>
+    <button onclick="showSection('👥 العملاء')">👥 العملاء</button>
+    <button onclick="showSection('⚙️ الإعدادات')">⚙️ الإعدادات</button>
+  </nav>
+  <div class="nav-title">مجموعات الوكلاء</div>
+  <div id="sideGroups" class="agent-menu"></div>
+</aside>
+<main class="main">
+  <div class="top">
+    <div><h1 id="pageTitle" style="margin:0 0 5px">مركز تحكم ORVIA</h1><div class="muted">كل مجموعة لها مساحة مستقلة ووكلاؤها وتقاريرها الخاصة.</div></div>
+    <div class="status"><span class="dot"></span><span id="systemStatus">يعمل</span></div>
+  </div>
+  <div id="content"></div>
+</main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let agents=[],departments={};
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function api(path,options={}){const r=await fetch(path,options);if(!r.ok)throw new Error(await r.text());return r.json();}
+async function loadData(){
+  const [a,h]=await Promise.all([api('/api/v1/agents'),api('/health')]);
+  agents=a.agents||[]; departments=a.departments||{};
+  $('systemStatus').textContent=h.status==='ok'?'يعمل':'يحتاج فحص';
+  renderSideGroups();
+}
+function renderSideGroups(){
+  $('sideGroups').innerHTML=Object.entries(departments).map(([d,n])=>
+    '<button onclick="showGroup(\''+encodeURIComponent(d)+'\')"><span>'+esc(d)+'</span><b>'+n+'</b></button>').join('');
+}
+function showHome(){
+  $('pageTitle').textContent='مركز تحكم ORVIA';
+  $('content').innerHTML='<div class="grid">'+
+    metric('🤖','إجمالي الوكلاء',agents.length,'شبكة التشغيل الرئيسية')+
+    metric('🧩','المجموعات',Object.keys(departments).length,'كل مجموعة مستقلة')+
+    metric('📋','تقارير المجموعات',Object.keys(departments).length,'تقرير خاص لكل مجموعة')+
+    metric('🟢','حالة النظام','ONLINE','مركز التحكم يعمل')+
+    '</div>'+
+    '<section class="section"><div class="section-head"><h2>مجموعات الوكلاء</h2><button class="btn primary" onclick="showAgents()">عرض جميع الوكلاء</button></div><div id="groups" class="groups"></div></section>'+
+    '<section class="section"><div class="card"><h2 style="margin-top:0">📌 كيف تتابع المجموعة؟</h2><div class="muted">اضغط على أي مجموعة لرؤية الوكلاء العاملين فيها، ما أنجزوه، ما اكتشفوه، ما تعلموه، الأخطاء، التعاونات، التنبيهات، العمل الجاري، والخطوات التالية. ويمكن حفظ التقرير في Google Sheets عند تفعيل التكامل.</div></div></section>';
+  $('groups').innerHTML=Object.entries(departments).map(([d,n])=>
+    '<div class="card group" onclick="showGroup(\''+encodeURIComponent(d)+'\')"><div class="row"><h3 style="margin:0">'+esc(d)+'</h3><span class="badge">'+n+' وكيل</span></div><p class="muted">📊 تقرير المجموعة · 👥 الوكلاء · 🟢 الحالة</p><div class="ok">فتح غرفة المجموعة ←</div></div>').join('');
+}
+function metric(icon,label,value,note){return '<div class="card"><div class="label">'+icon+' '+label+'</div><div class="metric">'+esc(value)+'</div><div class="label">'+note+'</div></div>';}
+async function showAgents(){
+  $('pageTitle').textContent='جميع الوكلاء';
+  $('content').innerHTML='<section class="section"><div class="card"><div class="section-head"><h2>🤖 شبكة ORVIA — '+agents.length+' وكيل</h2><input id="filter" class="btn" style="min-width:240px" placeholder="ابحث باسم الوكيل أو المجموعة"></div><div id="agentList" class="agent-list"></div></div></section>';
+  renderAgents(agents);
+  $('filter').oninput=e=>renderAgents(agents.filter(a=>(a.name+' '+a.department+' '+a.role).toLowerCase().includes(e.target.value.toLowerCase())));
+}
+function renderAgents(list){
+  $('agentList').innerHTML=list.map(a=>'<div class="agent" onclick="showAgent(\''+encodeURIComponent(a.name)+'\')"><b>'+esc(a.name)+'</b><small>'+esc(a.department)+' · '+esc(a.role)+(a.leader?' · قائد المجموعة':'')+'</small></div>').join('')||'<div class="empty">لا يوجد وكيل مطابق.</div>';
+}
+async function showAgent(name){
+  const a=agents.find(x=>x.name===decodeURIComponent(name));if(!a)return;
+  $('pageTitle').textContent=a.name;
+  $('content').innerHTML='<section class="section"><div class="card"><div class="section-head"><h2>🤖 '+esc(a.name)+'</h2><button class="btn" onclick="showGroup(\''+encodeURIComponent(a.department)+'\')">رجوع للمجموعة</button></div><div class="detail">'+
+    '<div class="detail-item"><b>القسم</b><br>'+esc(a.department)+'</div>'+
+    '<div class="detail-item"><b>الدور</b><br>'+esc(a.role)+'</div>'+
+    '<div class="detail-item"><b>القدرات</b><br>'+esc((a.capabilities||[]).join(' · '))+'</div>'+
+    '<div class="detail-item"><b>تقرير العمل</b><br><span class="muted">يظهر داخل تقرير المجموعة: الإنجاز، الاكتشافات، التعلم، الأخطاء، التعاونات، والتنبيهات.</span></div>'+
+    '</div></div></section>';
+}
+async function showGroup(encoded){
+  const dept=decodeURIComponent(encoded);$('pageTitle').textContent=dept;
+  $('content').innerHTML='<section class="section"><div class="grid">'+metric('🤖','الوكلاء',departments[dept]||0,'داخل هذه المجموعة')+metric('📋','التقرير','يومي','مع سجل التقارير')+metric('🟢','الحالة','نشطة','متابعة مستمرة')+metric('☁️','Google Sheets','متاح','عند التفعيل')+'</div></section>'+
+    '<section class="section report-layout"><div class="card"><div class="section-head"><h2>📋 التقرير الخاص بالمجموعة</h2><div><button class="btn" onclick="loadReport(\''+encodeURIComponent(dept)+'\',\'daily\')">يومي</button> <button class="btn" onclick="loadReport(\''+encodeURIComponent(dept)+'\',\'weekly\')">أسبوعي</button> <button class="btn" onclick="loadReport(\''+encodeURIComponent(dept)+'\',\'monthly\')">شهري</button></div></div><div id="reportBox" class="detail"><div class="empty">جارٍ تحميل التقرير...</div></div></div>'+
+    '<div class="card"><div class="section-head"><h2>👥 وكلاء المجموعة</h2></div><div id="groupAgents" class="agent-list"></div></div></section>';
+  $('groupAgents').innerHTML=agents.filter(a=>a.department===dept).map(a=>'<div class="agent" onclick="showAgent(\''+encodeURIComponent(a.name)+'\')"><b>'+esc(a.name)+'</b><small>'+esc(a.role)+'</small></div>').join('');
+  loadReport(encoded,'daily');
+}
+async function loadReport(encoded,period){
+  const dept=decodeURIComponent(encoded);
+  try{
+    const d=await api('/api/v1/reports/group?department='+encodeURIComponent(dept)+'&period='+period);
+    const r=d.report||{};
+    $('reportBox').innerHTML=
+      item('⏱️','وقت التقرير',r.generated_at)+
+      item('👥','الوكلاء المشاركون',r.agents_participating+' / '+r.agent_count)+
+      item('✅','عمل تم إنجازه',list(r.completed,'لا توجد مهام مسجلة بعد'))+
+      item('🔎','الاكتشافات والنتائج',list(r.discoveries,'لا توجد اكتشافات مسجلة بعد'))+
+      item('🧠','ما تم تعلمه',list(r.learning,'لا توجد ملاحظات تعلم مسجلة بعد'))+
+      item('🤝','التعاون بين الوكلاء',list(r.collaboration,'لا توجد تعاونات مسجلة بعد'))+
+      item('⚠️','الأخطاء والتنبيهات',list([...(r.errors||[]),...(r.alerts||[])],'لا توجد أخطاء أو تنبيهات'))+
+      item('⚙️','العمل الجاري',list(r.active_work,'لا يوجد عمل جارٍ مسجل'))+
+      item('➡️','الخطوات التالية',list(r.next_actions,'لا توجد خطوات تالية'))+
+      '<div class="detail-item"><button class="btn primary" onclick="saveReport(\''+encoded+'\',\''+period+'\')">☁️ حفظ هذا التقرير في Google Sheets</button><span id="saveState" class="muted" style="margin-right:10px"></span></div>';
+  }catch(e){$('reportBox').innerHTML='<div class="empty">تعذر تحميل التقرير: '+esc(e.message)+'</div>';}
+}
+function item(icon,title,value){return '<div class="detail-item"><b>'+icon+' '+title+'</b><div style="margin-top:6px">'+value+'</div></div>'}
+function list(v,empty){const a=Array.isArray(v)?v:[];return a.length?'<ul style="margin:6px 0 0;padding-right:20px">'+a.map(x=>'<li>'+esc(typeof x==='string'?x:JSON.stringify(x))+'</li>').join('')+'</ul>':'<span class="muted">'+empty+'</span>'}
+async function saveReport(encoded,period){
+  const dept=decodeURIComponent(encoded);$('saveState').textContent='جارٍ الحفظ...';
+  try{const d=await api('/api/v1/reports/save?department='+encodeURIComponent(dept)+'&period='+period,{method:'POST'});$('saveState').textContent=d.result?.status==='saved'?'تم الحفظ في Google Sheets':'الحفظ يحتاج إعداد التكامل';}
+  catch(e){$('saveState').textContent='تعذر الحفظ';}
+}
+async function showReports(){
+  $('pageTitle').textContent='📊 تقارير جميع المجموعات';
+  $('content').innerHTML='<section class="section"><div class="card"><div class="section-head"><h2>التقارير اليومية للمجموعات</h2><button class="btn primary" onclick="saveAll()">☁️ حفظ الكل في Google Sheets</button></div><div id="reportsTable" class="table-wrap"></div></div></section>';
+  try{
+    const d=await api('/api/v1/reports/all?period=daily');
+    $('reportsTable').innerHTML='<table class="table"><thead><tr><th>المجموعة</th><th>الوكلاء</th><th>المشاركون</th><th>الإنجاز</th><th>الاكتشافات</th><th>الأخطاء</th><th>التقرير</th></tr></thead><tbody>'+
+      d.reports.map(r=>'<tr><td><b>'+esc(r.department)+'</b></td><td>'+r.agent_count+'</td><td>'+r.agents_participating+'</td><td>'+((r.completed||[]).length)+'</td><td>'+((r.discoveries||[]).length)+'</td><td>'+((r.errors||[]).length)+'</td><td><button class="btn" onclick="showGroup(\''+encodeURIComponent(r.department)+'\')">فتح</button></td></tr>').join('')+'</tbody></table>';
+  }catch(e){$('reportsTable').innerHTML='<div class="empty">تعذر تحميل التقارير.</div>';}
+}
+async function saveAll(){
+  try{await api('/api/v1/reports/save-all?period=daily',{method:'POST'});alert('تم إرسال تقارير المجموعات للحفظ.');}catch(e){alert('تعذر الحفظ: '+e.message);}
+}
+function showSection(title){$('pageTitle').textContent=title;$('content').innerHTML='<div class="card empty">هذا القسم محفوظ في المعمارية الحالية، ويمكن ربط واجهته بنفس نظام المجموعات والتقارير.</div>';}
+loadData().then(showHome).catch(e=>{ $('systemStatus').textContent='تعذر الاتصال'; $('content').innerHTML='<div class="card empty">تعذر تحميل مركز التحكم.</div>';});
+setInterval(loadData,30000);
+</script>
+</body>
+</html>
