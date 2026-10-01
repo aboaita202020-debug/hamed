@@ -1,0 +1,1 @@
+"""HAMED AGI application package."""
