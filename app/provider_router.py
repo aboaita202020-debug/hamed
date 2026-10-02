@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import ClassVar, Protocol
 
 from .providers import openai_provider
+from .free_ai_scout import configured as configured_free_sources
 
 
 @dataclass(frozen=True)
@@ -62,6 +63,7 @@ class ProviderRouter:
             "gemini": SafeFallbackProvider("gemini"),
             "deepseek": SafeFallbackProvider("deepseek"),
             "kimi": SafeFallbackProvider("kimi"),
+            "freellmapi": SafeFallbackProvider("freellmapi"),
         }
 
     def states(self) -> list[ProviderState]:
@@ -99,8 +101,9 @@ class ProviderRouter:
             "configured": configured,
             "connected": connected,
             "offline": [s.name for s in states if not s.configured],
-            "active": connected[0] if connected else "fallback",
-            "safe_fallback": not bool(connected),
+            "active": connected[0] if connected else ("freellmapi" if configured_free_sources() else "fallback"),
+            "free_ai_sources_configured": [x["id"] for x in configured_free_sources()],
+            "safe_fallback": not bool(connected or configured_free_sources()),
         }
 
 
