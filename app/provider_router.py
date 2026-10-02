@@ -7,6 +7,19 @@ from typing import ClassVar, Protocol
 from .providers import openai_provider
 from .free_ai_scout import configured as configured_free_sources
 
+class FreeLLMAPIAdapter:
+    name = "freellmapi"
+
+    def state(self) -> ProviderState:
+        return ProviderState(self.name, bool(os.getenv("FREELLMAPI_BASE_URL")), "configured" if os.getenv("FREELLMAPI_BASE_URL") else "offline", os.getenv("FREELLMAPI_MODEL", "default"))
+
+    def generate(self, prompt: str) -> str:
+        from openai import OpenAI
+        base_url = os.getenv("FREELLMAPI_BASE_URL", "http://localhost:8000/v1")
+        client = OpenAI(api_key=os.getenv("FREELLMAPI_API_KEY", "freellm-local"), base_url=base_url)
+        response = client.chat.completions.create(model=os.getenv("FREELLMAPI_MODEL", "auto"), messages=[{"role": "user", "content": prompt}], max_tokens=900)
+        return response.choices[0].message.content or ""
+
 
 @dataclass(frozen=True)
 class ProviderState:
@@ -63,7 +76,7 @@ class ProviderRouter:
             "gemini": SafeFallbackProvider("gemini"),
             "deepseek": SafeFallbackProvider("deepseek"),
             "kimi": SafeFallbackProvider("kimi"),
-            "freellmapi": SafeFallbackProvider("freellmapi"),
+            "freellmapi": FreeLLMAPIAdapter(),
         }
 
     def states(self) -> list[ProviderState]:
@@ -87,6 +100,8 @@ class ProviderRouter:
         return [s.name for s in self.states() if s.configured]
 
     def select(self, preferred: str | None = None) -> Provider:
+        if preferred == "freellmapi" and os.getenv("FREELLMAPI_BASE_URL"):
+            return self.providers["freellmapi"]
         if preferred == "openai" and openai_provider.check_connection()["connected"]:
             return self.providers["openai"]
         if openai_provider.check_connection()["connected"]:
