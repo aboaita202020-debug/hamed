@@ -43,10 +43,17 @@ PY
 
 echo "[5/6] Reloading PythonAnywhere website"
 python -m pip install --upgrade pythonanywhere
+set +e
 pa website reload --domain aboaita2011.pythonanywhere.com
+RELOAD_RC=$?
+set -e
+if [ "$RELOAD_RC" -ne 0 ]; then
+  echo "Reload command returned $RELOAD_RC; waiting for the site to finish starting before treating it as fatal."
+  sleep 15
+fi
 
 echo "[6/6] Verifying public endpoints"
-sleep 3
+sleep 5
 curl -fsS https://aboaita2011.pythonanywhere.com/health
 curl -fsS https://aboaita2011.pythonanywhere.com/readiness
 curl -fsS https://aboaita2011.pythonanywhere.com/status
