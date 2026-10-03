@@ -57,7 +57,8 @@ class SafeFallbackProvider:
         return ProviderState(self.name, False, "offline", "mock")
 
     def generate(self, prompt: str) -> str:
-        return "ORVIA_SAFE_FALLBACK: no external model is configured; no external action was performed."
+        topic = prompt.split("Current learning topic:", 1)[-1].strip().split("\n", 1)[0][:180]
+        return (\n            "HAMED_RULE_BASED_FALLBACK\\n"\n            f"Topic: {topic}\\n"\n            "Actionable opportunities: identify 5 prospects in this topic; for each, validate customer/problem/demand before outreach.\\n"\n            "Growth loop: research -> problem evidence -> offer -> prospect -> outreach -> CRM -> follow-up -> revenue.\\n"\n            "Constraints: evidence first; assumptions labeled; no invented companies, prices, credentials, or completed external actions.\\n"\n            "Next action: collect public evidence and create the first opportunity record."\n        )
 
 
 class OpenAIAdapter:
