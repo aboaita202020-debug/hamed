@@ -6,6 +6,7 @@ from .core import core
 from .agent_bus import agent_bus
 from .programming_workforce import status as programming_workforce_status
 from .provider_router import provider_router
+from .cognitive_core import cognitive_core
 
 ROOT = Path(__file__).resolve().parent.parent
 STATE = ROOT / "data" / "autonomous_state.json"
@@ -42,6 +43,8 @@ def snapshot():
         "autonomous": state,
         "programming_workforce": programming_workforce_status(),
         "providers": [x.__dict__ for x in provider_router.states()],
+        "cognitive": cognitive_core.status(),
+        "intelligence_benchmark": cognitive_core.benchmark(),
         "agent_messages": agent_bus.status().get("messages", 0),
         "activity": activity,
     }
