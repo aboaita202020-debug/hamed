@@ -27,6 +27,7 @@ from app.learning import LearningMemory
 from app.provider_router import provider_router
 from app.orchestrator import Orchestrator
 from app.programming_autopilot import run_once as run_programming_autopilot
+from app.cognitive_core import cognitive_core
 
 
 class LearningCouncil:
@@ -248,6 +249,7 @@ def loop() -> None:
             # They sync only clean trees, verify compilation/tests, and request Claude review.
             if os.getenv("ORVIA_PROGRAMMING_AUTOPILOT", "1").lower() not in {"0", "false", "no"}:
                 run_programming_autopilot()
+        cognitive_core.run_cycle(topic or "ORVIA continuous improvement")
             index += 1
             work_index += 1
         except Exception as exc:
