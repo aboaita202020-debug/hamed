@@ -44,7 +44,7 @@ from .youtube_studio import youtube_studio
 from .lumikids_team import lumikids_studio
 from .islamic_english_team import islamic_english_studio
 from .control_api import require_control_secret, tail_log
-
+\nAGENT_ACTIVITY_PATH = Path(__file__).resolve().parent.parent / "data" / "agent_activity.jsonl"\n\ndef _read_agent_activity(limit: int = 100):\n    try:\n        lines = AGENT_ACTIVITY_PATH.read_text(encoding="utf-8").splitlines()\n    except FileNotFoundError:\n        return []\n    items = []\n    for line in lines[-max(1, min(limit, 500)):]:\n        try:\n            items.append(__import__("json").loads(line))\n        except Exception:\n            continue\n    return list(reversed(items))\n
 app = FastAPI(title=settings.app_name, version="2.4.0")
 for component in ("core","orchestrator","agents","crm","opportunity_engine","revenue_engine","agi_engine","decision_engine","memory","research","reporting","approval_audit","provider_router","autonomous_commercial_agent","sentinel_security","tool_registry","control_center","agent_communication_bus","kids_media_intelligence","universal_learning","rd_agents","science_agents","social_agents","collective_intelligence"):
     core.register(component)
@@ -99,6 +99,10 @@ def agents_collaborate(request: dict[str,Any]):
     if not objective: raise HTTPException(status_code=400,detail="objective is required")
     names=request.get("agents")
     return {"status":"ok","objective":objective,"results":orchestrator.collaborate(objective,names)}
+
+@app.get("/api/v1/agents/activity")
+def agent_activity(limit:int=100):
+    return {"status":"ok","activity":_read_agent_activity(limit)}
 
 @app.get("/api/v1/agents/messages")
 def agent_messages(limit:int=100):
