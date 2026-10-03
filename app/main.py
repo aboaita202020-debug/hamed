@@ -41,6 +41,7 @@ from .stock_agents import stock_status
 from .tooling import tool_registry
 from .universal_learning import universal_learning
 from .youtube_studio import youtube_studio
+from .ugc_video_factory import ugc_video_factory
 from .lumikids_team import lumikids_studio
 from .islamic_english_team import islamic_english_studio
 from .control_api import require_control_secret, tail_log
@@ -131,6 +132,35 @@ def agent_messages(limit:int=100):
 @app.get("/api/v1/kids/media-intelligence")
 def kids_media_intelligence():
     return {"status":"ready","mission":"daily original kids English-learning song and cartoon","signals":["trend topics","competitor channels","video performance","audience retention","titles/thumbnails","publishing cadence"],"policy":"analyze public/authorized analytics; do not copy protected content"}
+
+@app.get("/api/v1/ugc/status")
+def ugc_status():
+    return {"status": "ok", **ugc_video_factory.status()}
+
+@app.post("/api/v1/ugc/brief")
+def ugc_brief(request: dict[str, Any]):
+    product = str(request.get("product", "")).strip()
+    audience = str(request.get("audience", "")).strip()
+    platform = str(request.get("platform", "instagram_reels")).strip()
+    if not product or not audience:
+        raise HTTPException(status_code=400, detail="product and audience are required")
+    return ugc_video_factory.brief(product, audience, platform)
+
+@app.post("/api/v1/ugc/concepts")
+def ugc_concept(request: dict[str, Any]):
+    try:
+        item = ugc_video_factory.create_concept(
+            product=str(request.get("product", "")),
+            audience=str(request.get("audience", "")),
+            platform=str(request.get("platform", "instagram_reels")),
+            format=str(request.get("format", "problem_solution")),
+            hook=str(request.get("hook", "")),
+            script=str(request.get("script", "")),
+            cta=str(request.get("cta", "")),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return {"status": "ok", "concept": asdict(item)}
 
 @app.get("/api/v1/youtube/channels")
 def youtube_channels(): return {"status":"ok","channels":youtube_studio.channels(),**youtube_studio.status()}
