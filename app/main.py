@@ -50,6 +50,7 @@ from .programming_autopilot import run_once as run_programming_autopilot
 from .free_ai_scout import discover as discover_free_llm
 from .programming_workforce import status as programming_workforce_status, activate_and_audit
 from .mobile_control_center import snapshot as mobile_snapshot
+from .cognitive_core import cognitive_core
 
 AGENT_ACTIVITY_PATH = Path(__file__).resolve().parent.parent / "data" / "agent_activity.jsonl"
 
@@ -129,6 +130,44 @@ def agent_activity(limit:int=100):
         latest_by_agent.setdefault(item.get("agent"),item)
     active=[x for x in latest_by_agent.values() if x.get("event")=="started"]
     return {"status":"ok","active_count":len(active),"active_agents":active[:200],"activity":items}
+
+
+@app.get("/api/v1/cognitive/status")
+def cognitive_status():
+    return cognitive_core.status()
+
+@app.get("/api/v1/cognitive/benchmark")
+def cognitive_benchmark():
+    return cognitive_core.benchmark()
+
+@app.post("/api/v1/cognitive/observe")
+def cognitive_observe(request: dict[str, Any]):
+    return cognitive_core.observe(str(request.get("topic", "")), str(request.get("observation", "")), str(request.get("source", "system")), request.get("evidence") or [])
+
+@app.post("/api/v1/cognitive/hypothesize")
+def cognitive_hypothesize(request: dict[str, Any]):
+    return cognitive_core.hypothesize(str(request.get("problem", "")), request.get("hypotheses") or [])
+
+@app.post("/api/v1/cognitive/experiment")
+def cognitive_experiment(request: dict[str, Any]):
+    return cognitive_core.record_experiment(str(request.get("hypothesis", "")), str(request.get("result", "")), bool(request.get("success", False)), request.get("metric"), request.get("evidence") or [])
+
+@app.post("/api/v1/cognitive/learn")
+def cognitive_learn(request: dict[str, Any]):
+    return cognitive_core.learn(str(request.get("lesson", "")), str(request.get("topic", "")), float(request.get("confidence", 0.5)), bool(request.get("verified", False)), str(request.get("source", "experience")))
+
+@app.post("/api/v1/cognitive/error-learning")
+def cognitive_error_learning(request: dict[str, Any]):
+    return cognitive_core.learn_from_error(str(request.get("error", "")), str(request.get("cause", "")), str(request.get("prevention", "")))
+
+@app.post("/api/v1/cognitive/strategy")
+def cognitive_strategy(request: dict[str, Any]):
+    return cognitive_core.update_strategy(str(request.get("strategy", "")), str(request.get("evidence", "")), str(request.get("outcome", "")), request.get("score_before"), request.get("score_after"))
+
+@app.post("/api/v1/cognitive/cycle")
+def cognitive_cycle(request: dict[str, Any] | None = None):
+    request = request or {}
+    return cognitive_core.run_cycle(str(request.get("topic", "ORVIA continuous improvement")))
 
 @app.get("/api/v1/programming/workforce")
 def programming_workforce():
