@@ -177,7 +177,15 @@ def programming_workforce():
 @app.post("/api/v1/programming/workforce/activate")
 def programming_workforce_activate(request: dict[str, Any] | None = None):
     request = request or {}
-    return activate_and_audit(str(request.get("objective") or "").strip() or None, request.get("limit"))
+    # Keep the HTTP request short; heavy engineering work must run in the autonomous worker.
+    requested_limit = request.get("limit")
+    try:
+        batch_limit = max(1, min(int(requested_limit or 5), 5))
+    except (TypeError, ValueError):
+        batch_limit = 5
+    result = activate_and_audit(str(request.get("objective") or "").strip() or None, batch_limit)
+    result["dispatch_policy"] = {"requested_limit": requested_limit, "web_batch_limit": batch_limit, "reason": "protect_pythonanywhere_web_worker"}
+    return result
 
 @app.get("/api/v1/mobile/snapshot")
 def mobile_snapshot_endpoint():
