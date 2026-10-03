@@ -196,14 +196,15 @@ def run_opportunity_cycle(provider, learner: LearningCouncil, orchestrator: Orch
     growth_task = (
         "Run HAMED Growth Engine on this evidence. Identify measurable growth experiments, target customer, problem, offer, acquisition channel, KPI, test, expected signal, and next iteration. Separate evidence from assumptions.\n\nLEARNING REPORT:\n" + item.evidence
     )
-    # Every logical agent participates in the autonomous work cycle. The orchestrator keeps
-    # the physical worker pool bounded (20 by default), so 2020 logical agents do not become
-    # 2020 OS processes. A smaller executive synthesis pass remains for cross-functional output.
+    # All logical agents participate, but in bounded batches so PythonAnywhere does not
+    # accumulate 2020 result objects in RAM. The logical count remains 2020.
     all_agent_names = list(orchestrator.agents)
+    batch_size = max(5, min(int(os.getenv("ORVIA_AGENT_BATCH_SIZE", "20")), 50))
     with _lock:
         _state["agents_total"] = len(all_agent_names)
         _state["agents_dispatched_last_cycle"] = len(all_agent_names)
         _state["agents_completed_last_cycle"] = 0
+        _state["phase"] = "continuous_learning_and_work"
         save_state()
     swarm_task = (
         "Participate as your specialized HAMED agent in the autonomous business operating cycle. "
@@ -213,12 +214,25 @@ def run_opportunity_cycle(provider, learner: LearningCouncil, orchestrator: Orch
         "purchase, contract, or irreversible actions. Return concise, actionable output.\n\n"
         "LEARNING REPORT:\n" + item.evidence
     )
-    report = orchestrator.collaborate(swarm_task, agent_names=all_agent_names)
-    with _lock:
-        _state["agents_completed_last_cycle"] = len(report)
-        save_state()
+    completed = 0
+    batch_summaries = []
+    for start in range(0, len(all_agent_names), batch_size):
+        batch = all_agent_names[start:start + batch_size]
+        results = orchestrator.collaborate(swarm_task, agent_names=batch)
+        completed += len(results)
+        batch_summaries.append({"batch": start // batch_size + 1, "requested": len(batch), "completed": len(results)})
+        with _lock:
+            _state["agents_completed_last_cycle"] = completed
+            save_state()
+        del results
     growth_report = orchestrator.collaborate(growth_task, agent_names=["marketing", "analytics", "sales", "customer_psychology"])
-    record = {"timestamp": datetime.now(timezone.utc).isoformat(), "topic": topic, "learning": item.evidence[:12000], "growth": growth_report, "opportunities": report}
+    record = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "topic": topic,
+        "learning": item.evidence[:12000],
+        "growth": growth_report,
+        "opportunities_summary": {"agents_completed": completed, "batches": batch_summaries},
+    }
 
     log_path = ROOT / "data" / "autonomous_activity.jsonl"
     log_path.parent.mkdir(parents=True, exist_ok=True)
