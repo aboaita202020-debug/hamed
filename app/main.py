@@ -51,6 +51,7 @@ from .free_ai_scout import discover as discover_free_llm
 from .programming_workforce import status as programming_workforce_status, activate_and_audit
 from .mobile_control_center import snapshot as mobile_snapshot
 from .cognitive_core import cognitive_core
+from .tool_acquisition import discover as discover_tools, evaluate as evaluate_tool, status as tool_acquisition_status, register_verified_tool
 
 AGENT_ACTIVITY_PATH = Path(__file__).resolve().parent.parent / "data" / "agent_activity.jsonl"
 
@@ -190,6 +191,31 @@ def mobile_app():
         raise HTTPException(status_code=404, detail="mobile app not deployed yet")
     return HTMLResponse(path.read_text(encoding="utf-8"))
 
+
+@app.get("/api/v1/tools/acquisition")
+def tools_acquisition():
+    return tool_acquisition_status()
+
+@app.get("/api/v1/tools/discover")
+def tools_discover():
+    return {"status":"ok","tools":discover_tools()}
+
+@app.get("/api/v1/tools/evaluate/{candidate_id}")
+def tools_evaluate(candidate_id: str):
+    return evaluate_tool(candidate_id)
+
+@app.post("/api/v1/tools/register")
+def tools_register(request: dict[str, Any]):
+    required = ("name", "category", "description", "source_url")
+    if any(not str(request.get(key, "")).strip() for key in required):
+        raise HTTPException(status_code=400, detail="name, category, description and source_url are required")
+    return register_verified_tool(
+        name=str(request["name"]).strip(),
+        category=str(request["category"]).strip(),
+        description=str(request["description"]).strip(),
+        source_url=str(request["source_url"]).strip(),
+        requires_authorization=bool(request.get("requires_authorization", False)),
+    )
 
 @app.get("/api/v1/programming/status")
 def programming_status():
