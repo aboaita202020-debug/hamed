@@ -19,6 +19,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .programming_workforce import activate_and_audit
+
 ROOT = Path(__file__).resolve().parent.parent
 STATE_PATH = ROOT / "data" / "programming_autopilot.json"
 ACTIVITY_PATH = ROOT / "data" / "programming_activity.jsonl"
@@ -135,8 +137,15 @@ def claude_review(summary: str) -> dict[str, Any]:
 
 
 def run_once() -> dict[str, Any]:
-    state: dict[str, Any] = {"timestamp": _now(), "phase": "github_sync"}
+    state: dict[str, Any] = {"timestamp": _now(), "phase": "programming_workforce_activation"}
     try:
+        workforce = activate_and_audit()
+        state["programming_workforce"] = {
+            "status": workforce.get("status"),
+            "agents_dispatched": workforce.get("workforce", {}).get("agents_dispatched"),
+            "agents_completed": workforce.get("workforce", {}).get("agents_completed"),
+        }
+        state["phase"] = "github_sync"
         sync = git_sync()
         state["github"] = sync
         if sync["status"] == "blocked_dirty_tree":
