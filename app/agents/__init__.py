@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from .provider_router import provider_router
+from ..provider_router import provider_router
 
 
 @dataclass
@@ -124,3 +124,22 @@ assert len(ALL_AGENT_SPECS)==2020
 DEFAULT_AGENTS=[Agent(s) for s in ALL_AGENT_SPECS]
 AGENT_SPECS={s.name:s for s in ALL_AGENT_SPECS}
 DEPARTMENT_COUNTS={d:sum(s.department==d for s in ALL_AGENT_SPECS) for d,_,_ in _DEPARTMENTS}
+
+# Historical specialist-agent API retained for backward compatibility after the
+# unified runtime migration.  These imports intentionally live after the
+# 2020-agent registry above so both public interfaces coexist.
+from .base_agent import BaseAgent
+from .orchestrator import HamedOrchestrator
+from .opportunity_hunter_agent import OpportunityHunterAgent
+from .opportunity_machine_agent import OpportunityMachineAgent
+from .negotiation_agent import NegotiationAgent
+from .revenue_agent import RevenueAgent
+from .reporting_agent import ReportingAgent
+from .fact_check_agent import FactCheckAgent
+
+__all__ = [
+    "Agent", "AgentResult", "AgentSpec", "DEFAULT_AGENTS", "DEPARTMENT_COUNTS",
+    "SalesAgent", "BaseAgent", "HamedOrchestrator", "OpportunityHunterAgent",
+    "OpportunityMachineAgent", "NegotiationAgent", "RevenueAgent", "ReportingAgent",
+    "FactCheckAgent",
+]

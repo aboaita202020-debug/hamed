@@ -1,8 +1,18 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+
+@dataclass(frozen=True)
+class ApprovalLimits:
+    max_auto_payment_egp: float = 0.0
+    max_auto_purchase_egp: float = 0.0
+    max_auto_discount_pct: float = 10.0
+    max_negotiation_concession_pct: float = 15.0
+    require_approval_for_contracts: bool = True
 
 
 class Settings(BaseSettings):
@@ -33,6 +43,7 @@ class Settings(BaseSettings):
     telegram_bot_token: str | None = None
     whatsapp_access_token: str | None = None
     whatsapp_phone_number_id: str | None = None
+    approval_limits: ApprovalLimits = ApprovalLimits()
     model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")
 
 
