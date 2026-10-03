@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from dataclasses import asdict
 from typing import Any
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.responses import HTMLResponse
