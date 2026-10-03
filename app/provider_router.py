@@ -27,7 +27,7 @@ class FreeLLMAPIAdapter:
     name = "freellmapi"
 
     def state(self) -> ProviderState:
-        configured = bool(os.getenv("FREELLMAPI_BASE_URL"))
+        configured = bool(os.getenv("FREELLMAPI_BASE_URL") and os.getenv("FREELLMAPI_API_KEY"))
         return ProviderState(
             self.name,
             configured,
@@ -39,7 +39,7 @@ class FreeLLMAPIAdapter:
         from openai import OpenAI
         client = OpenAI(
             api_key=os.getenv("FREELLMAPI_API_KEY", "freellm-local"),
-            base_url=os.getenv("FREELLMAPI_BASE_URL", "http://localhost:8000/v1"),
+            base_url=os.getenv("FREELLMAPI_BASE_URL", "http://localhost:3001/v1"),
         )
         response = client.chat.completions.create(
             model=os.getenv("FREELLMAPI_MODEL", "auto"),

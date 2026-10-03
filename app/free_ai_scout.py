@@ -29,7 +29,7 @@ CANDIDATES: tuple[FreeProviderCandidate, ...] = (
         "FreeLLMAPI",
         "aggregator",
         "https://github.com/tashfeenahmed/freellmapi",
-        "http://localhost:8000/v1",
+        "http://localhost:3001/v1",
         "FREELLMAPI_API_KEY",
         True,
         "OpenAI-compatible proxy; aggregates free-tier providers and supports failover.",
