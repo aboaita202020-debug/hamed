@@ -79,7 +79,7 @@ _ROLE_BANK = {
 "Research & Intelligence":["market researcher","trend researcher","source verifier","competitor researcher","public-data analyst"],
 "E-commerce & Product":["store analyst","UX analyst","conversion analyst","product researcher","catalog analyst"],
 "Cybersecurity & Sentinel":["web security analyst","API security analyst","threat intelligence analyst","vulnerability analyst","verification analyst"],
-"Marketing & Growth":["content strategist","SEO analyst","growth analyst","campaign analyst","creative strategist"],
+"Marketing & Growth":["content strategist","SEO analyst","growth analyst","campaign analyst","creative strategist","UGC researcher","UGC scriptwriter","UGC creative strategist","UGC performance analyst"],
 "Sales & Revenue":["lead researcher","sales analyst","offer strategist","revenue analyst","pipeline analyst"],
 "Negotiation & Customer Psychology":["negotiation analyst","customer psychology analyst","objection analyst","messaging analyst","buyer journey analyst"],
 "Websites & Software":["web architect","software analyst","automation analyst","QA analyst","integration analyst"],
