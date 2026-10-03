@@ -102,7 +102,12 @@ def agents_collaborate(request: dict[str,Any]):
 
 @app.get("/api/v1/agents/activity")
 def agent_activity(limit:int=100):
-    return {"status":"ok","activity":_read_agent_activity(limit)}
+    items=_read_agent_activity(min(limit,500))
+    latest_by_agent={}
+    for item in items:
+        latest_by_agent.setdefault(item.get("agent"),item)
+    active=[x for x in latest_by_agent.values() if x.get("event")=="started"]
+    return {"status":"ok","active_count":len(active),"active_agents":active[:200],"activity":items}
 
 @app.get("/api/v1/agents/messages")
 def agent_messages(limit:int=100):
