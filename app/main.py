@@ -46,6 +46,8 @@ from .ugc_video_factory import ugc_video_factory
 from .lumikids_team import lumikids_studio
 from .islamic_english_team import islamic_english_studio
 from .control_api import require_control_secret, tail_log
+from .programming_autopilot import run_once as run_programming_autopilot
+from .free_ai_scout import discover as discover_free_llm
 
 AGENT_ACTIVITY_PATH = Path(__file__).resolve().parent.parent / "data" / "agent_activity.jsonl"
 
@@ -66,7 +68,7 @@ app = FastAPI(title=settings.app_name, version="2.4.0")
 for component in ("core","orchestrator","agents","crm","opportunity_engine","revenue_engine","agi_engine","decision_engine","memory","research","reporting","approval_audit","provider_router","autonomous_commercial_agent","sentinel_security","tool_registry","control_center","agent_communication_bus","kids_media_intelligence","universal_learning","rd_agents","science_agents","social_agents","collective_intelligence"):
     core.register(component)
 
-DASHBOARD = """<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ORVIA AGI</title><style>body{font-family:system-ui,sans-serif;max-width:1180px;margin:auto;padding:24px;background:#0b1020;color:#eef}header,.card{background:#151d33;border:1px solid #2a3658;border-radius:18px;padding:20px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.ok{color:#7ee787}.muted{color:#9aa7c7}code{background:#0e1528;padding:3px 7px;border-radius:6px}</style></head><body><header><h1>ORVIA AGI</h1><p class="muted">AGI تجاري + شبكة 2020 مساعد متعاون + ORVIA Kids Studio Intelligence.</p></header><div class="grid"><div class="card"><b>العقول</b><p class="ok">""" + str(len(orchestrator.agents)) + """ مساعدًا</p></div><div class="card"><b>التواصل</b><p class="ok">""" + str(agent_bus.status()["messages"]) + """ رسالة</p></div><div class="card"><b>Kids Intelligence</b><p class="ok">ترندات + منافسين + YouTube Analytics</p></div><div class="card"><b>الأمان</b><p class="ok">Sentinel مع بوابة تصريح</p></div></div><div class="card"><h2>واجهات التشغيل</h2><p><code>/health</code> <code>/status</code> <code>/api/v1/youtube/channels</code> <code>/api/v1/youtube/plan</code> <code>/api/v1/agents</code> <code>/api/v1/agents/collaborate</code> <code>/api/v1/agents/messages</code> <code>/api/v1/kids/media-intelligence</code> <code>/api/v1/control/daily</code> <code>/api/v1/learning/status</code> <code>/api/v1/learning/sources</code> <code>/api/v1/rd-agents</code> <code>/api/v1/execute</code></p></div></body></html>"""
+DASHBOARD = """<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ORVIA AGI</title><style>body{font-family:system-ui,sans-serif;max-width:1180px;margin:auto;padding:24px;background:#0b1020;color:#eef}header,.card{background:#151d33;border:1px solid #2a3658;border-radius:18px;padding:20px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.ok{color:#7ee787}.muted{color:#9aa7c7}code{background:#0e1528;padding:3px 7px;border-radius:6px}</style></head><body><header><h1>ORVIA AGI</h1><p class="muted">AGI تجاري + شبكة 2020 مساعد متعاون + ORVIA Kids Studio Intelligence.</p></header><div class="grid"><div class="card"><b>العقول</b><p class="ok">""" + str(len(orchestrator.agents)) + """ مساعدًا</p></div><div class="card"><b>التواصل</b><p class="ok">""" + str(agent_bus.status()["messages"]) + """ رسالة</p></div><div class="card"><b>Kids Intelligence</b><p class="ok">ترندات + منافسين + YouTube Analytics</p></div><div class="card"><b>الأمان</b><p class="ok">Sentinel مع بوابة تصريح</p></div></div><div class="card"><h2>واجهات التشغيل</h2><p><code>/health</code> <code>/status</code> <code>/api/v1/youtube/channels</code> <code>/api/v1/youtube/plan</code> <code>/api/v1/agents</code> <code>/api/v1/agents/collaborate</code> <code>/api/v1/agents/messages</code> <code>/api/v1/programming/status</code> <code>/api/v1/programming/run</code> <code>/api/v1/kids/media-intelligence</code> <code>/api/v1/control/daily</code> <code>/api/v1/learning/status</code> <code>/api/v1/learning/sources</code> <code>/api/v1/rd-agents</code> <code>/api/v1/execute</code></p></div></body></html>"""
 
 class MissionRequest(BaseModel):
     objective: str = Field(min_length=1, max_length=12000)
@@ -125,6 +127,19 @@ def agent_activity(limit:int=100):
         latest_by_agent.setdefault(item.get("agent"),item)
     active=[x for x in latest_by_agent.values() if x.get("event")=="started"]
     return {"status":"ok","active_count":len(active),"active_agents":active[:200],"activity":items}
+
+@app.get("/api/v1/programming/status")
+def programming_status():
+    path = Path(__file__).resolve().parent.parent / "data" / "programming_autopilot.json"
+    try:
+        state = __import__("json").loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        state = {"status": "not_run"}
+    return {"status": "ok", "autopilot": state, "free_llm_candidates": discover_free_llm()}
+
+@app.post("/api/v1/programming/run")
+def programming_run():
+    return {"status": "ok", "result": run_programming_autopilot()}
 
 @app.get("/api/v1/agents/messages")
 def agent_messages(limit:int=100):
