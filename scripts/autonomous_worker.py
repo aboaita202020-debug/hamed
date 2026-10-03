@@ -74,6 +74,9 @@ _state = {
     "cycles": 0,
     "lessons": 0,
     "opportunity_reports": 0,
+    "agents_total": 0,
+    "agents_dispatched_last_cycle": 0,
+    "agents_completed_last_cycle": 0,
     "last_error": None,
 }
 _lock = threading.Lock()
@@ -159,8 +162,28 @@ def run_opportunity_cycle(provider, learner: LearningCouncil, orchestrator: Orch
     growth_task = (
         "Run HAMED Growth Engine on this evidence. Identify measurable growth experiments, target customer, problem, offer, acquisition channel, KPI, test, expected signal, and next iteration. Separate evidence from assumptions.\n\nLEARNING REPORT:\n" + item.evidence
     )
+    # Every logical agent participates in the autonomous work cycle. The orchestrator keeps
+    # the physical worker pool bounded (20 by default), so 2020 logical agents do not become
+    # 2020 OS processes. A smaller executive synthesis pass remains for cross-functional output.
+    all_agent_names = list(orchestrator.agents)
+    with _lock:
+        _state["agents_total"] = len(all_agent_names)
+        _state["agents_dispatched_last_cycle"] = len(all_agent_names)
+        _state["agents_completed_last_cycle"] = 0
+        save_state()
+    swarm_task = (
+        "Participate as your specialized HAMED agent in the autonomous business operating cycle. "
+        "Use the learning evidence below. Produce one concrete finding, improvement, opportunity, "
+        "risk, customer insight, experiment, or operational action relevant to your specialization. "
+        "Do not invent facts; separate evidence from assumptions. Do not execute financial, legal, "
+        "purchase, contract, or irreversible actions. Return concise, actionable output.\n\n"
+        "LEARNING REPORT:\n" + item.evidence
+    )
+    report = orchestrator.collaborate(swarm_task, agent_names=all_agent_names)
+    with _lock:
+        _state["agents_completed_last_cycle"] = len(report)
+        save_state()
     growth_report = orchestrator.collaborate(growth_task, agent_names=["marketing", "analytics", "sales", "customer_psychology"])
-    report = orchestrator.collaborate(task, agent_names=["research", "marketing", "sales", "negotiation", "customer_psychology", "affiliate", "crm", "website_factory", "analytics", "b2b", "reporting", "decision", "learning", "revenue", "sentinel"])
     record = {"timestamp": datetime.now(timezone.utc).isoformat(), "topic": topic, "learning": item.evidence[:12000], "growth": growth_report, "opportunities": report}
 
     log_path = ROOT / "data" / "autonomous_activity.jsonl"
