@@ -49,6 +49,7 @@ from .control_api import require_control_secret, tail_log
 from .programming_autopilot import run_once as run_programming_autopilot
 from .free_ai_scout import discover as discover_free_llm
 from .programming_workforce import status as programming_workforce_status, activate_and_audit
+from .mobile_control_center import snapshot as mobile_snapshot
 
 AGENT_ACTIVITY_PATH = Path(__file__).resolve().parent.parent / "data" / "agent_activity.jsonl"
 
@@ -137,6 +138,19 @@ def programming_workforce():
 def programming_workforce_activate(request: dict[str, Any] | None = None):
     request = request or {}
     return activate_and_audit(str(request.get("objective") or "").strip() or None, request.get("limit"))
+
+@app.get("/api/v1/mobile/snapshot")
+def mobile_snapshot_endpoint():
+    return mobile_snapshot()
+
+
+@app.get("/mobile")
+def mobile_app():
+    path = Path(__file__).with_name("mobile.html")
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="mobile app not deployed yet")
+    return HTMLResponse(path.read_text(encoding="utf-8"))
+
 
 @app.get("/api/v1/programming/status")
 def programming_status():
