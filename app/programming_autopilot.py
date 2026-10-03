@@ -139,7 +139,7 @@ def claude_review(summary: str) -> dict[str, Any]:
 def run_once() -> dict[str, Any]:
     state: dict[str, Any] = {"timestamp": _now(), "phase": "programming_workforce_activation"}
     try:
-        workforce = activate_and_audit()
+        workforce = activate_and_audit(limit=10)
         state["programming_workforce"] = {
             "status": workforce.get("status"),
             "agents_dispatched": workforce.get("workforce", {}).get("agents_dispatched"),
