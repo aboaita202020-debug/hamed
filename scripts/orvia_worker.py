@@ -7,10 +7,19 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import threading
 import time
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+# When launched as "python scripts/orvia_worker.py", Python puts the scripts/
+# directory first on sys.path rather than the repository root. Add the root so
+# the worker can import the current application package on Railway/PaaS.
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from app.autonomous import autonomous_agent
 
