@@ -12,6 +12,11 @@ import subprocess
 import sys
 import threading
 import time
+
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -36,8 +41,10 @@ class LearningCouncil:
 
 ROOT = Path(__file__).resolve().parent.parent
 STATE_PATH = ROOT / "data" / "autonomous_state.json"
+LOCK_PATH = ROOT / "data" / "autonomous_worker.lock"
 PORT = int(os.getenv("HAMED_AUTONOMOUS_PORT", "8010"))
 INTERVAL = int(os.getenv("HAMED_AUTONOMOUS_INTERVAL", "1800"))
+HEARTBEAT_INTERVAL = int(os.getenv("HAMED_AUTONOMOUS_HEARTBEAT_INTERVAL", "60"))
 
 # Phase 1: build the knowledge base first. Each cycle researches one topic from the public web.
 LEARNING_TOPICS = [
@@ -78,6 +85,7 @@ _state = {
     "agents_dispatched_last_cycle": 0,
     "agents_completed_last_cycle": 0,
     "last_error": None,
+    "last_heartbeat_at": None,
 }
 _lock = threading.Lock()
 
@@ -87,6 +95,30 @@ def save_state() -> None:
     tmp = STATE_PATH.with_suffix(".tmp")
     tmp.write_text(json.dumps(_state, ensure_ascii=False, indent=2), encoding="utf-8")
     tmp.replace(STATE_PATH)
+
+
+_LOCK_FH = None
+
+
+def acquire_single_instance_lock() -> None:
+    """Prevent accidental duplicate worker launches on Unix/PythonAnywhere."""
+    global _LOCK_FH
+    LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
+    _LOCK_FH = LOCK_PATH.open("a+", encoding="utf-8")
+    if fcntl is None:
+        return
+    try:
+        fcntl.flock(_LOCK_FH.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError as exc:
+        raise SystemExit("Another autonomous worker instance is already running.") from exc
+
+
+def heartbeat_loop() -> None:
+    while True:
+        with _lock:
+            _state["last_heartbeat_at"] = datetime.now(timezone.utc).isoformat()
+            save_state()
+        time.sleep(max(10, HEARTBEAT_INTERVAL))
 
 
 def ensure_local_brain() -> None:
@@ -240,11 +272,13 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
+    acquire_single_instance_lock()
     with _lock:
         _state["status"] = "starting"
         _state["started_at"] = datetime.now(timezone.utc).isoformat()
         save_state()
     server = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
+    threading.Thread(target=heartbeat_loop, daemon=True, name="hamed-autonomous-heartbeat").start()
     threading.Thread(target=loop, daemon=True, name="hamed-autonomous-loop").start()
     print(f"Hamed autonomous worker running on http://127.0.0.1:{PORT}", flush=True)
     server.serve_forever()
