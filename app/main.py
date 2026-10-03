@@ -7,6 +7,13 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from .agent_bus import agent_bus
+from .ai_universal_hub import (
+    catalog as ai_hub_catalog,
+    find_tools as ai_hub_find_tools,
+    health as ai_hub_health,
+    route as ai_hub_route,
+    status as ai_hub_status,
+)
 from .agi_engine import agi_engine
 from .autonomous import autonomous_agent
 from .collective_intelligence import collective_intelligence
@@ -16,6 +23,8 @@ from .core import core
 from .crm import crm
 from .decision_engine import decision_engine
 from .execution import execution_loop
+from .free_ai_scout import discover as discover_free_ai_sources
+from .free_ai_scout import health as free_ai_scout_health
 from .group_reports import (
     all_group_reports,
     group_report,
@@ -44,8 +53,12 @@ from .youtube_studio import youtube_studio
 from .lumikids_team import lumikids_studio
 from .islamic_english_team import islamic_english_studio
 from .control_api import require_control_secret, tail_log
+from .instagram_webhooks import router as instagram_webhooks_router
+from .instagram_routes import router as instagram_router
 
 app = FastAPI(title=settings.app_name, version="2.4.0")
+app.include_router(instagram_webhooks_router)
+app.include_router(instagram_router)
 for component in ("core","orchestrator","agents","crm","opportunity_engine","revenue_engine","agi_engine","decision_engine","memory","research","reporting","approval_audit","provider_router","autonomous_commercial_agent","sentinel_security","tool_registry","control_center","agent_communication_bus","kids_media_intelligence","universal_learning","rd_agents","science_agents","social_agents","collective_intelligence"):
     core.register(component)
 
@@ -86,6 +99,83 @@ def readiness():
 @app.get("/status")
 def status():
     return {"status":"ok","collective_intelligence":collective_intelligence.status(),"core":core.health(),"agents":{"count":len(orchestrator.agents),"departments":len({a.department for a in orchestrator.agents.values()}),"messages":len(agent_bus.messages)},"crm":crm.summary(),"revenue":revenue_engine.summary(),"opportunity_engine":{"minimum_score":opportunity_engine.minimum_score},"orchestrator":{"agents":len(orchestrator.agents),"names":sorted(orchestrator.agents)},"providers":provider_router.health(),"memory":{"entries":len(memory_store.recent(500))},"model":openai_provider.check_connection(),"autonomous_agent":{"enabled":settings.autonomous_enabled,"max_targets":settings.autonomous_max_targets},"approval_policy":"financial_and_legal_actions_require_human_approval","sentinel":sentinel.status()}
+
+
+@app.get("/ai-hub")
+def ai_hub():
+    """Expose the integrated, environment-backed AI Universal Hub catalog."""
+    return {"status": "ok", "hub": ai_hub_status(), "tools": ai_hub_catalog()}
+
+
+@app.get("/ai-hub/health")
+def ai_hub_health_route():
+    return ai_hub_health()
+
+
+@app.get("/ai-hub/search")
+def ai_hub_search(capability: str, category: str | None = None):
+    return {"status": "ok", "results": ai_hub_find_tools(capability, category)}
+
+
+@app.get("/ai-hub/route")
+def ai_hub_route_endpoint(capability: str, preferred: str | None = None):
+    preferences = [item.strip() for item in preferred.split(",") if item.strip()] if preferred else []
+    return ai_hub_route(capability, preferences)
+
+
+@app.get("/scout")
+def scout():
+    """List discoverable free providers without returning any secret values."""
+    return {"status": "ok", "health": free_ai_scout_health(), "providers": discover_free_ai_sources()}
+
+
+@app.get("/providers")
+def providers_overview():
+    return providers()
+
+
+@app.get("/agents")
+def agents_overview():
+    return agents_list()
+
+
+@app.get("/minds")
+def minds_overview():
+    """Return the live registry-backed specialist minds, not a fixed demo count."""
+    active_provider = provider_router.health()["active"]
+    minds = [
+        {
+            "identity": agent.name,
+            "role": agent.role,
+            "department": agent.department,
+            "capabilities": list(agent.spec.capabilities),
+            "priority": "council" if agent.spec.leader else "specialist",
+            "provider": active_provider,
+        }
+        for agent in orchestrator.agents.values()
+    ]
+    return {"status": "ok", "count": len(minds), "minds": minds}
+
+
+@app.get("/opportunities")
+def opportunities_overview():
+    opportunities = opportunity_engine.discover(Mission(objective="control center opportunity scan"))
+    return {"status": "ok", "count": len(opportunities), "opportunities": [item.model_dump() for item in opportunities]}
+
+
+@app.get("/revenue")
+def revenue_overview():
+    return {"status": "ok", "revenue": revenue_engine.summary()}
+
+
+@app.get("/crm")
+def crm_overview():
+    return {"status": "ok", "crm": crm.summary()}
+
+
+@app.get("/youtube")
+def youtube_overview():
+    return {"status": "ok", "channels": youtube_studio.channels(), **youtube_studio.status()}
 
 @app.get("/api/v1/agents")
 def agents_list():

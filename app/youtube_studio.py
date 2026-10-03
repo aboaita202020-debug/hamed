@@ -62,6 +62,14 @@ CHANNELS = {
     ),
 }
 
+# Public channel locations are optional configuration, not credentials.  Keeping
+# this mapping separate lets the studio report channel metadata before a channel
+# is connected for publishing or analytics.
+CHANNEL_URLS = {
+    "kids": "https://www.youtube.com/@LumiKidsTV-b3e",
+    "islamic_english": None,
+}
+
 
 class YouTubeStudio:
     def __init__(self) -> None:
@@ -137,4 +145,3 @@ class YouTubeStudio:
 
 
 youtube_studio = YouTubeStudio()
-

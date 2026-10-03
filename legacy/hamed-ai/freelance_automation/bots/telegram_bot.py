@@ -123,7 +123,7 @@ def get_ai_response(message, intent):
     """Get AI response using Anthropic, OpenAI, Kimi, or Gemini"""
     
     # Try Anthropic first
-    if ANTHROPIC_KEY and ANTHROPIC_KEY != 'sk-ant-api03--1Y...mAAA':
+    if ANTHROPIC_KEY and ANTHROPIC_KEY != 'redacted-api03--1Y...mAAA':
         try:
             import anthropic
             client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
@@ -460,7 +460,7 @@ def main():
     print("🤖 Hamed AI Telegram Bot")
     print("="*60)
     print(f"✅ Bot Token: {TELEGRAM_TOKEN[:20]}...")
-    print(f"✅ Anthropic API: {'✅ Configured' if ANTHROPIC_KEY and ANTHROPIC_KEY != 'sk-ant-api03--1Y...mAAA' else '❌ Not configured'}")
+    print(f"✅ Anthropic API: {'✅ Configured' if ANTHROPIC_KEY and ANTHROPIC_KEY != 'redacted-api03--1Y...mAAA' else '❌ Not configured'}")
     print(f"✅ OpenAI API: {'✅ Configured' if OPENAI_KEY and OPENAI_KEY != 'key_C8KiWEvc7gnmHzxF' else '❌ Not configured'}")
     print(f"✅ WhatsApp: {WHATSAPP}")
     print(f"✅ Vodafone Cash: {VODAFONE_CASH}")

@@ -27,7 +27,7 @@ print()
 
 # Test Anthropic Claude
 print("1️⃣  اختبار Anthropic Claude...")
-if ANTHROPIC_KEY and ANTHROPIC_KEY != 'sk-ant-api03--1Y...mAAA':
+if ANTHROPIC_KEY and ANTHROPIC_KEY != 'redacted-api03--1Y...mAAA':
     try:
         import anthropic
         client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
