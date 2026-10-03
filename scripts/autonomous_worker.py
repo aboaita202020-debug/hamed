@@ -18,9 +18,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.agents.learning import LearningCouncil
-from app.agents.provider import MultiBrainProvider
-from app.agents.orchestrator import HamedOrchestrator
+from app.learning import LearningMemory
+from app.providers import openai_provider
+from app.orchestrator import Orchestrator
 
 ROOT = Path(__file__).resolve().parent.parent
 STATE_PATH = ROOT / "data" / "autonomous_state.json"
@@ -126,7 +126,7 @@ def run_learning_cycle(learner: LearningCouncil, index: int) -> bool:
     return True
 
 
-def run_opportunity_cycle(provider: MultiBrainProvider, learner: LearningCouncil, orchestrator: HamedOrchestrator, index: int) -> None:
+def run_opportunity_cycle(provider, learner: LearningCouncil, orchestrator: Orchestrator, index: int) -> None:
     topic = LEARNING_TOPICS[index % len(LEARNING_TOPICS)]
     with _lock:
         _state["status"] = "learning_and_working"
@@ -144,7 +144,7 @@ def run_opportunity_cycle(provider: MultiBrainProvider, learner: LearningCouncil
         "or facts. Separate evidence from assumptions. Never recommend purchases or irreversible actions without authorization.\n\n"
         "LEARNING REPORT:\n" + item.evidence
     )
-    report = orchestrator.consult_brains(task, context=f"Current learning topic: {topic}")
+    report = orchestrator.collaborate(task, agent_names=["research", "marketing", "sales", "negotiation", "customer_psychology", "affiliate", "crm", "website_factory", "analytics", "b2b", "reporting", "decision", "learning", "revenue", "sentinel"])
     record = {"timestamp": datetime.now(timezone.utc).isoformat(), "topic": topic, "learning": item.evidence[:12000], "opportunities": report}
     log_path = ROOT / "data" / "autonomous_activity.jsonl"
     log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -160,32 +160,18 @@ def run_opportunity_cycle(provider: MultiBrainProvider, learner: LearningCouncil
 
 def loop() -> None:
     ensure_local_brain()
-    provider = MultiBrainProvider()
+    provider = openai_provider
     learner = LearningCouncil(provider)
-    orchestrator = HamedOrchestrator(brain_provider=provider)
+    orchestrator = Orchestrator()
     index = 0
-
-    # Do not generate opportunities until the initial learning curriculum is complete.
-    while index < len(LEARNING_TOPICS):
-        try:
-            run_learning_cycle(learner, index)
-            index += 1
-        except Exception as exc:
-            with _lock:
-                _state["status"] = "learning_retry"
-                _state["last_error"] = f"{type(exc).__name__}: {exc}"
-                save_state()
-            time.sleep(min(max(60, INTERVAL), 300))
-
-    with _lock:
-        _state["phase"] = "continuous_learning_and_work"
-        _state["status"] = "learning_complete_starting_work"
-        save_state()
-
     work_index = 0
+
+    # Learning and business work run together from the first cycle; learning never blocks revenue discovery.
     while True:
         try:
+            run_learning_cycle(learner, index % len(LEARNING_TOPICS))
             run_opportunity_cycle(provider, learner, orchestrator, work_index)
+            index += 1
             work_index += 1
         except Exception as exc:
             with _lock:
