@@ -48,6 +48,7 @@ from .islamic_english_team import islamic_english_studio
 from .control_api import require_control_secret, tail_log
 from .programming_autopilot import run_once as run_programming_autopilot
 from .free_ai_scout import discover as discover_free_llm
+from .programming_workforce import status as programming_workforce_status, activate_and_audit
 
 AGENT_ACTIVITY_PATH = Path(__file__).resolve().parent.parent / "data" / "agent_activity.jsonl"
 
@@ -127,6 +128,15 @@ def agent_activity(limit:int=100):
         latest_by_agent.setdefault(item.get("agent"),item)
     active=[x for x in latest_by_agent.values() if x.get("event")=="started"]
     return {"status":"ok","active_count":len(active),"active_agents":active[:200],"activity":items}
+
+@app.get("/api/v1/programming/workforce")
+def programming_workforce():
+    return programming_workforce_status()
+
+@app.post("/api/v1/programming/workforce/activate")
+def programming_workforce_activate(request: dict[str, Any] | None = None):
+    request = request or {}
+    return activate_and_audit(str(request.get("objective") or "").strip() or None, request.get("limit"))
 
 @app.get("/api/v1/programming/status")
 def programming_status():
