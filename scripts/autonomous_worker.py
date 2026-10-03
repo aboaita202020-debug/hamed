@@ -19,7 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.learning import LearningMemory
-from app.providers import openai_provider
+from app.provider_router import provider_router
 from app.orchestrator import Orchestrator
 
 
@@ -172,7 +172,7 @@ def run_opportunity_cycle(provider, learner: LearningCouncil, orchestrator: Orch
 
 def loop() -> None:
     ensure_local_brain()
-    provider = openai_provider
+    provider = provider_router
     learner = LearningCouncil(provider)
     orchestrator = Orchestrator()
     index = 0
