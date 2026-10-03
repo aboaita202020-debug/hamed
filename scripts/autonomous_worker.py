@@ -249,7 +249,7 @@ def loop() -> None:
             # They sync only clean trees, verify compilation/tests, and request Claude review.
             if os.getenv("ORVIA_PROGRAMMING_AUTOPILOT", "1").lower() not in {"0", "false", "no"}:
                 run_programming_autopilot()
-        cognitive_core.run_cycle(topic or "ORVIA continuous improvement")
+            cognitive_core.run_cycle(LEARNING_TOPICS[index % len(LEARNING_TOPICS)])
             index += 1
             work_index += 1
         except Exception as exc:
