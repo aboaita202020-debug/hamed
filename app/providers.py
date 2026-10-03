@@ -35,7 +35,7 @@ class OpenAIProvider:
             return None
         if self._client is None:
             from openai import OpenAI
-            self._client = OpenAI(api_key=settings.openai_api_key)
+            self._client = OpenAI(api_key=settings.openai_api_key, timeout=20.0, max_retries=0)
         return self._client
 
     def check_connection(self, force: bool = False) -> dict:
