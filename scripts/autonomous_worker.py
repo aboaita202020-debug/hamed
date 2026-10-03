@@ -26,6 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.learning import LearningMemory
 from app.provider_router import provider_router
 from app.orchestrator import Orchestrator
+from app.programming_autopilot import run_once as run_programming_autopilot
 
 
 class LearningCouncil:
@@ -243,6 +244,10 @@ def loop() -> None:
         try:
             run_learning_cycle(learner, index % len(LEARNING_TOPICS))
             run_opportunity_cycle(provider, learner, orchestrator, work_index)
+            # Programming agents own the GitHub -> PythonAnywhere maintenance loop.
+            # They sync only clean trees, verify compilation/tests, and request Claude review.
+            if os.getenv("ORVIA_PROGRAMMING_AUTOPILOT", "1").lower() not in {"0", "false", "no"}:
+                run_programming_autopilot()
             index += 1
             work_index += 1
         except Exception as exc:
