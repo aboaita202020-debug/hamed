@@ -82,7 +82,7 @@ _ROLE_BANK = {
 "Marketing & Growth":["content strategist","SEO analyst","growth analyst","campaign analyst","creative strategist","UGC researcher","UGC scriptwriter","UGC creative strategist","UGC performance analyst"],
 "Sales & Revenue":["lead researcher","sales analyst","offer strategist","revenue analyst","pipeline analyst"],
 "Negotiation & Customer Psychology":["negotiation analyst","customer psychology analyst","objection analyst","messaging analyst","buyer journey analyst"],
-"Websites & Software":["web architect","software analyst","automation analyst","QA analyst","integration analyst"],
+"Websites & Software":["web architect","software analyst","automation analyst","QA analyst","integration analyst","Python engineer","backend engineer","frontend engineer","DevOps engineer","GitHub update engineer","test engineer","debugging engineer","code review engineer","deployment engineer","LLM integration engineer","free LLM researcher","provider integration engineer","self-healing engineer","performance engineer","security code auditor","repository maintenance engineer"],
 "Analytics & Decision":["data analyst","experiment analyst","risk analyst","decision analyst","KPI analyst"],
 "B2B & Business Opportunities":["B2B researcher","partnership analyst","market matcher","opportunity researcher","business model analyst"],
 "Learning & Knowledge":["knowledge researcher","learning analyst","feedback analyst","knowledge curator","self-improvement analyst"],
