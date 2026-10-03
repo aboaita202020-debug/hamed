@@ -30,6 +30,7 @@
     <button class="active" onclick="showHome()">🏠 الرئيسية</button>
     <button onclick="showAgents()">🤖 الوكلاء</button>
     <button onclick="showReports()">📊 التقارير</button>
+    <button onclick="showLiveActivity()">⚡ العمل المباشر</button>
     <button onclick="showSection('🧩 الفرص')">🎯 الفرص</button>
     <button onclick="showSection('👥 العملاء')">👥 العملاء</button>
     <button onclick="showSection('⚙️ الإعدادات')">⚙️ الإعدادات</button>
@@ -138,6 +139,29 @@ async function showReports(){
 async function saveAll(){
   try{await api('/api/v1/reports/save-all?period=daily',{method:'POST'});alert('تم إرسال تقارير المجموعات للحفظ.');}catch(e){alert('تعذر الحفظ: '+e.message);}
 }
+async function showLiveActivity(){
+  $('pageTitle').textContent='⚡ العمل المباشر';
+  $('content').innerHTML='<section class="section"><div class="grid">'+
+    metric('🤖','المساعدون','2020','كل المساعدين المنطقيين في الشبكة')+
+    metric('🟢','الحالة','مباشر','يتم التحديث كل 3 ثوانٍ')+
+    metric('⚙️','آخر نشاط','—','آخر عملية مسجلة فعليًا')+
+    metric('❤️','Heartbeat','—','من Worker autonomous')+
+    '</div></section>'+
+    '<section class="section"><div class="card"><div class="section-head"><h2>📡 ماذا يفعلون الآن؟</h2><button class="btn" onclick="refreshLiveActivity()">تحديث</button></div><div id="liveActivity" class="agent-list"><div class="empty">جارٍ التحميل...</div></div></div></section>';
+  await refreshLiveActivity();
+  if(window.liveTimer) clearInterval(window.liveTimer);
+  window.liveTimer=setInterval(refreshLiveActivity,3000);
+}
+async function refreshLiveActivity(){
+  try{
+    const [a,h]=await Promise.all([api('/api/v1/agents/activity?limit=80'),api('/health')]);
+    const items=a.activity||[];
+    const latest=items[0];
+    const cards=items.map(x=>'<div class="agent"><b>'+(x.event==='started'?'🟢':'📌')+' '+esc(x.agent)+'</b><small>'+esc(x.event)+' · '+esc(x.status)+' · '+esc(x.timestamp)+'</small><div style="margin-top:5px">'+esc(x.objective)+'</div>'+(x.output?'<small style="margin-top:6px;white-space:normal">'+esc(x.output)+'</small>':'')+'</div>').join('');
+    $('liveActivity').innerHTML=cards||'<div class="empty">لا يوجد نشاط مسجل بعد. سيظهر هنا عند بدء دورة المساعدين.</div>';
+  }catch(e){$('liveActivity').innerHTML='<div class="empty">تعذر تحميل النشاط: '+esc(e.message)+'</div>';}
+}
+
 function showSection(title){$('pageTitle').textContent=title;$('content').innerHTML='<div class="card empty">هذا القسم محفوظ في المعمارية الحالية، ويمكن ربط واجهته بنفس نظام المجموعات والتقارير.</div>';}
 loadData().then(showHome).catch(e=>{ $('systemStatus').textContent='تعذر الاتصال'; $('content').innerHTML='<div class="card empty">تعذر تحميل مركز التحكم.</div>';});
 setInterval(loadData,30000);
