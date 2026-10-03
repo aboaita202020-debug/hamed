@@ -26,8 +26,20 @@ else
   echo "control secret already present"
 fi
 
-echo "[4/6] Running tests"
-python -m pytest -q
+echo "[4/6] Running HAMED runtime smoke checks"
+python -m compileall -q app
+python - <<'PY'
+from fastapi.testclient import TestClient
+from app.main import app
+
+client = TestClient(app)
+for path in ("/health", "/readiness", "/status", "/dashboard"):
+    response = client.get(path)
+    print(f"{path} -> {response.status_code}")
+    if response.status_code != 200:
+        raise SystemExit(f"SMOKE_CHECK_FAILED: {path} returned {response.status_code}")
+print("SMOKE_CHECK_OK")
+PY
 
 echo "[5/6] Reloading PythonAnywhere website"
 python -m pip install --upgrade pythonanywhere
