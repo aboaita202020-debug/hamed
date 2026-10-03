@@ -156,8 +156,7 @@ def run_opportunity_cycle(provider, learner: LearningCouncil, orchestrator: Orch
         "or facts. Separate evidence from assumptions. Never recommend purchases or irreversible actions without authorization.\n\n"
         "LEARNING REPORT:\n" + item.evidence
     )
-    report = orchestrator.collaborate(task, agent_names=["research", "marketing", "sales", "negotiation", "customer_psychology", "affiliate", "crm", "website_factory", "analytics", "b2b", "reporting", "decision", "learning", "revenue", "sentinel"])
-    record = {"timestamp": datetime.now(timezone.utc).isoformat(), "topic": topic, "learning": item.evidence[:12000], "opportunities": report}
+    growth_task = (\n        "Run HAMED Growth Engine on this evidence. Identify measurable growth experiments, target customer, problem, offer, acquisition channel, KPI, test, expected signal, and next iteration. Separate evidence from assumptions.\\n\\nLEARNING REPORT:\\n" + item.evidence\n    )\n    growth_report = orchestrator.collaborate(growth_task, agent_names=["marketing", "analytics", "sales", "customer_psychology"])\n    report = orchestrator.collaborate(task, agent_names=["research", "marketing", "sales", "negotiation", "customer_psychology", "affiliate", "crm", "website_factory", "analytics", "b2b", "reporting", "decision", "learning", "revenue", "sentinel"])\n    record = {"timestamp": datetime.now(timezone.utc).isoformat(), "topic": topic, "learning": item.evidence[:12000], "growth": growth_report, "opportunities": report}
     log_path = ROOT / "data" / "autonomous_activity.jsonl"
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("a", encoding="utf-8") as fh:
