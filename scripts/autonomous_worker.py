@@ -22,6 +22,18 @@ from app.learning import LearningMemory
 from app.providers import openai_provider
 from app.orchestrator import Orchestrator
 
+
+class LearningCouncil:
+    def __init__(self, provider):
+        self.provider = provider
+        self.memory = LearningMemory()
+
+    def study(self, topic):
+        prompt = f"Study this business topic and return evidence-backed practical lessons: {topic}"
+        result = self.provider.generate(prompt)
+        text = getattr(result, "text", str(result))
+        return type("StudyResult", (), {"evidence": text})()
+
 ROOT = Path(__file__).resolve().parent.parent
 STATE_PATH = ROOT / "data" / "autonomous_state.json"
 PORT = int(os.getenv("HAMED_AUTONOMOUS_PORT", "8010"))
