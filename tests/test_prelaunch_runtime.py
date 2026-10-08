@@ -52,7 +52,7 @@ def test_startup_fails_cleanly_when_openai_key_is_missing():
 def _clear_brain_env(monkeypatch: pytest.MonkeyPatch):
     for key in (
         "OPENAI_API_KEY", "DEEPSEEK_API_KEY", "KIMI_API_KEY", "GEMINI_API_KEY",
-        "MISTRAL_API_KEY", "QWEN_API_KEY", "XAI_API_KEY", "GROK_API_KEY",
+        "MISTRAL_API_KEY", "QWEN_API_KEY", "XAI_API_KEY", "GROQ_API_KEY", "GROK_API_KEY",
         "LLAMA_API_KEY", "OPENROUTER_API_KEY", "ANTHROPIC_API_KEY",
     ):
         monkeypatch.delenv(key, raising=False)
