@@ -65,7 +65,7 @@ def fetch_page(url: str, timeout: int = 12) -> tuple[str, str, int]:
         raise ValueError("URL must be an absolute http(s) URL")
     request = Request(url, headers={"User-Agent": "Hamed-FreeAudit/1.0"})
     with urlopen(request, timeout=timeout) as response:
-        body = response.read(2_000_000).decode("utf-8", errors="replace")
+        response.read(2_000_000)  # Consume body
         return response.geturl(), response.headers.get_content_type(), response.status
 
 

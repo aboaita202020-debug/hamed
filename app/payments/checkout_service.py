@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from typing import Any
 
 from .order_payment_flow import PaymentOrderFlow
-from .payment_options import PaymentOption
 from .vodafone_cash_config import get_vodafone_cash_receiving_number
 
 
@@ -25,7 +24,7 @@ class CheckoutService:
 
     def create_checkout(self, order_id: str, method: str) -> Checkout:
         order = self.flow.select_method(order_id, method)
-        option: PaymentOption = next(
+        _ = next(
             item for item in self.flow.available_methods("EG") if item.method == method
         )
         instructions: dict[str, Any] = {"provider": method}

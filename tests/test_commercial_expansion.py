@@ -1,5 +1,5 @@
 from app.agents.opportunity_hunter import OpportunityHunter
-from app.services import SupplierDatabase, SupplierRecord, DigitalDeliveryEngine
+from app.services import SupplierDatabase, DigitalDeliveryEngine
 
 
 def test_supplier_database_requires_evidence_and_deduplicates():
