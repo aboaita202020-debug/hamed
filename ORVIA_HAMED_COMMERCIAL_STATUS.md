@@ -38,6 +38,7 @@ Project is **operational** with real LLM connectivity and a working commercial d
 
 1. **Real LLM chat & research**
    - `MultiBrainProvider` routes to Gemini/Groq with free-first ranking.
+   - `CentralBrainProvider` used in FastAPI with council fallback.
    - `ResearchAgent` uses provider.web_research for market queries.
 
 2. **Web search**
@@ -54,8 +55,9 @@ Project is **operational** with real LLM connectivity and a working commercial d
      - Synthesis of market report from web evidence + LLM summary
 
 4. **B2B offer generation**
-   - `commercial_offer_demo.py` generates bilingual B2B proposals using LLM + optional web evidence.
-   - Supports Egypt/Gulf market with Arabic/English output.
+   - `/offer` endpoint in `app/main.py` for programmatic B2B offer generation
+   - `commercial_offer_demo.py` generates bilingual B2B proposals using LLM + optional web evidence
+   - Supports Egypt/Gulf market with Arabic/English output
 
 ## Files Modified
 
@@ -65,6 +67,8 @@ Project is **operational** with real LLM connectivity and a working commercial d
 - `bot.py` — moved `validate_required_secrets()` to runtime init, added dummy bot for import safety
 - `BOT_4AI_README.md`, `CONNECT_AI_GUIDE.md`, `FIX_BOT_GUIDE.md` — replaced leaked Kimi key with placeholder
 - `app/agents/provider.py` — Gemini model fallback to `gemini-3.5-flash-lite`; Groq model fallback to `openai/gpt-oss-20b`
+- `app/agents/central_brain.py` — exists, used by FastAPI
+- `app/main.py` — added `/offer` endpoint for B2B offers
 - `app/tools/web_search_duckduckgo.py` — new free search provider
 - `app/tools/web_search_brave.py` — Brave Search API provider
 - `app/tools/__init__.py` — export new providers

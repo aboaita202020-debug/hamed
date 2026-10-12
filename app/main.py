@@ -59,6 +59,11 @@ class DecisionRequest(BaseModel):
     approved: bool
 
 
+class OfferRequest(BaseModel):
+    company: str = Field(min_length=1, max_length=200)
+    product: str = Field(min_length=1, max_length=200)
+
+
 app = FastAPI(title="Hamed AI", version="0.6.0", docs_url="/docs")
 
 if settings.openai_api_key:
@@ -208,6 +213,53 @@ def dashboard_data() -> dict[str, Any]:
                 "value": getattr(item, "value", None),
             })
     return {"pending_approvals": pending, "count": len(pending)}
+
+
+@app.post("/offer")
+def generate_offer(request: OfferRequest) -> dict[str, str]:
+    """Generate a B2B commercial offer using LLM + optional web evidence."""
+    from app.tools.web_search_brave import WebSearchToolWithBrave
+    from app.tools.web_search_duckduckgo import WebSearchToolWithDuckDuckGo
+    provider = CentralBrainProvider(settings.openai_api_key if settings.openai_api_key else None, settings.openai_model)
+    brave_tool = WebSearchToolWithBrave()
+    duck_tool = WebSearchToolWithDuckDuckGo()
+    search_tool = brave_tool if brave_tool.provider.api_key else duck_tool
+    
+    # Gather evidence
+    evidence = ""
+    try:
+        res = search_tool.run(f"{request.company} {request.product} price Egypt", max_results=5)
+        if res.success:
+            evidence = "\n".join([f"- {i['title']}: {i['snippet']}" for i in res.data])
+        else:
+            evidence = "No web evidence available."
+    except Exception:
+        evidence = "No web evidence available."
+    
+    # Generate offer
+    prompt = f"""You are a commercial offer compiler for Egypt/Gulf market.
+Company: {request.company}
+Product/Service: {request.product}
+
+Web evidence:
+{evidence}
+
+Create a concise B2B commercial proposal in Arabic and English:
+- Executive summary
+- Value proposition
+- Pricing estimate range
+- Next steps
+
+Be factual, do not invent prices if unknown."""
+    
+    try:
+        reply = provider.generate_response(
+            [{"role": "user", "content": prompt}],
+            system="You are a commercial analyst. Be concise and factual.",
+        )
+        return {"offer": reply}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
