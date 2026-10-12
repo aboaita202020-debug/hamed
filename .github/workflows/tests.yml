@@ -36,7 +36,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: 12345:TEST_TOKEN_PLACEHOLDER
           OPENAI_API_KEY: sk-test-placeholder
-        run: PYTHONPATH=legacy/hamed-ai-root:. pytest -q tests/
+        run: cd legacy/hamed-ai-root && PYTHONPATH=. python -m pytest --import-mode=importlib -q ../../tests/
 
       - name: Docker build
         run: docker build -t hamed-ai:ci .
