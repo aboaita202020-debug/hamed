@@ -42,6 +42,7 @@ Project is **operational** with real LLM connectivity and a working commercial d
 
 2. **Web search**
    - `DuckDuckGoSearchProvider` added in `app/tools/web_search_duckduckgo.py`.
+   - `BraveSearchProvider` added in `app/tools/web_search_brave.py` (requires BRAVE_API_KEY).
    - Spec-compliant: returns empty on bot challenge, never fabricates.
    - Current environment blocks DuckDuckGo HTML with anomaly challenge → returns `no_results_found` safely.
 
@@ -52,6 +53,10 @@ Project is **operational** with real LLM connectivity and a working commercial d
      - Research agent
      - Synthesis of market report from web evidence + LLM summary
 
+4. **B2B offer generation**
+   - `commercial_offer_demo.py` generates bilingual B2B proposals using LLM + optional web evidence.
+   - Supports Egypt/Gulf market with Arabic/English output.
+
 ## Files Modified
 
 - `agent.py` — removed unused `import os`
@@ -61,8 +66,10 @@ Project is **operational** with real LLM connectivity and a working commercial d
 - `BOT_4AI_README.md`, `CONNECT_AI_GUIDE.md`, `FIX_BOT_GUIDE.md` — replaced leaked Kimi key with placeholder
 - `app/agents/provider.py` — Gemini model fallback to `gemini-3.5-flash-lite`; Groq model fallback to `openai/gpt-oss-20b`
 - `app/tools/web_search_duckduckgo.py` — new free search provider
-- `app/tools/__init__.py` — export new provider
+- `app/tools/web_search_brave.py` — Brave Search API provider
+- `app/tools/__init__.py` — export new providers
 - `commercial_report_demo.py` — demo script
+- `commercial_offer_demo.py` — B2B offer generation demo
 - `_probe_providers.py` — provider probe
 
 ## Tests
