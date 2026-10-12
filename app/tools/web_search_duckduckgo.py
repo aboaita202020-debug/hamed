@@ -5,9 +5,8 @@ Spec-compliant: never fabricates results; returns empty list on failure.
 """
 from __future__ import annotations
 
-import re
 import time
-from typing import List, Dict
+from typing import List
 
 import requests
 from bs4 import BeautifulSoup

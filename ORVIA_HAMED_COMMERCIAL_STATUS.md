@@ -11,11 +11,12 @@ Project is **operational** with real LLM connectivity and a working commercial d
 ## Quality Gate
 
 - ✅ Structure
-- ✅ Syntax
-- ✅ Static analysis (pyflakes)
-- ✅ No secrets in code (Kimi key removed from docs)
+- ✅ Syntax (compileall)
+- ✅ Static analysis (pyflakes) — clean
+- ✅ No secrets in code (Kimi key replaced with placeholder)
 - ✅ Tests: **96 passed**
 - ✅ Import smoke test: `bot.py` importable
+- ✅ `/offer` endpoint live in FastAPI
 
 ## Providers Connected
 
@@ -86,7 +87,7 @@ python -m pytest -q
 ## Known Limitations
 
 - DuckDuckGo HTML search triggers bot challenge in this environment → returns empty safely. Alternative: wire SerpAPI/Brave/Tavily with API key when available.
-- Telegram bot requires `TELEGRAM_BOT_TOKEN` and `OPENAI_API_KEY` at runtime; import is safe now.
+- Telegram bot requires `TELEGRAM_BOT_TOKEN` and `OPENAI_API_KEY` at runtime; import is safe now (dummy bot used until real init).
 - No payments or external publishing performed.
 
 ## Next Steps
