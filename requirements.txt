@@ -19,6 +19,9 @@ python-dotenv==1.0.0
 # Date/Time Utilities
 python-dateutil==2.8.2
 
+# Configuration settings (app/config.py)
+pydantic-settings>=2.0,<3
+
 # JSON Processing
 # json is built-in, no additional packages needed
 
