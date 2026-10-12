@@ -3,10 +3,8 @@
 ✅ فحص شامل للمشروع - يتأكد إن كل حاجة شغالة
 """
 import os
-import sys
 import sqlite3
 from pathlib import Path
-from datetime import datetime
 
 print()
 print("=" * 70)

@@ -36,10 +36,30 @@ def validate_required_secrets() -> None:
         raise RuntimeError("Missing required environment variable(s): OPENAI_API_KEY")
 
 
-validate_required_secrets()
-bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN, parse_mode=None)
-hamed = HamedOrchestrator(MultiBrainProvider())
-voice_tts = TelegramTTS()
+def _init_runtime():
+    validate_required_secrets()
+    return (
+        telebot.TeleBot(TELEGRAM_BOT_TOKEN, parse_mode=None),
+        HamedOrchestrator(MultiBrainProvider()),
+        TelegramTTS(),
+    )
+
+
+def _dummy_bot():
+    class _Dummy:
+        def message_handler(self, *a, **k):
+            def deco(f):
+                return f
+            return deco
+        def send_message(self, *a, **k): pass
+        def send_audio(self, *a, **k): pass
+        def send_chat_action(self, *a, **k): pass
+    return _Dummy()
+
+
+bot = _dummy_bot()
+hamed = None
+voice_tts = None
 
 
 def autonomous_notify(text: str) -> None:
@@ -53,7 +73,7 @@ def autonomous_notify(text: str) -> None:
 
 
 # This core runs independently of Telegram polling. Telegram is only an interface/notification channel.
-autonomous_core = AutonomousCore(hamed, notify=autonomous_notify)
+autonomous_core = None
 
 
 def send_hamed_reply(chat_id: int, reply: str) -> None:
@@ -149,6 +169,9 @@ def start_health_server() -> threading.Thread:
 
 
 def run() -> None:
+    global bot, hamed, voice_tts, autonomous_core
+    bot, hamed, voice_tts = _init_runtime()
+    autonomous_core = AutonomousCore(hamed, notify=autonomous_notify)
     print(f"{HAMED_NAME} runtime STARTING...", flush=True)
     print("Autonomous Core / Multi-Brain / agents / learning / approvals: READY", flush=True)
     print("Telegram is an interface; autonomous core is independent of Telegram polling.", flush=True)

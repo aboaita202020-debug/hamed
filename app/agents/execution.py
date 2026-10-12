@@ -1,6 +1,6 @@
 """Generic specialist execution contract for every registered Hamed agent."""
 from __future__ import annotations
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import Any, Callable
 from .registry import AGENT_REGISTRY, AgentProfile
 

@@ -14,7 +14,7 @@ python --version
 # افتح ملف .env وتأكد إن فيه المفاتيح دي:
 ANTHROPIC_API_KEY=sk-ant-api03--1Y...mAAA
 OPENAI_API_KEY=key_C8KiWEvc7gnmHzxF
-KIMI_API_KEY=sk-ED3y5vB94bDj4bbKOEAlmUEhxRbHgu2btFr9pi2L3g4mU1Cc
+KIMI_API_KEY=sk-YOUR_KIMI_KEY_HERE
 GEMINI_API_KEY=AQ.Ab8RN6JVT1IzAnxTiHS4xZ4vWo8Bgsb2m-8k_aBhpIRW-cbU6w
 TELEGRAM_BOT_TOKEN=8843221025:AAGtegewAMOalwv1ZAlBlCKwjPI953vfJuU
 ```

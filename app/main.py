@@ -1,13 +1,11 @@
 """Unified Hamed AI application entrypoint."""
 from __future__ import annotations
 
-import html
 import os
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from .agent_worker import HamedWorker

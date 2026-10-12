@@ -23,7 +23,7 @@ OPENAI_API_KEY=key_C8KiWEvc7gnmHzxF
 
 ### ✅ Kimi Moonshot
 ```
-KIMI_API_KEY=sk-ED3y5vB94bDj4bbKOEAlmUEhxRbHgu2btFr9pi2L3g4mU1Cc
+KIMI_API_KEY=sk-YOUR_KIMI_KEY_HERE
 ```
 
 ### ✅ Google Gemini

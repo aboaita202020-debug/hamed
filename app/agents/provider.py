@@ -166,9 +166,11 @@ class MultiBrainProvider:
         # free-first, so free brains are preferred without silently hiding configured brains.
         key = os.getenv("GEMINI_API_KEY", "").strip()
         if key:
-            self.providers["gemini"] = GeminiProvider(
-                key, os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
-            )
+            model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+            # Fallback for deprecated models
+            if model == "gemini-2.5-flash-lite":
+                model = "gemini-3.5-flash-lite"
+            self.providers["gemini"] = GeminiProvider(key, model)
 
         key = os.getenv("KIMI_API_KEY", "").strip()
         if key:
@@ -195,8 +197,12 @@ class MultiBrainProvider:
             if name == "llama" and not value:
                 value = os.getenv("GROQ_API_KEY", "").strip()
             if value:
+                model = os.getenv(model_env, default)
+                # Fallback for Groq llama model not available
+                if name == "llama" and model == "llama-4-scout-17b-16e-instruct":
+                    model = "openai/gpt-oss-20b"
                 self.providers[name] = OpenAICompatibleProvider(
-                    name, value, os.getenv(env + "_BASE_URL", url), os.getenv(model_env, default)
+                    name, value, os.getenv(env + "_BASE_URL", url), model
                 )
 
         key = os.getenv("OPENAI_API_KEY", "").strip()

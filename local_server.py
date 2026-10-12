@@ -2,7 +2,8 @@
 
 Runs the full Hamed FastAPI application instead of a health-only stub.
 """
-from app.main import app
+# app is imported lazily by uvicorn via string reference "local_server:app"
+# from app.main import app  # noqa: F401
 
 if __name__ == "__main__":
     import os

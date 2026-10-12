@@ -19,17 +19,21 @@ class TestImports(unittest.TestCase):
         self.assertIsNotNone(settings)
 
     def test_import_all_agent_modules(self):
-        import app.agents.opportunity_hunter_agent  # noqa: F401
-        import app.agents.sales_agent  # noqa: F401
-        import app.agents.negotiation_agent  # noqa: F401
-        import app.agents.revenue_agent  # noqa: F401
-        import app.agents.reporting_agent  # noqa: F401
-        import app.agents.fact_check_agent  # noqa: F401
+        import app.agents.opportunity_hunter_agent as opp_agent
+        import app.agents.sales_agent as sales_agent
+        import app.agents.negotiation_agent as neg_agent
+        import app.agents.revenue_agent as rev_agent
+        import app.agents.reporting_agent as report_agent
+        import app.agents.fact_check_agent as fact_agent
+        for module in (opp_agent, sales_agent, neg_agent, rev_agent, report_agent, fact_agent):
+            self.assertIsNotNone(module)
 
     def test_import_tools_and_db(self):
-        from app.tools import ToolRegistry, WebSearchTool, CRMTool  # noqa: F401
-        from app.db import Database, Repository  # noqa: F401
-        from app.permissions import PermissionLayer  # noqa: F401
+        from app.tools import ToolRegistry, WebSearchTool, CRMTool
+        from app.db import Database, Repository
+        from app.permissions import PermissionLayer
+        for obj in (ToolRegistry, WebSearchTool, CRMTool, Database, Repository, PermissionLayer):
+            self.assertIsNotNone(obj)
 
 
 if __name__ == "__main__":
