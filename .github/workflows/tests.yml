@@ -36,7 +36,15 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: 12345:TEST_TOKEN_PLACEHOLDER
           OPENAI_API_KEY: sk-test-placeholder
-        run: cd legacy/hamed-ai-root && PYTHONPATH=. python -m pytest --import-mode=importlib -q ../../tests/
+        run: |
+          set -euo pipefail
+          # The repository contains a legacy app package and a current root app package.
+          # Run legacy-compatible tests from their package root, then root-app-specific tests
+          # from the repository root so Python resolves the intended package for each suite.
+          cd legacy/hamed-ai-root
+          PYTHONPATH=. python -m pytest --import-mode=importlib -q ../../tests/ --ignore=../../tests/test_free_ai_scout.py
+          cd ../..
+          PYTHONPATH=. python -m pytest --import-mode=importlib -q tests/test_free_ai_scout.py
 
       - name: Docker build
         run: docker build -t hamed-ai:ci .
