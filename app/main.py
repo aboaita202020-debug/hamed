@@ -115,7 +115,7 @@ async def stop_worker() -> None:
 
 @app.get("/")
 def root() -> dict[str, str]:
-    return {"name": "Hamed AI", "status": "running", "mode": settings.app_env}
+    return {"name": "Hamed AI", "status": "running", "environment": settings.environment}
 
 
 @app.get("/health")
@@ -132,7 +132,6 @@ def health() -> dict[str, Any]:
         "brains": brains,
         "telegram": bool(settings.telegram_bot_token),
         "voice": bool(os.getenv("TWILIO_ACCOUNT_SID") and os.getenv("TWILIO_AUTH_TOKEN")),
-        "autonomous_mode": settings.autonomous_mode,
         "worker": _worker.status(),
     }
 
