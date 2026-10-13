@@ -69,13 +69,14 @@ Project is **operational** with real LLM connectivity and a working commercial d
 - `BOT_4AI_README.md`, `CONNECT_AI_GUIDE.md`, `FIX_BOT_GUIDE.md` — replaced leaked Kimi key with placeholder
 - `app/agents/provider.py` — Gemini model fallback to `gemini-3.5-flash-lite`; Groq model fallback to `openai/gpt-oss-20b`
 - `app/agents/central_brain.py` — exists, used by FastAPI
-- `app/main.py` — added `/offer` endpoint for B2B offers
+- `app/main.py` — fixed `app_env` → `environment`, removed `autonomous_mode`, added `/offer` endpoint
 - `app/tools/web_search_duckduckgo.py` — new free search provider
 - `app/tools/web_search_brave.py` — Brave Search API provider
-- `app/tools/__init__.py` — export new providers
+- `app/tools/__init__.py` — export new providers with `__all__`
 - `commercial_report_demo.py` — demo script
 - `commercial_offer_demo.py` — B2B offer generation demo
 - `_probe_providers.py` — provider probe
+- `_test_api.py` — API smoke tests
 
 ## Tests
 
